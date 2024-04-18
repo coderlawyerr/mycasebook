@@ -6,6 +6,7 @@ Sayfanın amacı: Kullanıcı girişi yapmak veya kayıt olmak için kullanılan
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/textfield.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_application_1/wiew/overview.dart';
 import 'package:flutter_application_1/wiew/register.dart';
 
 class LoginPage extends StatelessWidget {
+  AuthService authService = AuthService();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   LoginPage({super.key});
@@ -76,12 +78,22 @@ class LoginPage extends StatelessWidget {
               Center(
                   child: CustomButton(
                 text: "GİRİŞ YAP", // Giriş yap buton metni
-                toDo: () {
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => Overview(),
-                      ));
+                toDo: () async {
+                  if (emailController.text.isNotEmpty &&
+                      passwordController.text.isNotEmpty) {
+                    await authService
+                        .signIn(emailController.text, passwordController.text)
+                        .then((userid) {
+                      if (userid != null) {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) => Overview(),
+                            ));
+                      }
+                    });
+                  } else
+                    print("Boş");
                 }, // Genel bakış sayfasına yönlendirme
               )),
               const SizedBox(

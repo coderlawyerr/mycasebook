@@ -85,10 +85,10 @@ packages:
     dependency: "direct main"
     description:
       name: cupertino_icons
-      sha256: d57953e10f9f8327ce64a508a355f0b1ec902193f66288e8cb5070e7c47eeb2d
+      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.6"
+    version: "1.0.8"
   fake_async:
     dependency: transitive
     description:
@@ -154,10 +154,10 @@ packages:
     dependency: "direct dev"
     description:
       name: flutter_lints
-      sha256: e2a421b7e59244faef694ba7b30562e489c2b489866e505074eb005cd7060db7
+      sha256: "9e8c3858111da373efc5aa341de011d9bd23e2c5c5e0c62bccf32438e192d7b1"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.1"
+    version: "3.0.2"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -305,18 +305,18 @@ packages:
     dependency: transitive
     description:
       name: syncfusion_flutter_core
-      sha256: "9fae07d8d1f1f66c61ad40cce8f85c02b8a3506ff0c3eae8ace0fd1d504b1ea5"
+      sha256: "8e19260d292ed77e1cbd4ee1baafb3c9486079cad856e7891478131d25076039"
       url: "https://pub.dev"
     source: hosted
-    version: "25.1.38"
+    version: "25.1.40"
   syncfusion_flutter_datepicker:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_datepicker
-      sha256: "99d81d3fff8fd79cb8589b67a006faa718afde6d2366d74d770fc3fd9a434531"
+      sha256: "04e7cc46b2c0ebfcd76e6082284f7daaf4731df37ddcc876d3073159a6e55d25"
       url: "https://pub.dev"
     source: hosted
-    version: "25.1.38"
+    version: "25.1.40"
   term_glyph:
     dependency: transitive
     description:

@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -12,13 +13,15 @@ class AuthService {
               email: email, password: password))
           .user;
     } catch (e) {
-      print('Error: Giriş işleminde Hata!: $e');
+      if (kDebugMode) {
+        print('Error: Giriş işleminde Hata!: $e');
+      }
       return null;
     }
     return user!.uid;
   }
 
-  Future<String> signupWithEmail(String email, String password) async {
+  Future<String?> signupWithEmail(String email, String password) async {
     User? user = (await _auth.createUserWithEmailAndPassword(
             email: email, password: password))
         .user;

@@ -5,6 +5,8 @@ burası splash ekran gırıs yapmadan oncekı  future delayed beklem suresını 
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Services/authService.dart';
+import 'package:flutter_application_1/Services/databaseService.dart';
+import 'package:flutter_application_1/models/userModel.dart';
 import 'package:flutter_application_1/wiew/overview.dart';
 import 'package:flutter_application_1/wiew/welcome.dart';
 
@@ -17,11 +19,21 @@ class Splash extends StatefulWidget {
 
 class _SplashState extends State<Splash> {
   final AuthService _authService = AuthService();
+  late UserModel userdata;
+
   @override
   void initState() {
     super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () async {
       if (_authService.getCurrentUser() != null) {
+        await DataBaseService()
+            .findUserbyID(AuthService().getCurrentUser()!.uid)
+            .then((data) {
+          if (data != null) {
+            userdata = UserModel(userID: AuthService().getCurrentUser()!.uid);
+            userdata.parseMap(data);
+          }
+        });
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => const Overview()),

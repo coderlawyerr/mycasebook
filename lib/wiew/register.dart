@@ -3,14 +3,25 @@
 */
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Services/authService.dart';
+import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
+import 'package:flutter_application_1/models/userModel.dart';
 import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/textfield.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
 import 'package:flutter_application_1/wiew/welcome.dart';
 
 class Register extends StatelessWidget {
-  const Register({super.key});
+  Register({super.key});
+
+  AuthService authService = AuthService();
+  DataBaseService databaseService = DataBaseService();
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController adsoyadController = TextEditingController();
+  final TextEditingController telNoController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -28,31 +39,55 @@ class Register extends StatelessWidget {
               children: [
                 // Ad-Soyad metin alanı
                 const CustomTextWidget(text: " Ad-Soyad"),
-                customTextField(), // Ad-Soyad metin alanı
+                customTextField(
+                    controller: adsoyadController), // Ad-Soyad metin alanı
                 Constants.sizedbox, // Sabit boşluk eklenmiş
                 // Telefon numarası metin alanı
                 const CustomTextWidget(text: "Telefon"),
-                customTextField(), // Telefon numarası metin alanı
+                customTextField(
+                    controller:
+                        telNoController), // Telefon numarası metin alanı
                 Constants.sizedbox, // Sabit boşluk eklenmiş
                 // Şifre metin alanı
                 const CustomTextWidget(text: "E-Posta"),
-                customTextField(), // Şifre metin alanı
+                customTextField(
+                    controller: emailController), // Şifre metin alanı
                 Constants.sizedbox, // Sabit boşluk eklenmiş
                 ///
                 const CustomTextWidget(text: "Şifre"),
-                customTextField(), // Şifre metin alanı
+                customTextField(
+                    controller: passwordController), // Şifre metin alanı
                 const SizedBox(
                   height: 100,
                 ), // Yükseklik için sabit bir değer eklenmiş
                 Center(
                   child: CustomButton(
                     text: "KAYDOL", // Buton metni: KAYDOL
-                    toDo: () {
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) => LoginPage(),
-                          ));
+                    toDo: () async {
+                      if (adsoyadController.text.isNotEmpty &&
+                          passwordController.text.isNotEmpty &&
+                          emailController.text.isNotEmpty &&
+                          telNoController.text.isNotEmpty) {
+                        await authService
+                            .signupWithEmail(
+                                emailController.text, passwordController.text)
+                            .then((userid) async {
+                          if (userid != null) {
+                            UserModel userdata = UserModel(userID: userid);
+                            userdata.email = emailController.text;
+                            userdata.telNo = int.tryParse(telNoController.text);
+                            userdata.name = adsoyadController.text;
+                            await databaseService.newUser(userdata.toMap());
+                            authService.signOut();
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext context) =>
+                                      LoginPage(),
+                                ));
+                          }
+                        });
+                      }
                     }, // Butona tıklandığında yönlendirilecek sayfa: Giriş Sayfası
                   ),
                 ),

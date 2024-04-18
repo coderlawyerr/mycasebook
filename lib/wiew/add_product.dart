@@ -2,7 +2,10 @@
  bu sayda urunlerı ekleme sayfası
 */
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Services/authService.dart';
+import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
+import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/textfield.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
@@ -17,6 +20,12 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
+  DataBaseService databaseService = DataBaseService();
+
+  final TextEditingController productName = TextEditingController();
+  final TextEditingController buyPrice = TextEditingController();
+  final TextEditingController sellPrice = TextEditingController();
+  final TextEditingController productAmount = TextEditingController();
   @override
   Widget build(BuildContext context) {
     // Uygulama çubuğunu oluştur
@@ -36,28 +45,28 @@ class _AddProductState extends State<AddProduct> {
                   // Ürün adı giriş alanı
                   CustomTextWidget(text: "Ürün Adı"),
                   // Ürün adı metin giriş alanı
-                  customTextField(),
+                  customTextField(controller: productName),
                   // Boşluk
                   Constants.sizedbox,
                   ///////////////
                   // Ürün alış fiyatı giriş alanı
                   CustomTextWidget(text: "Ürün Alış Fiyatı"),
                   // Ürün alış fiyatı metin giriş alanı
-                  customTextField(),
+                  customTextField(controller: buyPrice),
                   // Boşluk
                   Constants.sizedbox,
 
                   // Ürün satış fiyatı giriş alanı
                   CustomTextWidget(text: "Ürün Satış Fiyatı"),
                   // Ürün satış fiyatı metin giriş alanı
-                  customTextField(),
+                  customTextField(controller: sellPrice),
                   // Boşluk ekleyin
                   Constants.sizedbox,
 
                   // Adet giriş alanı
                   CustomTextWidget(text: "Adet"),
                   // Adet metin giriş alanı
-                  customTextField(),
+                  customTextField(controller: productAmount),
                   // Boşluk ekleyin
                   Constants.sizedbox,
                   Center(
@@ -67,11 +76,35 @@ class _AddProductState extends State<AddProduct> {
                       // Ürün sayfasına yönlendir
 
                       toDo: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute<void>(
-                              builder: (BuildContext context) => Product(),
-                            ));
+                        if (productName.text.isNotEmpty &&
+                            buyPrice.text.isNotEmpty &&
+                            sellPrice.text.isNotEmpty &&
+                            productAmount.text.isNotEmpty) {
+                          ProductModel product = ProductModel();
+                          product.buyPrice =
+                              double.tryParse(buyPrice.text) ?? 0.0;
+                          product.sellPrice =
+                              double.tryParse(sellPrice.text) ?? 0.0;
+                          product.productName = productName.text;
+                          product.productAmount =
+                              int.tryParse(productAmount.text) ?? 0;
+                          databaseService
+                              .addNewProduct(
+                                  AuthService().getCurrentUser()!.uid, product)
+                              .then((value) {
+                            if (value != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content:
+                                          Text("Ürün Başarıyla  Eklendi")));
+                            }
+                          });
+                        }
+                        /*Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (BuildContext context) => Product(),
+                              ));*/
                       },
                     ),
                   ),

@@ -3,8 +3,10 @@ bu sayfa genel bakıs sayfası
 */
 
 import 'package:flutter/material.dart';
-
+import 'package:flutter_application_1/Services/authService.dart';
+import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
+import 'package:flutter_application_1/models/userModel.dart';
 import 'package:flutter_application_1/widgets/listtile.dart';
 import 'package:flutter_application_1/widgets/pie_chart.dart';
 import 'package:flutter_application_1/wiew/add_product.dart';
@@ -23,6 +25,22 @@ class Overview extends StatefulWidget {
 }
 
 class _OverviewState extends State<Overview> {
+  UserModel? userdata;
+
+  @override
+  Future<void> didChangeDependencies() async {
+    await DataBaseService()
+        .findUserbyID(AuthService().getCurrentUser()!.uid)
+        .then((data) {
+      if (data != null) {
+        userdata = UserModel(userID: AuthService().getCurrentUser()!.uid);
+        userdata!.parseMap(data);
+        setState(() {});
+      }
+    });
+    super.didChangeDependencies();
+  }
+
   @override
   Widget build(BuildContext context) {
     // Ana ekranın yapılandırılması
@@ -57,6 +75,8 @@ class _OverviewState extends State<Overview> {
 
   // Yan menüyü oluştur
   Drawer _drawerr(BuildContext context) {
+    String name = userdata != null ? userdata!.name! : "";
+    String email = userdata != null ? userdata!.email! : "";
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.5,
 
@@ -79,12 +99,11 @@ class _OverviewState extends State<Overview> {
             const SizedBox(
               height: 5,
             ),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("BETÜL ŞENSOY"), // Kullanıcı adını göster
-                Text(
-                    "betulsensoy00@gmail.com"), // Kullanıcı e-posta adresini göster
+                Text(name), // Kullanıcı adını göster
+                Text(email), // Kullanıcı e-posta adresini göster
                 Divider(
                   color: Color.fromARGB(
                       255, 60, 60, 60), // Ayırıcı rengi gri olsun
@@ -154,6 +173,7 @@ class _OverviewState extends State<Overview> {
             CustomListTile(
               title: "Çıkış", // Menü öğesi: Çıkış
               onTap: () {
+                AuthService().signOut();
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),

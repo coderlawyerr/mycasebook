@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class Constants {
@@ -31,5 +33,25 @@ String dateFormat(DateTime date,{bool hoursIncluded=false}) {
     return "$yil/$ay/$gun  -  $saat";
   } else {
     return "$yil/$ay/$gun";
+  }
+}
+
+class AutoIdGenerator {
+  static const int _AUTO_ID_LENGTH = 10;
+
+  static const String _AUTO_ID_ALPHABET =
+      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+  static final Random _random = Random();
+
+  static String autoId() {
+    final StringBuffer stringBuffer = StringBuffer();
+    const int maxRandom = _AUTO_ID_ALPHABET.length;
+
+    for (int i = 0; i < _AUTO_ID_LENGTH; ++i) {
+      stringBuffer.write(_AUTO_ID_ALPHABET[_random.nextInt(maxRandom)]);
+    }
+
+    return stringBuffer.toString();
   }
 }
