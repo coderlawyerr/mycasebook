@@ -2,8 +2,13 @@
 tedarıkcı ve musterı ekleme sayfası
 */
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Services/authService.dart';
+import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
+import 'package:flutter_application_1/models/supliercustomer_model.dart';
 import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/dropdown.dart';
 import 'package:flutter_application_1/widgets/textfield.dart';
@@ -11,15 +16,26 @@ import 'package:flutter_application_1/widgets/textwidget.dart';
 import 'package:flutter_application_1/wiew/overview.dart';
 import 'package:flutter_application_1/wiew/supplier_and_customer.dart';
 
-class supplier_and_customeradd extends StatefulWidget {
-  const supplier_and_customeradd(
+class Supplier_And_Customeradd extends StatefulWidget {
+  const Supplier_And_Customeradd(
       {super.key}); // Tedarikçi ve Müşteri eklemek için stateful bir bileşen
 
   @override
-  State<supplier_and_customeradd> createState() => _MyWidgetState();
+  State<Supplier_And_Customeradd> createState() => _MyWidgetState();
 }
 
-class _MyWidgetState extends State<supplier_and_customeradd> {
+class _MyWidgetState extends State<Supplier_And_Customeradd> {
+  DataBaseService databaseService = DataBaseService();
+
+  final TextEditingController username = TextEditingController();
+  final TextEditingController tel = TextEditingController();
+  final TextEditingController adres = TextEditingController();
+  CurrentType? currentType;
+
+  void currentTypeSetter(CurrentType type) {
+    currentType = type;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,29 +52,59 @@ class _MyWidgetState extends State<supplier_and_customeradd> {
               ),
               DropdownMenuExample(
                 initialValue: 'Cari Tipi ',
+                setter: currentTypeSetter,
               ), // Dropdown menü örneği
               Constants.sizedbox, // Sabit boyutlu bir boşluk
               /////////////
               const CustomTextWidget(
                 text: "Ad-Soyad", // Telefon metni
               ),
-              customTextField(), // Özel metin giriş alanı
+              customTextField(controller: username), // Özel metin giriş alanı
               Constants.sizedbox, // Sabit boyutlu bir boşluk
               ///////////
               const CustomTextWidget(
                 text: "Telefon", // Adres metni
               ),
-              customTextField(), // Özel metin giriş alanı
+              customTextField(controller: tel), // Özel metin giriş alanı
               Constants.sizedbox, // Sabit boyutlu bir boşluk
               const CustomTextWidget(
                 text: "Adres", // Adres metni
               ),
-              customTextField(),
+              customTextField(controller: adres),
               Constants.sizedbox,
               Center(
                 child: CustomButton(
                   text: "ONAYLA", // Onayla metni
                   toDo: () {
+                    if (username.text.isNotEmpty &&
+                        tel.text.isNotEmpty &&
+                        adres.text.isNotEmpty &&
+                        currentType != null) {
+                      SuplierCustomerModel data = SuplierCustomerModel();
+                      data.tel = int.tryParse(tel.text) ?? 0;
+                      data.username = username.text;
+                      data.adress = adres.text;
+                      data.currentType = currentType!;
+
+                      databaseService
+                          .addSupplierOrCustomer(
+                              userId: AuthService().getCurrentUser()!.uid,
+                              data: data)
+                          .then((value) {
+                        if (value != null) {
+                          // Kullanıcıya başarılı ekleme mesajını göster
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Başarıyla  Eklendi")));
+                          // Giriş alanlarını temizle
+                          username.clear();
+                          tel.clear();
+                          adres.clear();
+                          currentType = null;
+                        }
+                      });
+                    }
+
                     Navigator.pushReplacement(
                         context,
                         MaterialPageRoute<void>(

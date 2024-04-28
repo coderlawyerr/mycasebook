@@ -176,7 +176,7 @@ class _SalesState extends State<Sales> {
       children: [
         CustomTextWidget(text: labelText),
         const SizedBox(height: 10),
-        DropdownMenuExample(initialValue: initialValue),
+        //DropdownMenuExample(initialValue: initialValue),
       ],
     );
   }

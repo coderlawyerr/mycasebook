@@ -1,4 +1,6 @@
 // KarZarar enum sınıfı, bir ürünün kar, zarar veya stabil olduğunu belirtir.
+import 'package:flutter_application_1/models/process_model.dart';
+
 enum KarZarar { kar, zarar, stabil }
 
 // IslemTipi enum sınıfı, bir işlemin alış mı yoksa satış mı olduğunu belirtir.

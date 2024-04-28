@@ -78,13 +78,18 @@ class LoginPage extends StatelessWidget {
               Center(
                   child: CustomButton(
                 text: "GİRİŞ YAP", // Giriş yap buton metni
+                // Kullanıcının giriş yapabilmesi için e-posta ve şifre giriş alanlarının dolu olup olmadığını kontrol eden asenkron bir işlev.
                 toDo: () async {
+                  // Eğer e-posta ve şifre alanları doluysa devam et
                   if (emailController.text.isNotEmpty &&
                       passwordController.text.isNotEmpty) {
+                    // AuthService sınıfından signIn metodu kullanılarak kullanıcı girişi yapılır ve dönen kullanıcı kimliği (userid) alınır.
                     await authService
                         .signIn(emailController.text, passwordController.text)
                         .then((userid) {
+                      // Eğer kullanıcı kimliği null değilse, yani giriş başarılı olduysa
                       if (userid != null) {
+                        // Yeni sayfaya geçiş için Navigator kullanılarak mevcut sayfa yerine Overview sayfası geçilir.
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
@@ -93,8 +98,10 @@ class LoginPage extends StatelessWidget {
                       }
                     });
                   } else
+                    // Eğer e-posta veya şifre alanları boşsa, "Boş" mesajı konsola yazdırılır.
                     print("Boş");
-                }, // Genel bakış sayfasına yönlendirme
+                },
+// Genel bakış sayfasına yönlendirme
               )),
               const SizedBox(
                 height: 20,

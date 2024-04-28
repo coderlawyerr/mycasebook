@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/supliercustomer_model.dart';
 
 class DropdownMenuExample extends StatefulWidget {
   final List<String> list = <String>[
@@ -6,8 +7,10 @@ class DropdownMenuExample extends StatefulWidget {
     'Tedarikçi',
   ];
   final String initialValue;
+  final Function(CurrentType) setter;
 
-  DropdownMenuExample({super.key, required this.initialValue});
+  DropdownMenuExample(
+      {super.key, required this.initialValue, required this.setter});
 
   @override
   State<DropdownMenuExample> createState() => _DropdownMenuExampleState();
@@ -36,6 +39,9 @@ class _DropdownMenuExampleState extends State<DropdownMenuExample> {
         onChanged: (String? newValue) {
           setState(() {
             dropdownValue = newValue!;
+            widget.setter(newValue == widget.list[0]
+                ? CurrentType.musteri
+                : CurrentType.tedarikci);
           });
         },
         items: widget.list.map<DropdownMenuItem<String>>((String value) {

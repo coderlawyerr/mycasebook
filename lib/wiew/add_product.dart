@@ -76,11 +76,14 @@ class _AddProductState extends State<AddProduct> {
                       // Ürün sayfasına yönlendir
 
                       toDo: () {
+                        // Kullanıcı girdileri boş değilse devam et
                         if (productName.text.isNotEmpty &&
                             buyPrice.text.isNotEmpty &&
                             sellPrice.text.isNotEmpty &&
                             productAmount.text.isNotEmpty) {
+                          // Yeni bir ProductModel örneği oluştur
                           ProductModel product = ProductModel();
+                          // Kullanıcı girişlerini ProductModel'e atayarak veri türlerini dönüştür
                           product.buyPrice =
                               double.tryParse(buyPrice.text) ?? 0.0;
                           product.sellPrice =
@@ -88,23 +91,26 @@ class _AddProductState extends State<AddProduct> {
                           product.productName = productName.text;
                           product.productAmount =
                               int.tryParse(productAmount.text) ?? 0;
+                          // Yeni ürünü veritabanına eklemek için databaseService'i kullan
                           databaseService
                               .addNewProduct(
                                   AuthService().getCurrentUser()!.uid, product)
                               .then((value) {
+                            // Eğer işlem başarılı olduysa (değer null değilse)
                             if (value != null) {
+                              // Kullanıcıya başarılı ekleme mesajını göster
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
+                                  const SnackBar(
                                       content:
                                           Text("Ürün Başarıyla  Eklendi")));
+                              // Giriş alanlarını temizle
+                              productName.clear();
+                              buyPrice.clear();
+                              sellPrice.clear();
+                              productAmount.clear();
                             }
                           });
                         }
-                        /*Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (BuildContext context) => Product(),
-                              ));*/
                       },
                     ),
                   ),

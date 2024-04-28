@@ -28,16 +28,23 @@ class _OverviewState extends State<Overview> {
   UserModel? userdata;
 
   @override
+// Bağımlılıklar değiştiğinde çağrılan asenkron bir işlev.
   Future<void> didChangeDependencies() async {
+    // Veritabanı hizmeti kullanılarak kullanıcı kimliğine göre kullanıcı bilgileri getirilir.
     await DataBaseService()
         .findUserbyID(AuthService().getCurrentUser()!.uid)
         .then((data) {
+      // Eğer veri bulunduysa
       if (data != null) {
+        // userdata değişkeni UserModel sınıfından bir nesne oluşturulur ve kullanıcı kimliği atanır.
         userdata = UserModel(userID: AuthService().getCurrentUser()!.uid);
+        // Veri haritalandırılır ve userdata nesnesine aktarılır.
         userdata!.parseMap(data);
+        // Widget'in yeniden çizilmesi için setState çağrılır.
         setState(() {});
       }
     });
+    // Üst sınıfın `didChangeDependencies` metoduna çağrı yapılır.
     super.didChangeDependencies();
   }
 
@@ -75,7 +82,9 @@ class _OverviewState extends State<Overview> {
 
   // Yan menüyü oluştur
   Drawer _drawerr(BuildContext context) {
+    // Eğer userdata null değilse, name değişkenine userdata'nın adını atar; null ise boş bir string atar.
     String name = userdata != null ? userdata!.name! : "";
+    // Eğer userdata null değilse, email değişkenine userdata'nın e-posta adresini atar; null ise boş bir string atar.
     String email = userdata != null ? userdata!.email! : "";
     return Drawer(
       width: MediaQuery.of(context).size.width * 0.5,
@@ -145,7 +154,7 @@ class _OverviewState extends State<Overview> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const supplier_and_customeradd()),
+                      builder: (context) => const Supplier_And_Customeradd()),
                 );
               },
             ),

@@ -43,7 +43,7 @@ class _SearchState extends State<Search> {
                 ),
               ),
             ],
-          )), // ne yapalım şimdi yeni table mı bulalım?
+          )), 
     );
   }
 }

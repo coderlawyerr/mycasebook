@@ -1,8 +1,12 @@
 /*
-  Bu sayfa, kayıt olma işlemlerini içerir. Text alanları ve metin widget'ları özel widget'lar olarak tanımlanmıştır.
+  Bu sayfa, kullanıcıların kayıt olma işlemlerini yönetir. 
+  Text alanları ve metin widget'ları özel widget'lar olarak tanımlanmıştır.
 */
 
+// Flutter bileşenlerini içe aktarır
 import 'package:flutter/material.dart';
+
+// Servis ve model dosyalarını projeye dahil eder
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
@@ -12,73 +16,87 @@ import 'package:flutter_application_1/widgets/textfield.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
 import 'package:flutter_application_1/wiew/welcome.dart';
 
+// Kayıt sayfasını oluşturan sınıf
 class Register extends StatelessWidget {
-  Register({super.key});
+  Register({super.key}); // Register sınıfının yapıcı metodu
 
+  // AuthService ve DataBaseService sınıflarından nesneler oluşturulur
   AuthService authService = AuthService();
   DataBaseService databaseService = DataBaseService();
 
+  // Metin alanları için kontrolcüler
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController adsoyadController = TextEditingController();
   final TextEditingController telNoController = TextEditingController();
 
+  // Kayıt sayfasının yapılandırılması
   @override
   Widget build(BuildContext context) {
-    // Kayıt sayfasının yapılandırılması
+    // Scaffold bileşeni ile sayfa yapısı oluşturulur
     return Scaffold(
-      appBar: _appbar(context), // Uygulama çubuğunun oluşturulması
+      // Uygulama çubuğunu belirleyen metot çağrılır
+      appBar: _appbar(context),
+
+      // Sayfanın ana içeriği
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(28),
+          padding: const EdgeInsets.all(28), // Kenar boşlukları belirlenir
           child: SingleChildScrollView(
             child: Column(
-              //crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center, // Dikeyde ortala
+              crossAxisAlignment:
+                  CrossAxisAlignment.start, // Yatayda sola yasla
               children: [
-                // Ad-Soyad metin alanı
+                // Ad-Soyad metin alanı ve giriş kutusu
                 const CustomTextWidget(text: " Ad-Soyad"),
-                customTextField(
-                    controller: adsoyadController), // Ad-Soyad metin alanı
-                Constants.sizedbox, // Sabit boşluk eklenmiş
-                // Telefon numarası metin alanı
+                customTextField(controller: adsoyadController),
+                Constants.sizedbox,
+
+                // Telefon numarası metin alanı ve giriş kutusu
                 const CustomTextWidget(text: "Telefon"),
-                customTextField(
-                    controller:
-                        telNoController), // Telefon numarası metin alanı
-                Constants.sizedbox, // Sabit boşluk eklenmiş
-                // Şifre metin alanı
+                customTextField(controller: telNoController),
+                Constants.sizedbox,
+
+                // E-Posta metin alanı ve giriş kutusu
                 const CustomTextWidget(text: "E-Posta"),
-                customTextField(
-                    controller: emailController), // Şifre metin alanı
-                Constants.sizedbox, // Sabit boşluk eklenmiş
-                ///
+                customTextField(controller: emailController),
+                Constants.sizedbox,
+
+                // Şifre metin alanı ve giriş kutusu
                 const CustomTextWidget(text: "Şifre"),
-                customTextField(
-                    controller: passwordController), // Şifre metin alanı
+                customTextField(controller: passwordController),
                 const SizedBox(
                   height: 100,
-                ), // Yükseklik için sabit bir değer eklenmiş
+                ),
+
+                // Kayıt butonu
                 Center(
                   child: CustomButton(
-                    text: "KAYDOL", // Buton metni: KAYDOL
+                    text: "KAYDOL",
                     toDo: () async {
                       if (adsoyadController.text.isNotEmpty &&
                           passwordController.text.isNotEmpty &&
                           emailController.text.isNotEmpty &&
                           telNoController.text.isNotEmpty) {
+                        // Boş alan kontrolü yapılır, eğer tüm alanlar doluysa devam edilir
                         await authService
                             .signupWithEmail(
                                 emailController.text, passwordController.text)
                             .then((userid) async {
+                              
                           if (userid != null) {
+                            // Kullanıcı kimliği (userID) alınır
                             UserModel userdata = UserModel(userID: userid);
+                            // Kullanıcı kimliği (userID) alınır
                             userdata.email = emailController.text;
+                            // Kullanıcı bilgileri UserModel'den bir haritaya dönüştürülür ve veritabanına eklenir
                             userdata.telNo = int.tryParse(telNoController.text);
                             userdata.name = adsoyadController.text;
                             await databaseService.newUser(userdata.toMap());
+                            // Kullanıcı kaydı başarılı bir şekilde tamamlandıktan sonra oturumu kapatır
                             authService.signOut();
+                            // Kullanıcı giriş sayfasına yönlendirilir
                             Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute<void>(
@@ -88,7 +106,7 @@ class Register extends StatelessWidget {
                           }
                         });
                       }
-                    }, // Butona tıklandığında yönlendirilecek sayfa: Giriş Sayfası
+                    },
                   ),
                 ),
               ],
@@ -99,25 +117,22 @@ class Register extends StatelessWidget {
     );
   }
 
-  // Uygulama çubuğunun oluşturulması
+  // Uygulama çubuğunu oluşturan metod
   AppBar _appbar(BuildContext context) {
     return AppBar(
-      backgroundColor: Colors.transparent, // Arkaplan rengi şeffaf olsun
+      backgroundColor: Colors.transparent,
       leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios,
-            color: Colors.grey, // Sol üst köşede geri butonu, gri renkte olsun
+            color: Colors.grey,
           ),
           onPressed: () {
             Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        LoginPage())); // Geri butonuna basıldığında giriş sayfasına yönlendir
+                context, MaterialPageRoute(builder: (context) => LoginPage()));
           }),
       title: const Text(
-        "Kayıt Ol", // Uygulama çubuğunda "Kayıt Ol" başlığı
-        style: Constants.textStyle, // Başlık stili belirtildi
+        "Kayıt Ol",
+        style: Constants.textStyle,
       ),
     );
   }
