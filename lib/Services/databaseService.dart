@@ -81,9 +81,11 @@ class DataBaseService {
     }
   }
 
-  Future<bool?> addSupplierOrCustomer({required String userId, required SuplierCustomerModel data}) async {
+  Future<bool?> addSupplierOrCustomer(
+      {required String userId, required SuplierCustomerModel data}) async {
     try {
-      String referans= data.currentType == CurrentType.musteri ? "Customer":"Supplier";
+      String referans =
+          data.currentType == CurrentType.musteri ? "Customer" : "Supplier";
       return await _ref
           .collection('users')
           .doc(userId)
@@ -93,6 +95,70 @@ class DataBaseService {
           .then((value) => true);
     } catch (e) {
       print(e);
+      return false;
+    }
+  }
+
+  Future<List<SuplierCustomerModel>> fetchCustomer(String userID) async {
+    try {
+      List<SuplierCustomerModel> customerlist = [];
+      await _ref
+          .collection('users')
+          .doc(userID)
+          .collection('Customer')
+          .get()
+          .then((customer) {
+        if (customer.size > 0) {
+          for (var customer in customer.docs) {
+            SuplierCustomerModel c = SuplierCustomerModel();
+            c.parseMap(customer.data());
+            c.id = customer.id;
+            customerlist.add(c);
+          }
+        }
+      });
+
+      await _ref
+          .collection('users')
+          .doc(userID)
+          .collection('Supplier')
+          .get()
+          .then((suplier) {
+        if (suplier.size > 0) {
+          for (var sup in suplier.docs) {
+            SuplierCustomerModel c = SuplierCustomerModel();
+            c.parseMap(sup.data());
+            c.id = sup.id;
+            customerlist.add(c);
+          }
+        }
+      });
+
+      return customerlist;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return [];
+    }
+  }
+
+  Future<bool> deleteSuplierOrCustomer(
+      {required String userId, required SuplierCustomerModel data}) async {
+    try {
+      String referans =
+          data.currentType == CurrentType.musteri ? "Customer" : "Supplier";
+      await _ref
+          .collection('users')
+          .doc(userId)
+          .collection(referans)
+          .doc(data.id)
+          .delete();
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
       return false;
     }
   }

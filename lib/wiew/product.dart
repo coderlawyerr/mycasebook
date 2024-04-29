@@ -8,6 +8,7 @@ import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/widgets/card.dart';
+import 'package:flutter_application_1/widgets/search.dart';
 import 'package:flutter_application_1/wiew/overview.dart';
 
 class Product extends StatefulWidget {
@@ -73,7 +74,7 @@ class _ProductState extends State<Product> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-                  searchBar(),
+                  searchBar(searchController, context, "ürün ara"),
                 ] +
                 (filteredProducts.isNotEmpty
                     ? filteredProducts
@@ -86,48 +87,16 @@ class _ProductState extends State<Product> {
     );
   }
 
-  Widget searchBar() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-          width: double.infinity,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: () {},
-              ),
-              const SizedBox(
-                width: 2,
-              ),
-              SizedBox(
-                width: widthSize(context, 80),
-                child: TextField(
-                  controller: searchController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                      hintText: "ÜRÜN ARA",
-                      hintStyle: const TextStyle(color: Colors.grey)),
-                ),
-              ),
-            ],
-          )),
-    );
-  }
-
   Widget productCard(ProductModel product) {
     var tarih = dateFormat(DateTime.fromMillisecondsSinceEpoch(product.date),
         hoursIncluded: true);
     return Padding(
       padding: const EdgeInsets.all(15.0),
-      child: CustomCard(
-        text:
-            "Ürün Adı: ${product.productName}\nAlış Fiyat: ${product.buyPrice}TL\nSatış Fiyat: ${product.sellPrice}\nAdet: ${product.productAmount}\nTarih:${tarih}", // Ürün bilgileri içeren metin
-      ),
+      child: customCard(
+          text:
+              "Ürün Adı: ${product.productName}\nAlış Fiyat: ${product.buyPrice}TL\nSatış Fiyat: ${product.sellPrice}\nAdet: ${product.productAmount}\nTarih:${tarih}", // Ürün bilgileri içeren metin
+
+          context: context),
     );
   }
 
