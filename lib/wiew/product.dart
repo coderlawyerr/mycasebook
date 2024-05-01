@@ -103,7 +103,7 @@ class _ProductState extends State<Product> {
           onDelete: () {
             showAreYouSureDialog(context, message: "Eminmisiniz?")
                 .then((value) {
-              if (value as bool) {
+              if (value != null && value as bool) {
                 dataBaseService
                     .deleteProcess(
                         userId: AuthService().getCurrentUser()!.uid,

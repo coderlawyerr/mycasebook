@@ -82,15 +82,13 @@ class DataBaseService {
     }
   }
 
-  Future<bool?> addSupplierOrCustomer(
+  Future<bool> addSupplierOrCustomer(
       {required String userId, required SuplierCustomerModel data}) async {
     try {
-      String referans =
-          data.currentType == CurrentType.musteri ? "Customer" : "Supplier";
       return await _ref
           .collection('users')
           .doc(userId)
-          .collection(referans)
+          .collection("Customer&Supplier")
           .doc()
           .set(data.toMap())
           .then((value) => true);
@@ -106,7 +104,7 @@ class DataBaseService {
       await _ref
           .collection('users')
           .doc(userID)
-          .collection('Customer')
+          .collection("Customer&Supplier")
           .get()
           .then((customer) {
         if (customer.size > 0) {
@@ -114,22 +112,6 @@ class DataBaseService {
             SuplierCustomerModel c = SuplierCustomerModel();
             c.parseMap(customer.data());
             c.id = customer.id;
-            customerlist.add(c);
-          }
-        }
-      });
-
-      await _ref
-          .collection('users')
-          .doc(userID)
-          .collection('Supplier')
-          .get()
-          .then((suplier) {
-        if (suplier.size > 0) {
-          for (var sup in suplier.docs) {
-            SuplierCustomerModel c = SuplierCustomerModel();
-            c.parseMap(sup.data());
-            c.id = sup.id;
             customerlist.add(c);
           }
         }
@@ -143,16 +125,15 @@ class DataBaseService {
       return [];
     }
   }
+
 //// sılme ıslemı
   Future<bool> deleteSuplierOrCustomer(
       {required String userId, required SuplierCustomerModel data}) async {
     try {
-      String referans =
-          data.currentType == CurrentType.musteri ? "Customer" : "Supplier";
       await _ref
           .collection('users')
           .doc(userId)
-          .collection(referans)
+          .collection("Customer&Supplier")
           .doc(data.id)
           .delete();
       return true;
@@ -163,6 +144,7 @@ class DataBaseService {
       return false;
     }
   }
+
 //sılme ıslemı
   Future<bool> deleteProcess(
       {required String userId, required ProcessModel data}) async {
@@ -183,53 +165,42 @@ class DataBaseService {
     }
   }
 
-//   Future<bool> updateSuplierOrCustomer(
-//       {required String userId, required SuplierCustomerModel newData}) async {
-//     try {
-//       String referans =
-//           newData.currentType == CurrentType.musteri ? "Customer" : "Supplier";
-//       await _ref
-//           .collection('users')
-//           .doc(userId)
-//           .collection(referans)
-//           .doc(newData.id)
-//           .update(newData.toMap()); // newData ile verileri güncelle
-//       return true;
-//     } catch (e) {
-//       if (kDebugMode) {
-//         print(e);
-//       }
-//       return false;
-//     }
-//   }
+  Future<bool> editSuplierOrCustomer(
+      {required String userId, required SuplierCustomerModel newData}) async {
+    try {
+      await _ref
+          .collection('users')
+          .doc(userId)
+          .collection("Customer&Supplier")
+          .doc(newData.id)
+          .update(newData.toMap()); // newData ile verileri güncelle
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return false;
+    }
+  }
 
-
-// Future<bool> updateProcess(
-//       {required String userId, required ProcessModel newData}) async {
-//     try {
-//       await _ref
-//           .collection('users')
-//           .doc(userId)
-//           .collection("Processes")
-//           .doc(newData.processId)
-//           .update(newData.toMap()); // newData ile verileri güncelle
-//       print("process güncellendi");
-//       return true;
-//     } catch (e) {
-//       if (kDebugMode) {
-//         print(e);
-//       }
-//       return false;
-//     }
-//   }
-
-
-
-
-
-
-
-
+  Future<bool> editProcess(
+      {required String userId, required ProcessModel newData}) async {
+    try {
+      await _ref
+          .collection('users')
+          .doc(userId)
+          .collection("Processes")
+          .doc(newData.processId)
+          .update(newData.toMap()); // newData ile verileri güncelle
+      if (kDebugMode) {
+        print("process güncellendi");
+      }
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return false;
+    }
+  }
 }
-
-

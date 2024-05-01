@@ -6,7 +6,7 @@ class DropdownMenuExample extends StatefulWidget {
     'Müşteri',
     'Tedarikçi',
   ];
-  final String initialValue;
+  final CurrentType? initialValue;
   final Function(CurrentType) setter;
 
   DropdownMenuExample(
@@ -17,11 +17,14 @@ class DropdownMenuExample extends StatefulWidget {
 }
 
 class _DropdownMenuExampleState extends State<DropdownMenuExample> {
-  String? dropdownValue;
+  CurrentType? dropdownValue;
 
   @override
   void initState() {
-    dropdownValue = "${widget.initialValue} Seç";
+    if (widget.initialValue != null) {
+      dropdownValue = widget.initialValue;
+    }
+
     super.initState();
   }
 
@@ -31,17 +34,21 @@ class _DropdownMenuExampleState extends State<DropdownMenuExample> {
       width: MediaQuery.of(context).size.width * 0.9,
       color: const Color(0xFF5D5353),
       child: DropdownButton<String>(
-        value: null,
-        hint: Text(dropdownValue ?? ""),
+        value: dropdownValue == null
+            ? null
+            : dropdownValue == CurrentType.musteri
+                ? widget.list[0]
+                : widget.list[1],
+        hint: dropdownValue == null ? Text("Cari Tipi Seç") : null,
         iconEnabledColor: Colors.white,
         isExpanded: true,
         dropdownColor: const Color(0xFF5D5353),
         onChanged: (String? newValue) {
           setState(() {
-            dropdownValue = newValue!;
-            widget.setter(newValue == widget.list[0]
+            dropdownValue = newValue == widget.list[0]
                 ? CurrentType.musteri
-                : CurrentType.tedarikci);
+                : CurrentType.tedarikci;
+            widget.setter(dropdownValue!);
           });
         },
         items: widget.list.map<DropdownMenuItem<String>>((String value) {

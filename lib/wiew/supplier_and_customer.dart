@@ -10,9 +10,10 @@ import 'package:flutter_application_1/models/supliercustomer_model.dart';
 import 'package:flutter_application_1/widgets/card.dart';
 import 'package:flutter_application_1/widgets/search.dart';
 import 'package:flutter_application_1/wiew/overview.dart';
+import 'package:flutter_application_1/wiew/suplier_and_customer_add.dart';
 
-class  supplier_and_customer extends StatefulWidget {
-    supplier_and_customer({Key? key});
+class supplier_and_customer extends StatefulWidget {
+  supplier_and_customer({Key? key});
 
   @override
   State<supplier_and_customer> createState() => _ProductState();
@@ -23,9 +24,9 @@ class _ProductState extends State<supplier_and_customer> {
   DataBaseService dataBaseService = DataBaseService();
   List<SuplierCustomerModel> customerlist = []; // Müşteri listesi
   List<SuplierCustomerModel> filterlist = []; // Filtrelenmiş müşteri listesi
-  List<Widget> indexedFilteredCardList = []; // Filtrelenmiş kartlar listesi
 
-  bool isCustomerFetched = false; // Müşterilerin çekilip çekilmediğini belirten bayrak
+  bool isCustomerFetched =
+      false; // Müşterilerin çekilip çekilmediğini belirten bayrak
 
   @override
   void initState() {
@@ -65,11 +66,6 @@ class _ProductState extends State<supplier_and_customer> {
 
   @override
   Widget build(BuildContext context) {
-    indexedFilteredCardList.clear();
-    // Filtrelenmiş müşteri kartları oluşturulur
-    filterlist.asMap().forEach((key, value) {
-      indexedFilteredCardList.add(customerCard(index: key, customer: value));
-    });
     return Scaffold(
       appBar: _appbar(context), // Özel AppBar bileşeni
       body: Padding(
@@ -80,8 +76,9 @@ class _ProductState extends State<supplier_and_customer> {
                   searchBar(searchController, context, "Ara"),
                 ] +
                 (filterlist.isNotEmpty
-                    ? indexedFilteredCardList
-                    //filterlist.map((product) => customerCard(product)).toList()
+                    ? filterlist
+                        .map((customer) => customerCard(customer: customer))
+                        .toList()
                     : []),
           ),
         ),
@@ -90,25 +87,44 @@ class _ProductState extends State<supplier_and_customer> {
   }
 
   // Her bir müşteri için özel kart oluşturan metod
-  Widget customerCard(
-      {required int index, required SuplierCustomerModel customer}) {
+  Widget customerCard({required SuplierCustomerModel customer}) {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: customCard(
         context: context,
+        /////
         onDelete: () async {
           // Silme işlemi
-          await dataBaseService
-              .deleteSuplierOrCustomer(
-                  userId: AuthService().getCurrentUser()!.uid, data: customer)
-              .then((value) {
-            if (value) {
-              setState(() {
-                filterlist.removeAt(index);
-                indexedFilteredCardList.removeAt(index);
+          showAreYouSureDialog(context, message: "Silmek istiyormusunuz?")
+              .then((value) async {
+            if (value != null && value) {
+              await dataBaseService
+                  .deleteSuplierOrCustomer(
+                      userId: AuthService().getCurrentUser()!.uid,
+                      data: customer)
+                  .then((value) {
+                if (value) {
+                  setState(() {
+                    customerlist.clear();
+                    isCustomerFetched = false;
+                    filterlist.clear();
+                    bringCustomer().whenComplete(() => setState(() {}));
+                  });
+                }
               });
             }
           });
+        },
+        onEdit: () async {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Supplier_And_Customeradd(
+                mod: SupplierPageMode.edit,
+                data: customer,
+              ),
+            ),
+          );
         },
         text:
             "Cari Tipi: ${customer.currentType.name}\nAd-Soyad: ${customer.username}\nTel: ${customer.tel}\nAdres: ${customer.adress}", // Müşteri bilgileri
@@ -126,11 +142,7 @@ class _ProductState extends State<supplier_and_customer> {
             color: Colors.grey, // Gri renkli geri dönüş ikonu
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        const Overview())); // Genel bakış sayfasına geri dönüş işlemi
+            Navigator.pop(context);
           }),
       title: const Text(
         "Tedarikçi Ve Müşteriler", // Başlık metni

@@ -10,23 +10,26 @@ import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/dropdown.dart';
 import 'package:flutter_application_1/widgets/textfield.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
-import 'package:flutter_application_1/wiew/overview.dart';
 import 'package:flutter_application_1/wiew/supplier_and_customer.dart';
 
-class Supplier_And_Customeradd extends StatefulWidget {
-  const Supplier_And_Customeradd(
-      {super.key}); // Tedarikçi ve Müşteri eklemek için stateful bir bileşen
+enum SupplierPageMode { add, edit }
 
-  @override
-  State<Supplier_And_Customeradd> createState() => _MyWidgetState();
-}
+class Supplier_And_Customeradd extends StatelessWidget {
+  Supplier_And_Customeradd(
+      {super.key, this.mod = SupplierPageMode.add, this.data});
 
-class _MyWidgetState extends State<Supplier_And_Customeradd> {
-  DataBaseService databaseService = DataBaseService();
+  SupplierPageMode mod;
 
-  final TextEditingController username = TextEditingController();
-  final TextEditingController tel = TextEditingController();
-  final TextEditingController adres = TextEditingController();
+  SuplierCustomerModel? data;
+
+  final DataBaseService _databaseService = DataBaseService();
+
+  late TextEditingController username;
+
+  late TextEditingController tel;
+
+  late TextEditingController adres;
+
   CurrentType? currentType;
 
   void currentTypeSetter(CurrentType type) {
@@ -35,6 +38,10 @@ class _MyWidgetState extends State<Supplier_And_Customeradd> {
 
   @override
   Widget build(BuildContext context) {
+    username = TextEditingController(text: data?.username);
+    tel = TextEditingController(text: data?.tel.toString());
+    adres = TextEditingController(text: data?.adress);
+    currentType = data?.currentType;
     return Scaffold(
       appBar: _appbar(context), // Üst çubuk olarak kullanılacak özel AppBar
       body: SingleChildScrollView(
@@ -48,7 +55,7 @@ class _MyWidgetState extends State<Supplier_And_Customeradd> {
                 text: "Cari Tipi", // Seçim metni
               ),
               DropdownMenuExample(
-                initialValue: 'Cari Tipi ',
+                initialValue: currentType,
                 setter: currentTypeSetter,
               ), // Dropdown menü örneği
               Constants.sizedbox, // Sabit boyutlu bir boşluk
@@ -77,37 +84,53 @@ class _MyWidgetState extends State<Supplier_And_Customeradd> {
                         tel.text.isNotEmpty &&
                         adres.text.isNotEmpty &&
                         currentType != null) {
-                      SuplierCustomerModel data = SuplierCustomerModel();
-                      data.tel = int.tryParse(tel.text) ?? 0;
-                      data.username = username.text;
-                      data.adress = adres.text;
-                      data.currentType = currentType!;
+                      if (mod == SupplierPageMode.add) {
+                        data = SuplierCustomerModel();
+                        data!.tel = int.tryParse(tel.text) ?? 0;
+                        data!.username = username.text;
+                        data!.adress = adres.text;
+                        data!.currentType = currentType!;
 
-                      databaseService
-                          .addSupplierOrCustomer(
-                              userId: AuthService().getCurrentUser()!.uid,
-                              data: data)
-                          .then((value) {
-                        if (value != null) {
-                          // Kullanıcıya başarılı ekleme mesajını göster
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Başarıyla  Eklendi")));
-                          // Giriş alanlarını temizle
-                          username.clear();
-                          tel.clear();
-                          adres.clear();
-                          currentType = null;
-                        }
-                      });
+                        _databaseService
+                            .addSupplierOrCustomer(
+                                userId: AuthService().getCurrentUser()!.uid,
+                                data: data!)
+                            .then((value) {
+                          if (value) {
+                            // Kullanıcıya başarılı ekleme mesajını göster
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Başarıyla  Eklendi")));
+                            // Giriş alanlarını temizle
+
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext context) =>
+                                      supplier_and_customer(),
+                                ));
+                          }
+                        });
+                      } else {
+                        data!.tel = int.tryParse(tel.text) ?? 0;
+                        data!.username = username.text;
+                        data!.adress = adres.text;
+                        data!.currentType = currentType!;
+                        _databaseService
+                            .editSuplierOrCustomer(
+                                userId: AuthService().getCurrentUser()!.uid,
+                                newData: data!)
+                            .then((value) {
+                          if (value) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Başarıyla  değiştirildi")));
+
+                            Navigator.pop(context);
+                          }
+                        });
+                      }
                     }
-
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (BuildContext context) =>
-                               supplier_and_customer(),
-                        ));
                   },
                   // Tedarikçi ve Müşteri sayfasına geçişi sağlayan sayfa
                 ),
@@ -128,14 +151,10 @@ class _MyWidgetState extends State<Supplier_And_Customeradd> {
             color: Colors.grey, // Gri renkli geri dönüş ikonu
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        const Overview())); // Genel bakış sayfasına geri dönüş işlemi
+            Navigator.pop(context);
           }),
-      title: const Text(
-        " TEDARİKÇİ VE MÜŞTERİ EKLE ", // Başlık metni
+      title: Text(
+        " TEDARİKÇİ VE MÜŞTERİ ${mod == SupplierPageMode.add ? "EKLE" : "DÜZENLE"}", // Başlık metni
         style:
             TextStyle(fontSize: 20, color: Colors.white), // Başlık metni stili
       ),
