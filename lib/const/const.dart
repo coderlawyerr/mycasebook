@@ -24,12 +24,12 @@ double widthSize(BuildContext context, double value) {
   return MediaQuery.of(context).size.width * value;
 }
 
-String dateFormat(DateTime date,{bool hoursIncluded=false}) {
+String dateFormat(DateTime date, {bool hoursIncluded = false}) {
   var yil = date.year;
   var ay = date.month;
   var gun = date.day;
   var saat = "${date.hour}:${date.minute}:${date.second}";
-  if(hoursIncluded) {
+  if (hoursIncluded) {
     return "$yil/$ay/$gun  -  $saat";
   } else {
     return "$yil/$ay/$gun";
@@ -54,4 +54,22 @@ class AutoIdGenerator {
 
     return stringBuffer.toString();
   }
+}
+
+Future showAreYouSureDialog(BuildContext context, {required String message}) {
+  return showDialog(
+      context: context,
+      builder: (con) {
+        return AlertDialog(
+          content: Text(message),
+          actions: [
+            ElevatedButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: Text("Hayır")),
+            ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: Text("Evet"))
+          ],
+        );
+      });
 }

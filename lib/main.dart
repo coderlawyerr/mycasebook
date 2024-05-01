@@ -4,6 +4,7 @@ import 'firebase_options.dart';
 import 'wiew/splash.dart';
 
 Future<void> main() async {
+  // Uygulama başlatıldığında Firebase'i başlatıyoruz ve ardından uygulamayı çalıştırıyoruz.
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -17,12 +18,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-          scaffoldBackgroundColor: const Color.fromARGB(145, 7, 3, 48)),
-      title: 'Flutter Demo',
-      home:
-          const Splash(), //eklenene bır sey yok userse tıklayınca  ama ekledıgım yazıyı yok
-    );
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+            scaffoldBackgroundColor: const Color.fromARGB(145, 7, 3, 48)),
+        title: 'Flutter Demo',
+        home:
+            const Splash()); //eklenene bır sey yok userse tıklayınca  ama ekledıgım yazıyı yok
+    //ForgotPassword());
   }
 }

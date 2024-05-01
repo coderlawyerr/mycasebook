@@ -1,5 +1,5 @@
 /*
-tedarıkcı ve musterı lıstesı burada  ve sılme ıslemı gerceklesıyo
+ Bu sayfa, kullanıcıların tedarikçi ve müşteri listesini görüntüler ve silme işlemini gerçekleştirir.
 */
 
 import 'package:flutter/material.dart';
@@ -11,8 +11,8 @@ import 'package:flutter_application_1/widgets/card.dart';
 import 'package:flutter_application_1/widgets/search.dart';
 import 'package:flutter_application_1/wiew/overview.dart';
 
-class supplier_and_customer extends StatefulWidget {
-  const supplier_and_customer({super.key});
+class  supplier_and_customer extends StatefulWidget {
+    supplier_and_customer({Key? key});
 
   @override
   State<supplier_and_customer> createState() => _ProductState();
@@ -21,33 +21,34 @@ class supplier_and_customer extends StatefulWidget {
 class _ProductState extends State<supplier_and_customer> {
   TextEditingController searchController = TextEditingController();
   DataBaseService dataBaseService = DataBaseService();
-  List<SuplierCustomerModel> customerlist = [];
-  List<SuplierCustomerModel> filterlist = [];
-  List<Widget> indexedFilteredCardList = [];
+  List<SuplierCustomerModel> customerlist = []; // Müşteri listesi
+  List<SuplierCustomerModel> filterlist = []; // Filtrelenmiş müşteri listesi
+  List<Widget> indexedFilteredCardList = []; // Filtrelenmiş kartlar listesi
 
-  bool isCustomerFetched = false;
+  bool isCustomerFetched = false; // Müşterilerin çekilip çekilmediğini belirten bayrak
 
   @override
   void initState() {
-    bringCustomer();
+    bringCustomer(); // Müşterileri getiren fonksiyon çağrılır
     searchController.addListener(() {
       filterlist.clear();
       if (isCustomerFetched &&
           customerlist.isNotEmpty &&
           searchController.text.length > 2) {
         print("Filtrelendi");
+        // Filtreleme işlemi
         for (var customer in customerlist) {
           if (customer.username.contains(searchController.text)) {
             filterlist.add(customer);
           }
         }
-
-        setState(() {}); //
+        setState(() {}); // State güncellenir
       }
     });
     super.initState();
   }
 
+  // Müşterileri getiren fonksiyon
   Future<void> bringCustomer() async {
     customerlist = await dataBaseService
         .fetchCustomer(AuthService().getCurrentUser()!.uid)
@@ -65,6 +66,7 @@ class _ProductState extends State<supplier_and_customer> {
   @override
   Widget build(BuildContext context) {
     indexedFilteredCardList.clear();
+    // Filtrelenmiş müşteri kartları oluşturulur
     filterlist.asMap().forEach((key, value) {
       indexedFilteredCardList.add(customerCard(index: key, customer: value));
     });
@@ -87,6 +89,7 @@ class _ProductState extends State<supplier_and_customer> {
     );
   }
 
+  // Her bir müşteri için özel kart oluşturan metod
   Widget customerCard(
       {required int index, required SuplierCustomerModel customer}) {
     return Padding(
@@ -94,6 +97,7 @@ class _ProductState extends State<supplier_and_customer> {
       child: customCard(
         context: context,
         onDelete: () async {
+          // Silme işlemi
           await dataBaseService
               .deleteSuplierOrCustomer(
                   userId: AuthService().getCurrentUser()!.uid, data: customer)
@@ -107,11 +111,12 @@ class _ProductState extends State<supplier_and_customer> {
           });
         },
         text:
-            "Cari Tipi: ${customer.currentType.name}\nAd-Soyad: ${customer.username}\nTel: ${customer.tel}\nAdres: ${customer.adress}", // Ürün bilgileri içeren metin
+            "Cari Tipi: ${customer.currentType.name}\nAd-Soyad: ${customer.username}\nTel: ${customer.tel}\nAdres: ${customer.adress}", // Müşteri bilgileri
       ),
     );
   }
 
+  // Özel AppBar bileşeni oluşturan metod
   AppBar _appbar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.transparent, // Saydam arka plan rengi

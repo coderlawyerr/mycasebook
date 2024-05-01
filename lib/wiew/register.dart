@@ -73,36 +73,44 @@ class Register extends StatelessWidget {
                 // Kayıt butonu
                 Center(
                   child: CustomButton(
-                    text: "KAYDOL",
+                    text: "KAYDOL", // Buton metni belirlenir
                     toDo: () async {
-                      if (adsoyadController.text.isNotEmpty &&
-                          passwordController.text.isNotEmpty &&
-                          emailController.text.isNotEmpty &&
+                      if (adsoyadController.text
+                              .isNotEmpty && // Ad ve soyad alanı boş değilse devam edilir
+                          passwordController.text
+                              .isNotEmpty && // Şifre alanı boş değilse devam edilir
+                          emailController.text
+                              .isNotEmpty && // E-posta alanı boş değilse devam edilir
                           telNoController.text.isNotEmpty) {
-                        // Boş alan kontrolü yapılır, eğer tüm alanlar doluysa devam edilir
+                        // Telefon numarası alanı boş değilse devam edilir
+
+                        // AuthService sınıfından bir örnek alınır
+                        // Bu, kullanıcı girişi ve kaydı işlemlerini gerçekleştirmek için kullanılır
                         await authService
                             .signupWithEmail(
                                 emailController.text, passwordController.text)
                             .then((userid) async {
-                              
+                          // Kullanıcı kaydı başarılı bir şekilde tamamlandıysa devam edilir
                           if (userid != null) {
-                            // Kullanıcı kimliği (userID) alınır
+                            // Yeni bir UserModel örneği oluşturulur ve kullanıcı kimliği (userID) atanır
                             UserModel userdata = UserModel(userID: userid);
-                            // Kullanıcı kimliği (userID) alınır
+                            // Kullanıcının e-posta bilgisi alınır ve UserModel'de saklanır
                             userdata.email = emailController.text;
-                            // Kullanıcı bilgileri UserModel'den bir haritaya dönüştürülür ve veritabanına eklenir
+                            // Kullanıcının telefon numarası bilgisi alınır, eğer dönüşüm başarısız olursa null atanır
                             userdata.telNo = int.tryParse(telNoController.text);
+                            // Kullanıcının ad ve soyad bilgisi alınır
                             userdata.name = adsoyadController.text;
+                            // Kullanıcı bilgileri UserModel'den bir haritaya dönüştürülür ve veritabanına eklenir
                             await databaseService.newUser(userdata.toMap());
                             // Kullanıcı kaydı başarılı bir şekilde tamamlandıktan sonra oturumu kapatır
                             authService.signOut();
                             // Kullanıcı giriş sayfasına yönlendirilir
                             Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext context) =>
-                                      LoginPage(),
-                                ));
+                              context,
+                              MaterialPageRoute<void>(
+                                builder: (BuildContext context) => LoginPage(),
+                              ),
+                            );
                           }
                         });
                       }

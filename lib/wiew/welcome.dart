@@ -55,11 +55,19 @@ class LoginPage extends StatelessWidget {
                       passwordController), // Özel metin giriş alanı bileşeni
               GestureDetector(
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const ForgotPassword())); // Şifremi unuttum sayfasına yönlendirme
+                  if (emailController.text.isNotEmpty) {
+                    authService
+                        .passwordReset(emailController.text)
+                        .then((value) {
+                      if (value) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ForgotPassword(email: emailController.text,)));
+                      }
+                    });
+                  }
+                  // Şifremi unuttum sayfasına yönlendirme
                 },
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.end,

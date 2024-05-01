@@ -1,9 +1,6 @@
 /*
 tedarıkcı ve musterı ekleme sayfası
 */
-
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
@@ -109,7 +106,7 @@ class _MyWidgetState extends State<Supplier_And_Customeradd> {
                         context,
                         MaterialPageRoute<void>(
                           builder: (BuildContext context) =>
-                              const supplier_and_customer(),
+                               supplier_and_customer(),
                         ));
                   },
                   // Tedarikçi ve Müşteri sayfasına geçişi sağlayan sayfa

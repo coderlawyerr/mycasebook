@@ -113,7 +113,7 @@ class _OverviewState extends State<Overview> {
               children: [
                 Text(name), // Kullanıcı adını göster
                 Text(email), // Kullanıcı e-posta adresini göster
-                Divider(
+             const Divider(
                   color: Color.fromARGB(
                       255, 60, 60, 60), // Ayırıcı rengi gri olsun
                 ),
@@ -165,7 +165,7 @@ class _OverviewState extends State<Overview> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const supplier_and_customer()),
+                      builder: (context) =>  supplier_and_customer()),
                 );
               },
             ),

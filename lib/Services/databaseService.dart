@@ -21,6 +21,7 @@ class DataBaseService {
       return false;
     }
   }
+
   ////kullanıcı bılgılerını fırebaseden getırıyor//okuma
 
   Future<Map<String, dynamic>?> findUserbyID(String userID) async {
@@ -58,9 +59,9 @@ class DataBaseService {
   }
 
   //ürünlerım sayfası//getıme
-  Future<List<ProductModel>> fetchProcess(String userID) async {
+  Future<List<ProcessModel>> fetchProcess(String userID) async {
     try {
-      List<ProductModel> productList = [];
+      List<ProcessModel> productList = [];
       return await _ref
           .collection('users')
           .doc(userID)
@@ -71,7 +72,7 @@ class DataBaseService {
         for (var process in processes.docs) {
           ProcessModel p = ProcessModel();
           p.parseMap(process.data());
-          productList.add(p.product);
+          productList.add(p);
         }
         return productList;
       });
@@ -142,7 +143,7 @@ class DataBaseService {
       return [];
     }
   }
-
+//// sılme ıslemı
   Future<bool> deleteSuplierOrCustomer(
       {required String userId, required SuplierCustomerModel data}) async {
     try {
@@ -162,4 +163,73 @@ class DataBaseService {
       return false;
     }
   }
+//sılme ıslemı
+  Future<bool> deleteProcess(
+      {required String userId, required ProcessModel data}) async {
+    try {
+      await _ref
+          .collection('users')
+          .doc(userId)
+          .collection("Processes")
+          .doc(data.processId)
+          .delete();
+      print("process sİlindi");
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return false;
+    }
+  }
+
+//   Future<bool> updateSuplierOrCustomer(
+//       {required String userId, required SuplierCustomerModel newData}) async {
+//     try {
+//       String referans =
+//           newData.currentType == CurrentType.musteri ? "Customer" : "Supplier";
+//       await _ref
+//           .collection('users')
+//           .doc(userId)
+//           .collection(referans)
+//           .doc(newData.id)
+//           .update(newData.toMap()); // newData ile verileri güncelle
+//       return true;
+//     } catch (e) {
+//       if (kDebugMode) {
+//         print(e);
+//       }
+//       return false;
+//     }
+//   }
+
+
+// Future<bool> updateProcess(
+//       {required String userId, required ProcessModel newData}) async {
+//     try {
+//       await _ref
+//           .collection('users')
+//           .doc(userId)
+//           .collection("Processes")
+//           .doc(newData.processId)
+//           .update(newData.toMap()); // newData ile verileri güncelle
+//       print("process güncellendi");
+//       return true;
+//     } catch (e) {
+//       if (kDebugMode) {
+//         print(e);
+//       }
+//       return false;
+//     }
+//   }
+
+
+
+
+
+
+
+
 }
+
+

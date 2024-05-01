@@ -32,39 +32,39 @@ class _AddProductState extends State<AddProduct> {
     return Scaffold(
       appBar: _appbar(context),
       body: Padding(
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: SingleChildScrollView(
           child: Center(
             child: Padding(
-              padding: EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Constants.sizedbox,
                   // Ürün adı giriş alanı
-                  CustomTextWidget(text: "Ürün Adı"),
+                  const CustomTextWidget(text: "Ürün Adı"),
                   // Ürün adı metin giriş alanı
                   customTextField(controller: productName),
                   // Boşluk
                   Constants.sizedbox,
                   ///////////////
                   // Ürün alış fiyatı giriş alanı
-                  CustomTextWidget(text: "Ürün Alış Fiyatı"),
+                  const CustomTextWidget(text: "Ürün Alış Fiyatı"),
                   // Ürün alış fiyatı metin giriş alanı
                   customTextField(controller: buyPrice),
                   // Boşluk
                   Constants.sizedbox,
 
                   // Ürün satış fiyatı giriş alanı
-                  CustomTextWidget(text: "Ürün Satış Fiyatı"),
+                  const CustomTextWidget(text: "Ürün Satış Fiyatı"),
                   // Ürün satış fiyatı metin giriş alanı
                   customTextField(controller: sellPrice),
                   // Boşluk ekleyin
                   Constants.sizedbox,
 
                   // Adet giriş alanı
-                  CustomTextWidget(text: "Adet"),
+                  const CustomTextWidget(text: "Adet"),
                   // Adet metin giriş alanı
                   customTextField(controller: productAmount),
                   // Boşluk ekleyin

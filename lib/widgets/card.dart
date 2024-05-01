@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_application_1/const/const.dart';
 
 Widget customCard(
     {required String text,
     required BuildContext context,
-    Function()? onDelete}) {
+    Function()? onDelete,
+    Function()? onEdit}) {
   return Container(
     decoration: const BoxDecoration(
         color: Colors.grey,
@@ -27,8 +27,11 @@ Widget customCard(
         SizedBox(
           width: widthSize(context, 10),
         ),
-        Image.asset(
-          "assets/edıt.png",
+        GestureDetector(
+          onTap: onEdit,
+          child: Image.asset(
+            "assets/edıt.png",
+          ),
         ),
         GestureDetector(onTap: onDelete, child: Image.asset("assets/bin.png")),
       ],

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
+import 'package:flutter_application_1/models/process_model.dart';
 import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/widgets/card.dart';
 import 'package:flutter_application_1/widgets/search.dart';
@@ -19,39 +20,42 @@ class Product extends StatefulWidget {
 }
 
 class _ProductState extends State<Product> {
+  // Arama yapmak için kullanılacak metin denetleyicisi
   TextEditingController searchController = TextEditingController();
+  // Veritabanı işlemlerini gerçekleştirmek için servis nesnesi
   DataBaseService dataBaseService = DataBaseService();
-  List<ProductModel> products = [];
-  List<ProductModel> filteredProducts = [];
-
+  // Tüm ürünlerin listesi
+  List<ProcessModel> processes = [];
+  // Filtrelenmiş ürünlerin listesi
+  List<ProcessModel> filteredProcesses = [];
+  // Ürünlerin getirilip getirilmediğini kontrol etmek için bayrak
   bool isProductsFetched = false;
 
   @override
   void initState() {
-    bringProducts();
+    bringProducts(); // Ürünleri getirme işlemi
     searchController.addListener(() {
-      filteredProducts.clear();
-
+      filteredProcesses.clear();
+      // Ürünler getirildiyse ve arama metni minimum uzunluğa ulaştıysa
       if (isProductsFetched &&
-          products.isNotEmpty &&
+          processes.isNotEmpty &&
           searchController.text.length > 2) {
         //print("Filtrelendi");
-        for (var product in products) {
-          if (product.productName.contains(searchController.text)) {
-            filteredProducts.add(product);
+        for (var process in processes) {
+          if (process.product.productName.contains(searchController.text)) {
+            filteredProcesses.add(process);
           }
         }
-        /*filteredProducts.forEach((element) {
-          print(element.productName);
-        });*/
+
         setState(() {});
       }
     });
     super.initState();
   }
 
+  // Veritabanından ürünleri getirme işlemi
   Future<void> bringProducts() async {
-    products = await dataBaseService
+    processes = await dataBaseService
         .fetchProcess(AuthService().getCurrentUser()!.uid)
         .whenComplete(() => setState(() {
               isProductsFetched = true;
@@ -60,7 +64,8 @@ class _ProductState extends State<Product> {
 
   @override
   void dispose() {
-    searchController.dispose();
+    searchController
+        .dispose(); // Bellek sızıntısını önlemek için metin denetleyicisi kapatılır
     super.dispose();
   }
 
@@ -76,9 +81,9 @@ class _ProductState extends State<Product> {
             children: [
                   searchBar(searchController, context, "ürün ara"),
                 ] +
-                (filteredProducts.isNotEmpty
-                    ? filteredProducts
-                        .map((product) => productCard(product))
+                (filteredProcesses.isNotEmpty
+                    ? filteredProcesses
+                        .map((process) => productCard(process))
                         .toList()
                     : []),
           ),
@@ -87,14 +92,35 @@ class _ProductState extends State<Product> {
     );
   }
 
-  Widget productCard(ProductModel product) {
-    var tarih = dateFormat(DateTime.fromMillisecondsSinceEpoch(product.date),
+  ////ürün kartı
+  Widget productCard(ProcessModel process) {
+    var tarih = dateFormat(
+        DateTime.fromMillisecondsSinceEpoch(process.product.date),
         hoursIncluded: true);
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: customCard(
+          onDelete: () {
+            showAreYouSureDialog(context, message: "Eminmisiniz?")
+                .then((value) {
+              if (value as bool) {
+                dataBaseService
+                    .deleteProcess(
+                        userId: AuthService().getCurrentUser()!.uid,
+                        data: process)
+                    .then((value) {
+                  if (value) {
+                    processes.clear();
+                    isProductsFetched = false;
+                    filteredProcesses.clear();
+                    bringProducts().whenComplete(() => setState(() {}));
+                  }
+                });
+              }
+            });
+          },
           text:
-              "Ürün Adı: ${product.productName}\nAlış Fiyat: ${product.buyPrice}TL\nSatış Fiyat: ${product.sellPrice}\nAdet: ${product.productAmount}\nTarih:${tarih}", // Ürün bilgileri içeren metin
+              "Ürün Adı: ${process.product.productName}\nAlış Fiyat: ${process.product.buyPrice}TL\nSatış Fiyat: ${process.product.sellPrice}\nAdet: ${process.product.productAmount}\nTarih:${tarih}", // Ürün bilgileri içeren metin
 
           context: context),
     );

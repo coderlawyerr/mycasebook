@@ -2,20 +2,13 @@
 bu sayfa urun sılme sayfası
 */
 import 'package:flutter/material.dart';
-
+import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/const/const.dart';
-import 'package:flutter_application_1/widgets/squre.dart';
-import 'package:flutter_application_1/wiew/welcome.dart';
 
-class ForgotPassword extends StatefulWidget {
-  const ForgotPassword({super.key});
+class ForgotPassword extends StatelessWidget {
+  final String email;
+  const ForgotPassword({super.key, required this.email});
 
-  @override
-  State<ForgotPassword> createState() => _ForgotPasswordState();
-}
-
-// Şifremi unuttum işlemleri
-class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +20,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             const SizedBox(
               height: 125,
             ),
-            Center(child: CustomSquare()), // Özel Kareyi ortala
+            //Center(child: CustomSquare()), // Özel Kareyi ortala
             const SizedBox(
               height: 100,
             ),
@@ -35,24 +28,30 @@ class _ForgotPasswordState extends State<ForgotPassword> {
               "E-postanıza kod gönderildi", // Bilgi metni: E-postanıza kod gönderildi
               style: TextStyle(color: Colors.grey, fontSize: 20),
             ),
-            const Text(
+            /*const Text(
               "Kodun Süresi Doluyor 5 sn", // Bilgi metni: Kodun Süresi Doluyor 5 sn
               style: TextStyle(color: Colors.grey, fontSize: 15),
-            ),
+            ),*/
             const SizedBox(
               height: 50,
             ),
             Center(
-              child: Container(
-                width: 254,
-                height: 34,
-                decoration: const BoxDecoration(
-                  color: Colors.grey,
-                ),
-                child: const Center(
-                  child: Text(
-                    "DOĞRULAMA KODU TEKRAR GÖNDER", // Buton metni: DOĞRULAMA KODU TEKRAR GÖNDER
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+              child: GestureDetector(
+                onTap: (){
+                  AuthService()
+                        .passwordReset(email);
+                },
+                child: Container(
+                  width: 254,
+                  height: 34,
+                  decoration: const BoxDecoration(
+                    color: Colors.grey,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "DOĞRULAMA KODU TEKRAR GÖNDER", // Buton metni: DOĞRULAMA KODU TEKRAR GÖNDER
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
                   ),
                 ),
               ),
@@ -73,11 +72,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             color: Colors.grey, // Sol üst köşede geri butonu, gri renkte olsun
           ),
           onPressed: () {
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        LoginPage())); // Geri butonuna basıldığında önceki sayfaya yönlendir
+            Navigator.pop(context);
           }),
       title: const Text(
         "Parolanızı Mı  Unuttunuz", // Uygulama çubuğunda "Parolanızı Mı  Unuttunuz" başlığı
