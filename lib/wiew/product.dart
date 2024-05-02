@@ -7,9 +7,9 @@ import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/models/process_model.dart';
-import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/widgets/card.dart';
 import 'package:flutter_application_1/widgets/search.dart';
+import 'package:flutter_application_1/wiew/add_product.dart';
 import 'package:flutter_application_1/wiew/overview.dart';
 
 class Product extends StatefulWidget {
@@ -56,7 +56,7 @@ class _ProductState extends State<Product> {
   // Veritabanından ürünleri getirme işlemi
   Future<void> bringProducts() async {
     processes = await dataBaseService
-        .fetchProcess(AuthService().getCurrentUser()!.uid)
+        .fetchProcess(userID:AuthService().getCurrentUser()!.uid,tip: IslemTipi.alis)
         .whenComplete(() => setState(() {
               isProductsFetched = true;
             }));
@@ -118,6 +118,17 @@ class _ProductState extends State<Product> {
                 });
               }
             });
+          },
+          onEdit: () {
+            Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddProduct(
+                mod: AddProductMod.edit,
+                data: process,
+              ),
+            ),
+          );
           },
           text:
               "Ürün Adı: ${process.product.productName}\nAlış Fiyat: ${process.product.buyPrice}TL\nSatış Fiyat: ${process.product.sellPrice}\nAdet: ${process.product.productAmount}\nTarih:${tarih}", // Ürün bilgileri içeren metin

@@ -1,8 +1,8 @@
-
-
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/Services/authService.dart';
+import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
-import 'package:flutter_application_1/models/table_model.dart';
+import 'package:flutter_application_1/models/process_model.dart';
 import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/dataList.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
@@ -12,48 +12,26 @@ import 'package:flutter_application_1/wiew/overview.dart';
 class Todo extends StatefulWidget {
   const Todo({
     super.key,
-  }); // Yapılacaklar sayfası için stateful bir bileşen
+  });
 
   @override
   State<Todo> createState() => _MyWidgetState();
 }
 
 class _MyWidgetState extends State<Todo> {
+  DataBaseService dataBaseService = DataBaseService();
   double toplamSatis = 0.0;
   double toplamAlis = 0.0;
   double bakiye = 10000.0;
   bool showCards = false;
-  List<TableDataModel> data = [
-    //modellerımızı çağırıyoruz
-    TableDataModel(
-      tarih: DateTime.now(),
-      urun: 'BEYAZ KUMAŞ ',
-      urunAdet: 25,
-      islemTipi: IslemTipi.alis,
-      urunAlisFiyati: 150,
-      urunSatisFiyati: 200,
-      urunKarZararDurumu: KarZarar.kar,
-    ),
-    TableDataModel(
-      tarih: DateTime(2024, 5, 6),
-      urun: 'BEYAZ KUMAŞ ',
-      urunAdet: 50,
-      islemTipi: IslemTipi.alis,
-      urunAlisFiyati: 150,
-      urunSatisFiyati: 200,
-      urunKarZararDurumu: KarZarar.kar,
-    ),
-    TableDataModel(
-      tarih: DateTime(2024, 4, 6),
-      urun: 'kara kumaş',
-      urunAdet: 15,
-      islemTipi: IslemTipi.satis,
-      urunAlisFiyati: 150,
-      urunSatisFiyati: 200,
-      urunKarZararDurumu: KarZarar.kar,
-    ),
-  ];
-  List<TableDataModel> filteredData = [];
+  List<ProcessModel> data = [];
+  List<ProcessModel> filteredData = [];
+
+  @override
+  void initState() {
+    bringProcesses();
+    super.initState();
+  }
 
 // Fonksiyon, başlangıç ve bitiş tarihleri alır.
   void datePickerNotifier(DateTime baslangic, DateTime bitis) {
@@ -66,29 +44,24 @@ class _MyWidgetState extends State<Todo> {
 
     // Kartları gösterme kapat.
     showCards = false;
-    
-    
 
     // Veri listesindeki her bir öğe için kontrol yap.
-    for (TableDataModel eleman in data) {
+    for (ProcessModel eleman in data) {
       // Eğer öğenin tarihi, başlangıç ve bitiş tarihleri arasındaysa
-      if (eleman.tarih!.millisecondsSinceEpoch >=
+      if (eleman.date.millisecondsSinceEpoch >=
               baslangic.millisecondsSinceEpoch &&
-          eleman.tarih!.millisecondsSinceEpoch <=
-              bitis.millisecondsSinceEpoch) {
+          eleman.date.millisecondsSinceEpoch <= bitis.millisecondsSinceEpoch) {
         // Filtrelenmiş veri listesine öğeyi ekle.
         filteredData.add(eleman);
 
         // Eğer öğe bir satış işlemi ise
-        if (eleman.urunSatisFiyati != null &&
-            eleman.islemTipi == IslemTipi.satis) {
+        if (eleman.processType == IslemTipi.satis) {
           // Toplam satış miktarına öğenin kazancını ekle.
           toplamSatis += eleman.kazancHesapla();
         }
 
         // Eğer öğe bir alış işlemi ise
-        if (eleman.urunAlisFiyati != null &&
-            eleman.islemTipi == IslemTipi.alis) {
+        if (eleman.processType == IslemTipi.alis) {
           // Toplam alış miktarına öğenin toplam tutarını ekle.
           toplamAlis += eleman.toplamTutar();
         }
@@ -174,9 +147,7 @@ class _MyWidgetState extends State<Todo> {
                           })),
                   const SizedBox(height: 8),
                 ] +
-                (showCards
-                    ? dataCardList(context, filteredData, 1)
-                    : []), // dataCardList fonksiyonunu doğru şekilde çağırın
+                (showCards ? dataCardList(context, filteredData, 1) : []),
           ),
         ),
       ),
@@ -204,5 +175,11 @@ class _MyWidgetState extends State<Todo> {
                         const Overview())); // Genel bakış sayfasına geri dönüş işlemi
           }),
     );
+  }
+
+  Future<void> bringProcesses() async {
+    data = await dataBaseService
+        .fetchAllProcess(userID: AuthService().getCurrentUser()!.uid)
+        .whenComplete(() => setState(() {}));
   }
 }

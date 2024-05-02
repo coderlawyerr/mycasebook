@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter_application_1/Services/authService.dart';
+import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
-import 'package:flutter_application_1/models/table_model.dart';
+import 'package:flutter_application_1/models/process_model.dart';
+import 'package:flutter_application_1/models/product_model.dart';
+import 'package:flutter_application_1/models/supliercustomer_model.dart';
 import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/dateandclock.dart';
-import 'package:flutter_application_1/widgets/dropdown.dart';
 import 'package:flutter_application_1/widgets/dataList.dart';
-
 import 'package:flutter_application_1/widgets/textwidget.dart';
+import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 import 'overview.dart';
 
 class Sales extends StatefulWidget {
@@ -22,11 +24,22 @@ class _SalesState extends State<Sales> {
 
   TextEditingController urunAdetiController = TextEditingController();
 
+  DateTime? tarih = DateTime.now();
+  List<SuplierCustomerModel> customers = [];
+  List<ProductModel> products = [];
+  SuplierCustomerModel? selectedCustomer;
+  ProductModel? selectedProduct;
+  DataBaseService dataBaseService = DataBaseService();
+  List<ProcessModel> soldProcessList = [];
+
   int toplamFiyat = 0;
 
   @override
   void initState() {
     // Satis fiyatı alanının değişikliklerini dinleyen listener
+    bringCustomers();
+    bringProducts();
+    bringSoldProcesses();
     satisFiyatController.addListener(() {
       //// Satış fiyatını al
       int? satis = int.tryParse(satisFiyatController.text);
@@ -56,30 +69,6 @@ class _SalesState extends State<Sales> {
     super.dispose();
   }
 
-  List<TableDataModel> data = [
-    TableDataModel(
-      tarih: DateTime.now(),
-      urun: 'BEYAZ KUMAŞ ',
-      musteriAd: "zeynep kavak",
-      urunAdet: 11,
-      urunSatisFiyati: 150,
-    ),
-    TableDataModel(
-      tarih: DateTime.now(),
-      urun: 'siyah kadife parlak opak',
-      musteriAd: "ahmet veli",
-      urunAdet: 11,
-      urunSatisFiyati: 150,
-    ),
-    TableDataModel(
-      tarih: DateTime.now(),
-      urun: 'ahşap masa ayağı',
-      musteriAd: "hasan koca",
-      urunAdet: 11,
-      urunSatisFiyati: 150,
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,20 +78,58 @@ class _SalesState extends State<Sales> {
           mainAxisSize: MainAxisSize.min,
           children: [
                 _buildDateTimeRow(),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 _buildDropdownRow(),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 _buildDataInputRow(),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 CustomButton(
                   text: "KAYDET",
-                  toDo: () {},
+                  toDo: () async {
+                    if (selectedCustomer != null &&
+                        selectedProduct != null &&
+                        satisFiyatController.text.isNotEmpty &&
+                        urunAdetiController.text.isNotEmpty &&
+                        tarih != null) {
+                      ProcessModel processModel = ProcessModel.predefined(
+                          product: selectedProduct!,
+                          date: tarih!,
+                          customerName: selectedCustomer!.username,
+                          processType: IslemTipi.satis);
+
+                      processModel.product.sellPrice =
+                          double.tryParse(satisFiyatController.text) ?? 0;
+                      processModel.product.productAmount =
+                          int.tryParse(urunAdetiController.text) ?? 0;
+
+                      await dataBaseService
+                          .createSaleProcess(
+                              userId: AuthService().getCurrentUser()!.uid,
+                              processModel: processModel)
+                          .then((value) {
+                        if (value != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Satış Başarıyla  Eklendi")));
+                          setState(() {
+                            selectedCustomer = null;
+                            selectedProduct = null;
+                            satisFiyatController.text = "";
+                            urunAdetiController.text = "";
+                            toplamFiyat = 0;
+                            tarih = DateTime.now();
+                            bringSoldProcesses();
+                          });
+                        }
+                      });
+                    }
+                  },
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
               ] +
 
               ///datacard cagırıyoruz2. tablo gelsın dıye
-              dataCardList(context, data, 2),
+              dataCardList(context, soldProcessList, 2),
         ),
       ),
     );
@@ -132,56 +159,95 @@ class _SalesState extends State<Sales> {
 
   // Tarih ve saat satırı oluşturuluyor
   Widget _buildDateTimeRow() {
-    return const Row(
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        DATE(imagepath: "assets/clock.png", text: "13:20"),
-        SizedBox(width: 15),
-        DATE(imagepath: "assets/calendar.png", text: "1/2/2024"),
+        const SizedBox(width: 15),
+        Container(
+            width: 40,
+            height: 40,
+            color: Constants.mycontainer,
+            child: IconButton(
+                onPressed: () async {
+                  tarih = await showOmniDateTimePicker(
+                          context: context, is24HourMode: true)
+                      .then((value) {
+                    if (value == null) return DateTime.now();
+                    return value;
+                  });
+                  setState(() {});
+                },
+                icon: const Icon(Icons.date_range))),
+        const Spacer(),
+        DATE(
+            imagepath: "assets/clock.png",
+            text: "${tarih!.hour}:${tarih!.minute}"),
+        const SizedBox(width: 15),
+        DATE(
+            imagepath: "assets/calendar.png",
+            text: "${tarih!.day}/${tarih!.month}/${tarih!.year}"),
+        const SizedBox(width: 15),
       ],
     );
   }
 
   ///dropdown menu satırını olusuturuyor
   Widget _buildDropdownRow() {
-    return Container(
-      child: Column(
-        children: [
-          _buildDropdownColumn("Müşteri Seç"),
-          const SizedBox(height: 20),
-          _buildDropdownColumn("Ürün Seç"),
-        ],
-      ),
-    );
-  }
-
-//////dropdown sutunun olusturan wıdget
-  Widget _buildDropdownColumn(String labelText) {
-    String initialValue = '';
-    switch (labelText) {
-      case 'Tedarikçi Seç':
-        initialValue = 'Tedarikçi';
-        break;
-      case 'Müşteri Seç':
-        initialValue = 'Müşteri';
-        break;
-      case 'Ürün Seç':
-        initialValue = 'Ürün';
-        break;
-      default:
-        initialValue = 'Seç';
-        break;
-    }
-
     return Column(
       children: [
-        CustomTextWidget(text: labelText),
-        const SizedBox(height: 10),
-        //DropdownMenuExample(initialValue: initialValue),
+        customersDropDown(),
+        const SizedBox(height: 20),
+        productsDropDown()
       ],
     );
   }
 
-////textler
+  DropdownButton<SuplierCustomerModel> customersDropDown() {
+    return DropdownButton<SuplierCustomerModel>(
+        value: selectedCustomer,
+        style: Constants.textStyle,
+        //dropdownColor: Colors.red,
+        // isExpanded: true,
+        hint: const Text(
+          "Müşteri Seç",
+          style: TextStyle(color: Colors.grey),
+        ),
+        items: customers.isEmpty
+            ? null
+            : customers
+                .map((e) => DropdownMenuItem<SuplierCustomerModel>(
+                    value: e, child: Text(e.username)))
+                .toList(),
+        onChanged: (selected) {
+          setState(() {
+            selectedCustomer = selected;
+          });
+        });
+  }
+
+  DropdownButton<ProductModel> productsDropDown() {
+    return DropdownButton<ProductModel>(
+        value: selectedProduct,
+        style: Constants.textStyle,
+        //dropdownColor: Colors.red,
+        // isExpanded: true,
+        hint: const Text(
+          "Ürün Seç",
+          style: TextStyle(color: Colors.grey),
+        ),
+        items: products.isEmpty
+            ? null
+            : products
+                .map((e) => DropdownMenuItem<ProductModel>(
+                    value: e, child: Text(e.productName)))
+                .toList(),
+        onChanged: (selected) {
+          setState(() {
+            selectedProduct = selected;
+          });
+        });
+  }
+
   Widget _buildDataInputRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -191,20 +257,18 @@ class _SalesState extends State<Sales> {
         const SizedBox(width: 10),
         _buildDataInputField("Ürün Adedi", urunAdetiController),
         const SizedBox(width: 10),
-        Container(
-          child: Column(
-            children: [
-              const CustomTextWidget(text: "Toplam Tutar"),
-              SizedBox(
-                  height: 50,
-                  child: Center(
-                    child: Text(
-                      toplamFiyat.toString(),
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                  ))
-            ],
-          ),
+        Column(
+          children: [
+            const CustomTextWidget(text: "Toplam Tutar"),
+            SizedBox(
+                height: 50,
+                child: Center(
+                  child: Text(
+                    toplamFiyat.toString(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ))
+          ],
         )
       ],
     );
@@ -212,13 +276,11 @@ class _SalesState extends State<Sales> {
 
   Widget _buildDataInputField(
       String labelText, TextEditingController controller) {
-    return Container(
-      child: Column(
-        children: [
-          CustomTextWidget(text: labelText),
-          customTextFieldTwo(controller),
-        ],
-      ),
+    return Column(
+      children: [
+        CustomTextWidget(text: labelText),
+        customTextFieldTwo(controller),
+      ],
     );
   }
 
@@ -234,5 +296,24 @@ class _SalesState extends State<Sales> {
           decoration: const InputDecoration(border: InputBorder.none),
           style: const TextStyle(color: Colors.white)),
     );
+  }
+
+  Future<void> bringCustomers() async {
+    customers = await dataBaseService
+        .fetchCustomerAndSuppliers(AuthService().getCurrentUser()!.uid)
+        .whenComplete(() => setState(() {}));
+  }
+
+  Future<void> bringProducts() async {
+    products = await dataBaseService
+        .fetchProducts(AuthService().getCurrentUser()!.uid)
+        .whenComplete(() => setState(() {}));
+  }
+
+  Future<void> bringSoldProcesses() async {
+    soldProcessList = await dataBaseService
+        .fetchProcess(
+            userID: AuthService().getCurrentUser()!.uid, tip: IslemTipi.satis)
+        .whenComplete(() => setState(() {}));
   }
 }

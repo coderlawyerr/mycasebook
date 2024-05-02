@@ -52,7 +52,7 @@ class _ProductState extends State<supplier_and_customer> {
   // Müşterileri getiren fonksiyon
   Future<void> bringCustomer() async {
     customerlist = await dataBaseService
-        .fetchCustomer(AuthService().getCurrentUser()!.uid)
+        .fetchCustomerAndSuppliers(AuthService().getCurrentUser()!.uid)
         .whenComplete(() => setState(() {
               isCustomerFetched = true;
             }));
@@ -92,7 +92,6 @@ class _ProductState extends State<supplier_and_customer> {
       padding: const EdgeInsets.all(15.0),
       child: customCard(
         context: context,
-        /////
         onDelete: () async {
           // Silme işlemi
           showAreYouSureDialog(context, message: "Silmek istiyormusunuz?")

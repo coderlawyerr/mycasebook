@@ -54,19 +54,12 @@ class _DropdownMenuExampleState extends State<DropdownMenuExample> {
         items: widget.list.map<DropdownMenuItem<String>>((String value) {
           return DropdownMenuItem<String>(
             value: value,
-            child: Column(children: [
-              Text(
-                value,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const Divider(
-                color: Colors.white,
-                height: 1,
-              ),
-            ]),
+            child: Text(
+              value,
+            ),
           );
         }).toList(),
-        style: const TextStyle(color: Colors.black),
+        style: const TextStyle(color: Colors.white),
       ),
     );
   }

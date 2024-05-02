@@ -1,5 +1,3 @@
-
-
 class ProductModel {
   late String productID;
   late String productName;
@@ -15,7 +13,7 @@ class ProductModel {
       'buyPrice': buyPrice,
       'sellPrice': sellPrice,
       'productAmount': productAmount,
-      'date': DateTime.now().millisecondsSinceEpoch,
+      'date': date,
     };
   }
 

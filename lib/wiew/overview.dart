@@ -3,6 +3,7 @@ bu sayfa genel bakıs sayfası
 */
 
 import 'package:flutter/material.dart';
+
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
@@ -28,9 +29,12 @@ class _OverviewState extends State<Overview> {
   UserModel? userdata;
 
   @override
-// Bağımlılıklar değiştiğinde çağrılan asenkron bir işlev.
-  Future<void> didChangeDependencies() async {
-    // Veritabanı hizmeti kullanılarak kullanıcı kimliğine göre kullanıcı bilgileri getirilir.
+  void initState() {
+    bringUserData();
+    super.initState();
+  }
+
+  Future<void> bringUserData() async {
     await DataBaseService()
         .findUserbyID(AuthService().getCurrentUser()!.uid)
         .then((data) {
@@ -44,8 +48,6 @@ class _OverviewState extends State<Overview> {
         setState(() {});
       }
     });
-    // Üst sınıfın `didChangeDependencies` metoduna çağrı yapılır.
-    super.didChangeDependencies();
   }
 
   @override
@@ -63,15 +65,16 @@ class _OverviewState extends State<Overview> {
         ),
       ),
       drawer: _drawerr(context), // Yan menüyü oluştur
-      body: const Padding(
-        padding: EdgeInsets.only(top: 30),
+      body: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Expanded(
-              child: Center(
-                child: MyPieChart(), // Pasta grafiğini ekle
+            Center(
+              child: SizedBox(
+                width: widthSize(context, 90),
+                height: heightSize(context, 90),
+                child: MyPieChart(),
               ),
             ),
           ],
@@ -90,107 +93,105 @@ class _OverviewState extends State<Overview> {
       width: MediaQuery.of(context).size.width * 0.5,
 
       backgroundColor: Colors.grey, // Menü arka plan rengi gri olsun
-      child: Container(
-        child: ListView(
-          children: [
-            // Kullanıcı bilgilerini göster
-            CircleAvatar(
-              radius: 50, // İstediğiniz bir boyut
-              backgroundColor:
-                  Colors.transparent, // Arka plan rengini şeffaf yapın
+      child: ListView(
+        children: [
+          // Kullanıcı bilgilerini göster
+          CircleAvatar(
+            radius: 50, // İstediğiniz bir boyut
+            backgroundColor:
+                Colors.transparent, // Arka plan rengini şeffaf yapın
 
-              child: Image.asset(
-                "assets/prof.png",
-                fit: BoxFit.cover, // Resmi doldurmak için BoxFit kullanın
+            child: Image.asset(
+              "assets/prof.png",
+              fit: BoxFit.cover, // Resmi doldurmak için BoxFit kullanın
+            ),
+          ),
+
+          const SizedBox(
+            height: 5,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text(name), // Kullanıcı adını göster
+              Text(email), // Kullanıcı e-posta adresini göster
+              const Divider(
+                color:
+                    Color.fromARGB(255, 60, 60, 60), // Ayırıcı rengi gri olsun
               ),
-            ),
+            ],
+          ),
+          // Menü seçenekleri
+          CustomListTile(
+            title: "Ürün Ekle", // Menü öğesi: Ürün Ekle
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddProduct()),
+              );
+            },
+          ),
+          CustomListTile(
+            title: "Ürünler", // Menü öğesi: Ürünler
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Product()),
+              );
+            },
+          ),
+          CustomListTile(
+            title: "Yapılan İşlemler", // Menü öğesi: Yapılan İşlemler
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Todo()),
+              );
+            },
+          ),
+          CustomListTile(
+            title:
+                "Tedarikçi Müşteri Ekle", // Menü öğesi: Tedarikçi Müşteri Ekle
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Supplier_And_Customeradd()),
+              );
+            },
+          ),
+          CustomListTile(
+            title:
+                "Tedarikçiler ve Müşteriler", // Menü öğesi: Tedarikçi Müşteri Sil
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => supplier_and_customer()),
+              );
+            },
+          ),
+          CustomListTile(
+            title: "Satış", // Menü öğesi: Satış
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const Sales()),
+              );
+            },
+          ),
 
-            const SizedBox(
-              height: 5,
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(name), // Kullanıcı adını göster
-                Text(email), // Kullanıcı e-posta adresini göster
-             const Divider(
-                  color: Color.fromARGB(
-                      255, 60, 60, 60), // Ayırıcı rengi gri olsun
-                ),
-              ],
-            ),
-            // Menü seçenekleri
-            CustomListTile(
-              title: "Ürün Ekle", // Menü öğesi: Ürün Ekle
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AddProduct()),
-                );
-              },
-            ),
-            CustomListTile(
-              title: "Ürünler", // Menü öğesi: Ürünler
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Product()),
-                );
-              },
-            ),
-            CustomListTile(
-              title: "Yapılan İşlemler", // Menü öğesi: Yapılan İşlemler
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Todo()),
-                );
-              },
-            ),
-            CustomListTile(
-              title:
-                  "Tedarikçi Müşteri Ekle", // Menü öğesi: Tedarikçi Müşteri Ekle
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => Supplier_And_Customeradd()),
-                );
-              },
-            ),
-            CustomListTile(
-              title:
-                  "Tedarikçiler ve Müşteriler", // Menü öğesi: Tedarikçi Müşteri Sil
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>  supplier_and_customer()),
-                );
-              },
-            ),
-            CustomListTile(
-              title: "Satış", // Menü öğesi: Satış
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Sales()),
-                );
-              },
-            ),
-
-            CustomListTile(
-              title: "Çıkış", // Menü öğesi: Çıkış
-              onTap: () {
-                AuthService().signOut();
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginPage()),
-                );
-              },
-            ),
-          ],
-        ),
+          CustomListTile(
+            title: "Çıkış", // Menü öğesi: Çıkış
+            onTap: () {
+              AuthService().signOut();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginPage()),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

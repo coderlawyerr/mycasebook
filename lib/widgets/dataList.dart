@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/const/const.dart';
-import 'package:flutter_application_1/models/table_model.dart';
+import 'package:flutter_application_1/models/process_model.dart';
 
 // Veri kartlarını oluşturan fonksiyon
 List<Widget> dataCardList(
-    BuildContext context, List<TableDataModel> data, int cardType) {
+    BuildContext context, List<ProcessModel> data, int cardType) {
   return List.generate(data.length, (index) {
     return Padding(
       padding: const EdgeInsets.only(top: 8, bottom: 8),
@@ -13,7 +12,7 @@ List<Widget> dataCardList(
         decoration: const BoxDecoration(
             color: Colors.grey,
             borderRadius: BorderRadius.all(Radius.circular(10))),
-        height: cardType == 1 && data[index].islemTipi == IslemTipi.satis
+        height: cardType == 1 && data[index].processType == IslemTipi.satis
             ? heightSize(context, 25)
             : heightSize(context, 18),
         width: widthSize(context, 90),
@@ -25,28 +24,28 @@ List<Widget> dataCardList(
             children: cardType == 1
                 ? ([
                       Text(
-                        "Tarih :${dateFormat(data[index].tarih!, hoursIncluded: true)}",
+                        "Tarih :${dateFormat(data[index].date, hoursIncluded: true)}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Text(
-                        "Ürün Adı :${data[index].urun!}",
+                        "Ürün Adı :${data[index].product.productName}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Text(
-                        "Ürun Adeti :${data[index].urunAdet!}",
+                        "Ürun Adeti :${data[index].product.productAmount}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Row(
                         children: [
-                          Text("İşlem Tipi:  ",
+                          const Text("İşlem Tipi:  ",
                               style: TextStyle(color: Colors.white)),
                           Text(
-                            data[index].islemTipi!.name,
+                            data[index].processType.name,
                             style: TextStyle(
-                                color: data[index].islemTipi == IslemTipi.alis
+                                color: data[index].processType == IslemTipi.alis
                                     ? Colors.black
                                     : Colors.amber,
                                 fontSize: 15),
@@ -54,12 +53,12 @@ List<Widget> dataCardList(
                         ],
                       ),
                       Text(
-                        "Alış fiyatı :${data[index].urunAlisFiyati!}",
+                        "Alış fiyatı :${data[index].product.buyPrice}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Visibility(
-                        visible: data[index].islemTipi == IslemTipi.alis,
+                        visible: data[index].processType == IslemTipi.alis,
                         child: Text(
                           "Toplam Tutar :${data[index].toplamTutar()}",
                           style: const TextStyle(
@@ -67,15 +66,15 @@ List<Widget> dataCardList(
                         ),
                       ),
                     ] +
-                    (data[index].islemTipi == IslemTipi.satis
+                    (data[index].processType == IslemTipi.satis
                         ? [
                             Text(
-                              "Satış fiyatı :${data[index].urunSatisFiyati!}",
+                              "Satış fiyatı :${data[index].product.sellPrice}",
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 15),
                             ),
                             Text(
-                              "Kar Zarar Durumu :${data[index].urunKarZararDurumu!.name}",
+                              "Kar Zarar Durumu :${data[index].profitState?? data[index].profitState!.name}",
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 15),
                             ),
@@ -88,23 +87,23 @@ List<Widget> dataCardList(
                         : []))
                 : [
                     Text(
-                      "Tarih :${dateFormat(data[index].tarih!, hoursIncluded: true)}",
+                      "Tarih :${dateFormat(data[index].date, hoursIncluded: true)}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Musteri Adı :${data[index].musteriAd!}",
+                      "Musteri Adı :${data[index].customerName}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Ürün Adı :${data[index].urun!}",
+                      "Ürün Adı :${data[index].product.productName}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Urun Adeti :${data[index].urunAdet!}",
+                      "Urun Adeti :${data[index].product.productAmount}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Satış fiyatı :${data[index].urunSatisFiyati!}",
+                      "Satış fiyatı :${data[index].product.sellPrice}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(

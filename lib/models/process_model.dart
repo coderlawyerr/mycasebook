@@ -21,9 +21,16 @@ class ProcessModel {
     required this.date,
     required this.product,
     this.customerName,
-    this.profitState,
     required this.processType,
-  });
+  }) {
+    if (product.buyPrice < product.sellPrice) {
+      profitState = KarZarar.kar;
+    } else if (product.buyPrice == product.sellPrice) {
+      profitState = KarZarar.stabil;
+    } else {
+      profitState = KarZarar.zarar;
+    }
+  }
 
 // İşlem kazancını hesaplayan fonksiyon
   double kazancHesapla() {
@@ -40,9 +47,10 @@ class ProcessModel {
     return {
       'id': processId,
       'product': product.toMap(),
-      'date': DateTime.now().millisecondsSinceEpoch,
+      'date': date.millisecondsSinceEpoch,
       'customerName': customerName ?? "",
-      'profitState': profitState != null ? profitState!.index : KarZarar.stabil.index,
+      'profitState':
+          profitState != null ? profitState!.index : KarZarar.stabil.index,
       'processType': processType.index,
     };
   }
