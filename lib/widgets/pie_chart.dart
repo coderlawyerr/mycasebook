@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
 
-class MyPieChart extends StatefulWidget {
-  const MyPieChart({super.key});
-
-  @override
-  State<MyPieChart> createState() => _MyPieChartState();
-}
-
-class _MyPieChartState extends State<MyPieChart> {
-  Map<String, double> dataMap = {
+class MyPieChart extends StatelessWidget {
+  MyPieChart({super.key, required this.dataMap});
+  final Map<String, double> dataMap;
+  Map<String, double> dataMapold = {
     "GELİR": 32,
     "GİDER": 28,
-    "BORÇ": 16,
+    //"BORÇ": 16,
     "ANA PARA": 24,
   };
+
   List<Color> colorList = [
     const Color.fromARGB(255, 127, 96, 3),
     const Color.fromARGB(255, 4, 46, 80),
     Colors.black,
-    Colors.grey
+    Colors.grey 
   ];
 
   @override

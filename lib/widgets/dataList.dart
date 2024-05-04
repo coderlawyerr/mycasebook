@@ -60,7 +60,7 @@ List<Widget> dataCardList(
                       Visibility(
                         visible: data[index].processType == IslemTipi.alis,
                         child: Text(
-                          "Toplam Tutar :${data[index].toplamTutar()}",
+                          "Toplam Tutar :${data[index].giderHesapla()}",
                           style: const TextStyle(
                               color: Colors.white, fontSize: 15),
                         ),
@@ -79,7 +79,7 @@ List<Widget> dataCardList(
                                   color: Colors.white, fontSize: 15),
                             ),
                             Text(
-                              "Toplam Kazanç :${data[index].kazancHesapla()}",
+                              "Toplam Kazanç :${data[index].gelirHesapla()}",
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 15),
                             ),
@@ -107,7 +107,7 @@ List<Widget> dataCardList(
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Toplam Tutar :${data[index].kazancHesapla()}",
+                      "Toplam Tutar :${data[index].giderHesapla()}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                   ],

@@ -33,13 +33,13 @@ class ProcessModel {
   }
 
 // İşlem kazancını hesaplayan fonksiyon
-  double kazancHesapla() {
+  double gelirHesapla() {
     double kazancFiyat = product.productAmount.toDouble() * product.sellPrice;
     return kazancFiyat;
   }
 
-  // İşlem toplam tutarını hesaplayan fonksiyon
-  double toplamTutar() {
+  
+  double giderHesapla() {
     return product.productAmount.toDouble() * product.buyPrice;
   }
 

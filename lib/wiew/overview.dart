@@ -27,6 +27,7 @@ class Overview extends StatefulWidget {
 
 class _OverviewState extends State<Overview> {
   UserModel? userdata;
+  Map<String, double> dataMap = {"": 100};
 
   @override
   void initState() {
@@ -65,20 +66,33 @@ class _OverviewState extends State<Overview> {
         ),
       ),
       drawer: _drawerr(context), // Yan menüyü oluştur
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: SizedBox(
-                width: widthSize(context, 90),
-                height: heightSize(context, 90),
-                child: MyPieChart(),
+      body: FutureBuilder(future: DataBaseService(). bringStatistics(userID: AuthService().getCurrentUser()!.uid), builder: (_,snap){
+        if(snap.connectionState== ConnectionState.done) {
+          dataMap = snap.data!;
+          return main(context);
+        }else {
+          return const Center(child: CircularProgressIndicator());
+        }
+      }),
+    );
+  }
+
+  Widget main(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Center(
+            child: SizedBox(
+              width: widthSize(context, 90),
+              height: heightSize(context, 90),
+              child: MyPieChart(
+                dataMap: dataMap,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

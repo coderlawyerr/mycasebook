@@ -57,13 +57,13 @@ class _MyWidgetState extends State<Todo> {
         // Eğer öğe bir satış işlemi ise
         if (eleman.processType == IslemTipi.satis) {
           // Toplam satış miktarına öğenin kazancını ekle.
-          toplamSatis += eleman.kazancHesapla();
+          toplamSatis += eleman.gelirHesapla();
         }
 
         // Eğer öğe bir alış işlemi ise
         if (eleman.processType == IslemTipi.alis) {
           // Toplam alış miktarına öğenin toplam tutarını ekle.
-          toplamAlis += eleman.toplamTutar();
+          toplamAlis += eleman.giderHesapla();
         }
       }
     }

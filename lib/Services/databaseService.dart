@@ -334,4 +334,33 @@ class DataBaseService {
       return false;
     }
   }
+
+  Future<Map<String, double>> bringStatistics({required String userID}) async {
+    try {
+      Map<String, double> data = {};
+      List<ProcessModel> processesList = await fetchAllProcess(userID: userID);
+
+      double totalIncome = 0;
+      double totalOutcome = 0;
+      processesList.forEach((process) {
+        if (process.processType == IslemTipi.satis) {
+          totalIncome += process.gelirHesapla();
+        } else {
+          totalOutcome += process.giderHesapla();
+        }
+      });
+
+      double total = totalIncome + totalOutcome;
+
+      data["Gelir"] = (100.0 * totalIncome) / total;
+      data["Gider"] = (100.0 * totalOutcome) / total;
+
+      return data;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return {};
+    }
+  }
 }
