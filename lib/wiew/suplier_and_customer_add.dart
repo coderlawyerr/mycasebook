@@ -18,11 +18,12 @@ class Supplier_And_Customeradd extends StatelessWidget {
   Supplier_And_Customeradd(
       {super.key, this.mod = SupplierPageMode.add, this.data});
 
-  SupplierPageMode mod;
+  SupplierPageMode mod; // Sayfa modu değişkeni
 
-  SuplierCustomerModel? data;
+  SuplierCustomerModel? data; // Veri değişkeni
 
-  final DataBaseService _databaseService = DataBaseService();
+  final DataBaseService _databaseService =
+      DataBaseService(); // Veritabanı servisi örneği
 
   late TextEditingController username;
 
@@ -30,8 +31,9 @@ class Supplier_And_Customeradd extends StatelessWidget {
 
   late TextEditingController adres;
 
-  CurrentType? currentType;
+  CurrentType? currentType; // Geçerli tür değişkeni
 
+  // Geçerli türü ayarlayan metod
   void currentTypeSetter(CurrentType type) {
     currentType = type;
   }
@@ -80,11 +82,13 @@ class Supplier_And_Customeradd extends StatelessWidget {
                 child: CustomButton(
                   text: "ONAYLA", // Onayla metni
                   toDo: () {
+                    // Veri girişi kontrolü
                     if (username.text.isNotEmpty &&
                         tel.text.isNotEmpty &&
                         adres.text.isNotEmpty &&
                         currentType != null) {
                       if (mod == SupplierPageMode.add) {
+                        // Yeni tedarikçi/müşteri ekleme işlemi
                         data = SuplierCustomerModel();
                         data!.tel = int.tryParse(tel.text) ?? 0;
                         data!.username = username.text;
@@ -112,6 +116,7 @@ class Supplier_And_Customeradd extends StatelessWidget {
                           }
                         });
                       } else {
+                        // Tedarikçi/müşteri düzenleme işlemi
                         data!.tel = int.tryParse(tel.text) ?? 0;
                         data!.username = username.text;
                         data!.adress = adres.text;

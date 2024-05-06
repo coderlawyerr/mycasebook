@@ -66,14 +66,17 @@ class _OverviewState extends State<Overview> {
         ),
       ),
       drawer: _drawerr(context), // Yan menüyü oluştur
-      body: FutureBuilder(future: DataBaseService(). bringStatistics(userID: AuthService().getCurrentUser()!.uid), builder: (_,snap){
-        if(snap.connectionState== ConnectionState.done) {
-          dataMap = snap.data!;
-          return main(context);
-        }else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      }),
+      body: FutureBuilder(
+          future: DataBaseService()
+              .bringStatistics(userID: AuthService().getCurrentUser()!.uid),
+          builder: (_, snap) {
+            if (snap.connectionState == ConnectionState.done) {
+              dataMap = snap.data!;
+              return main(context);
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          }),
     );
   }
 

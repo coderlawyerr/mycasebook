@@ -22,8 +22,6 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
             scaffoldBackgroundColor: const Color.fromARGB(145, 7, 3, 48)),
         title: 'Flutter Demo',
-        home:
-            const Splash()); //eklenene bır sey yok userse tıklayınca  ama ekledıgım yazıyı yok
-    //ForgotPassword());
+        home: const Splash());
   }
 }

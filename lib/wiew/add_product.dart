@@ -81,72 +81,113 @@ class AddProduct extends StatelessWidget {
                   Constants.sizedbox,
                   Center(
                     child: CustomButton(
-                      // Onayla butonu
-                      text: "ONAYLA",
-                      // Ürün sayfasına yönlendir
+                        // Onayla butonu
+                        text: "ONAYLA",
+                        // Ürün sayfasına yönlendir
 
-                      toDo: () {
-                        if (productName.text.isNotEmpty &&
-                            buyPrice.text.isNotEmpty &&
-                            sellPrice.text.isNotEmpty &&
-                            productAmount.text.isNotEmpty) {
-                          if (mod == AddProductMod.add) {
-                            ProductModel product = ProductModel();
+                        toDo: () {
+                          // Eğer ürün adı, alış fiyatı, satış fiyatı ve ürün miktarı alanları boş değilse devam et
+                          if (productName.text.isNotEmpty &&
+                              buyPrice.text.isNotEmpty &&
+                              sellPrice.text.isNotEmpty &&
+                              productAmount.text.isNotEmpty) {
+                            // Eğer işlem ekleme modunda ise
+                            if (mod == AddProductMod.add) {
+                              // Yeni bir ürün modeli oluştur
+                              ProductModel product = ProductModel();
 
-                            product.buyPrice =
-                                double.tryParse(buyPrice.text) ?? 0.0;
-                            product.sellPrice =
-                                double.tryParse(sellPrice.text) ?? 0.0;
-                            product.productName = productName.text;
-                            product.productAmount =
-                                int.tryParse(productAmount.text) ?? 0;
-                            databaseService
-                                .addNewProduct(
-                                    AuthService().getCurrentUser()!.uid,
-                                    product)
-                                .then((value) {
-                              // Eğer işlem başarılı olduysa (değer null değilse)
-                              if (value == true) {
-                                // Kullanıcıya başarılı ekleme mesajını göster
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content:
-                                            Text("Ürün Başarıyla  Eklendi")));
-                                // Giriş alanlarını temizle
-                                productName.clear();
-                                buyPrice.clear();
-                                sellPrice.clear();
-                                productAmount.clear();
-                              }
-                            });
-                          } else {
-                            data!.product.buyPrice =
-                                double.tryParse(buyPrice.text) ?? 0.0;
-                            data!.product.sellPrice =
-                                double.tryParse(sellPrice.text) ?? 0.0;
-                            data!.product.productName = productName.text;
-                            data!.product.productAmount =
-                                int.tryParse(productAmount.text) ?? 0;
-                            databaseService
-                                .updateProcess(
-                                    userID: AuthService().getCurrentUser()!.uid,
-                                    newData: data!)
-                                .then((value) {
-                              // Eğer işlem başarılı olduysa (değer null değilse)
-                              if (value == true) {
-                                // Kullanıcıya başarılı ekleme mesajını göster
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            "Ürün Başarıyla  Güncellendi")));
+                              // Alış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
+                              double? buyPriceValue =
+                                  double.tryParse(buyPrice.text);
+                              product.buyPrice = buyPriceValue ?? 0.0;
 
-                                Navigator.pop(context);
-                              }
-                            });
+                              // Satış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
+                              double? sellPriceValue =
+                                  double.tryParse(sellPrice.text);
+                              product.sellPrice = sellPriceValue ?? 0.0;
+
+                              // Ürün adını ata
+                              product.productName = productName.text;
+
+                              // Ürün miktarını al, int'e dönüştür, dönüşüm başarısız olursa 0 olarak ata
+                              int? productAmountValue =
+                                  int.tryParse(productAmount.text);
+                              product.productAmount = productAmountValue ?? 0;
+
+                              // Yeni ürünü veritabanına eklemek için databaseService kullanarak işlemi gerçekleştir
+                              databaseService
+                                  .addNewProduct(
+                                      AuthService().getCurrentUser()!.uid,
+                                      product)
+                                  .then((value) {
+                                // Eğer işlem başarılı olduysa (değer null değilse)
+                                if (value == true) {
+                                  // Kullanıcıya başarılı ekleme mesajını göster
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content:
+                                              Text("Ürün Başarıyla  Eklendi")));
+                                  // Giriş alanlarını temizle
+                                  productName.clear();
+                                  buyPrice.clear();
+                                  sellPrice.clear();
+                                  productAmount.clear();
+                                }
+                              });
+                            } else {
+                              // Eğer işlem güncelleme modunda ise
+                              // Alış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
+                              double? buyPriceValue =
+                                  double.tryParse(buyPrice.text);
+                              data!.product.buyPrice = buyPriceValue ?? 0.0;
+
+                              ////
+
+                            // double? buyPriceValue = double.tryParse(buyPrice.text);
+                           // if (buyPriceValue != null) {
+                          //   data!.product.buyPrice = buyPriceValue;
+                          // } else {
+                         //   data!.product.buyPrice = 0.0;
+                           // }
+
+                             //////
+                              // Satış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
+                              double? sellPriceValue =
+                                  double.tryParse(sellPrice.text);
+                              data!.product.sellPrice = sellPriceValue ?? 0.0;
+
+                              // Ürün adını ata
+                              data!.product.productName = productName.text;
+
+                              // Ürün miktarını al, int'e dönüştür, dönüşüm başarısız olursa 0 olarak ata
+                              int? productAmountValue =
+                                  int.tryParse(productAmount.text);
+                              data!.product.productAmount =
+                                  productAmountValue ?? 0;
+
+                              // İşlemi güncellemek için databaseService kullanarak işlemi gerçekleştir
+                              databaseService
+                                  .updateProcess(
+                                      userID:
+                                          AuthService().getCurrentUser()!.uid,
+                                      newData: data!)
+                                  .then((value) {
+                                // Eğer işlem başarılı olduysa (değer null değilse)
+                                if (value == true) {
+                                  // Kullanıcıya başarılı güncelleme mesajını göster
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              "Ürün Başarıyla  Güncellendi")));
+
+                                  // Sayfayı kapat
+                                  Navigator.pop(context);
+                                }
+                              });
+
+                            }
                           }
-                        }
-                      },
-                    ),
+                        }),
                   ),
                 ],
               ),

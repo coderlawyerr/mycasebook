@@ -63,7 +63,9 @@ class LoginPage extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ForgotPassword(email: emailController.text,)));
+                                builder: (context) => ForgotPassword(
+                                      email: emailController.text,
+                                    )));
                       }
                     });
                   }
@@ -97,18 +99,34 @@ class LoginPage extends StatelessWidget {
                         .then((userid) {
                       // Eğer kullanıcı kimliği null değilse, yani giriş başarılı olduysa
                       if (userid != null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Hoş geldiniz!'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
                         // Yeni sayfaya geçiş için Navigator kullanılarak mevcut sayfa yerine Overview sayfası geçilir.
                         Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (BuildContext context) => Overview(),
-                            ));
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => Overview(),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content:
+                                Text('Giriş başarısız. Lütfen tekrar deneyin.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
                       }
                     });
                   } else
                     // Eğer e-posta veya şifre alanları boşsa, "Boş" mesajı konsola yazdırılır.
                     print("Boş");
                 },
+
 // Genel bakış sayfasına yönlendirme
               )),
               const SizedBox(

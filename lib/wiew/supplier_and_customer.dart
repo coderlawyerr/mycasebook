@@ -97,6 +97,7 @@ class _ProductState extends State<supplier_and_customer> {
           showAreYouSureDialog(context, message: "Silmek istiyormusunuz?")
               .then((value) async {
             if (value != null && value) {
+             // databaseden sılme
               await dataBaseService
                   .deleteSuplierOrCustomer(
                       userId: AuthService().getCurrentUser()!.uid,
@@ -114,6 +115,7 @@ class _ProductState extends State<supplier_and_customer> {
             }
           });
         },
+        //databaseden duzenleme
         onEdit: () async {
           Navigator.push(
             context,

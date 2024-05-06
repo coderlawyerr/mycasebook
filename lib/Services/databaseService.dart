@@ -45,6 +45,7 @@ class DataBaseService {
     try {
       data.productID = AutoIdGenerator.autoId();
       data.date = DateTime.now().millisecondsSinceEpoch;
+      // İşlem modelini oluştur
       ProcessModel processModel = ProcessModel.predefined(
           product: data, date: DateTime.now(), processType: IslemTipi.alis);
       processModel.processId = AutoIdGenerator.autoId();
@@ -63,6 +64,7 @@ class DataBaseService {
     }
   }
 
+  //urun satıs
   Future<bool?> createSaleProcess({
     required String userId,
     required ProcessModel processModel,
@@ -112,6 +114,7 @@ class DataBaseService {
     }
   }
 
+  //urun cagıırma
   Future<List<ProcessModel>> fetchAllProcess({required String userID}) async {
     try {
       List<ProcessModel> processList = [];
@@ -136,6 +139,7 @@ class DataBaseService {
     }
   }
 
+  ///urun gerıme
   Future<List<ProductModel>> fetchProducts(String userID) async {
     try {
       List<ProductModel> productList = [];
@@ -161,6 +165,7 @@ class DataBaseService {
     }
   }
 
+////tedarıkcı ve musterı ekleme sayfası
   Future<bool> addSupplierOrCustomer(
       {required String userId, required SuplierCustomerModel data}) async {
     try {
@@ -179,6 +184,7 @@ class DataBaseService {
     }
   }
 
+//musetero getırme
   Future<List<SuplierCustomerModel>> fetchCustomerAndSuppliers(
       String userID) async {
     try {
@@ -208,34 +214,34 @@ class DataBaseService {
     }
   }
 
-  Future<List<SuplierCustomerModel>> fetchCustomers(String userID) async {
-    try {
-      List<SuplierCustomerModel> customerlist = [];
-      await _ref
-          .collection('users')
-          .doc(userID)
-          .collection("Customer&Supplier")
-          .where("currentType", isEqualTo: 1)
-          .get()
-          .then((customer) {
-        if (customer.size > 0) {
-          for (var customer in customer.docs) {
-            SuplierCustomerModel c = SuplierCustomerModel();
-            c.parseMap(customer.data());
-            c.id = customer.id;
-            customerlist.add(c);
-          }
-        }
-      });
+  // Future<List<SuplierCustomerModel>> fetchCustomers(String userID) async {
+  //   try {
+  //     List<SuplierCustomerModel> customerlist = [];
+  //     await _ref
+  //         .collection('users')
+  //         .doc(userID)
+  //         .collection("Customer&Supplier")
+  //         .where("currentType", isEqualTo: 1)
+  //         .get()
+  //         .then((customer) {
+  //       if (customer.size > 0) {
+  //         for (var customer in customer.docs) {
+  //           SuplierCustomerModel c = SuplierCustomerModel();
+  //           c.parseMap(customer.data());
+  //           c.id = customer.id;
+  //           customerlist.add(c);
+  //         }
+  //       }
+  //     });
 
-      return customerlist;
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
-      }
-      return [];
-    }
-  }
+  //     return customerlist;
+  //   } catch (e) {
+  //     if (kDebugMode) {
+  //       print(e);
+  //     }
+  //     return [];
+  //   }
+  // }
 
 //// sılme ıslemı
   Future<bool> deleteSuplierOrCustomer(
@@ -256,6 +262,7 @@ class DataBaseService {
     }
   }
 
+//guncelleme urun sayfası
   Future<bool> updateProcess(
       {required String userID, required ProcessModel newData}) async {
     try {
@@ -274,7 +281,7 @@ class DataBaseService {
     }
   }
 
-//sılme ıslemı
+//sılme ıslemı urun
   Future<bool> deleteProcess(
       {required String userId, required ProcessModel data}) async {
     try {
@@ -296,6 +303,7 @@ class DataBaseService {
     }
   }
 
+  //musterı tedarıkcı guncelle
   Future<bool> editSuplierOrCustomer(
       {required String userId, required SuplierCustomerModel newData}) async {
     try {
@@ -314,6 +322,7 @@ class DataBaseService {
     }
   }
 
+  ///urun guncelle
   Future<bool> editProcess(
       {required String userId, required ProcessModel newData}) async {
     try {
@@ -335,6 +344,7 @@ class DataBaseService {
     }
   }
 
+//over vıew  grafık
   Future<Map<String, double>> bringStatistics({required String userID}) async {
     try {
       Map<String, double> data = {};

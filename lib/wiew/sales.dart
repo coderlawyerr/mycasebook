@@ -91,12 +91,13 @@ class _SalesState extends State<Sales> {
                         satisFiyatController.text.isNotEmpty &&
                         urunAdetiController.text.isNotEmpty &&
                         tarih != null) {
+                           // Yeni bir işlem modeli oluşturuluyor
                       ProcessModel processModel = ProcessModel.predefined(
                           product: selectedProduct!,
                           date: tarih!,
                           customerName: selectedCustomer!.username,
                           processType: IslemTipi.satis);
-
+                     // Satış fiyatı ve ürün adedi ekleniyor
                       processModel.product.sellPrice =
                           double.tryParse(satisFiyatController.text) ?? 0;
                       processModel.product.productAmount =
@@ -107,10 +108,12 @@ class _SalesState extends State<Sales> {
                               userId: AuthService().getCurrentUser()!.uid,
                               processModel: processModel)
                           .then((value) {
+                            // Ekleme başarılıysa bilgilendirme gösteriliyor
                         if (value != null) {
                           ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content: Text("Satış Başarıyla  Eklendi")));
+                         // Alanlar temizleniyor ve satılan işlemler yeniden getiriliyor
                           setState(() {
                             selectedCustomer = null;
                             selectedProduct = null;
@@ -128,7 +131,8 @@ class _SalesState extends State<Sales> {
                 const SizedBox(height: 8),
               ] +
 
-              ///datacard cagırıyoruz2. tablo gelsın dıye
+             // Satılan işlemlerin listesi oluşturuluyor
+
               dataCardList(context, soldProcessList, 2),
         ),
       ),
@@ -169,6 +173,7 @@ class _SalesState extends State<Sales> {
             color: Constants.mycontainer,
             child: IconButton(
                 onPressed: () async {
+                  // Tarih seçimi yapılıyor
                   tarih = await showOmniDateTimePicker(
                           context: context, is24HourMode: true)
                       .then((value) {
@@ -224,7 +229,7 @@ class _SalesState extends State<Sales> {
           });
         });
   }
-
+ // Ürün dropdown bileşeni oluşturuluyor
   DropdownButton<ProductModel> productsDropDown() {
     return DropdownButton<ProductModel>(
         value: selectedProduct,
@@ -247,7 +252,7 @@ class _SalesState extends State<Sales> {
           });
         });
   }
-
+ // Veri giriş satırı oluşturuluyor
   Widget _buildDataInputRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -257,8 +262,10 @@ class _SalesState extends State<Sales> {
         const SizedBox(width: 10),
         _buildDataInputField("Ürün Adedi", urunAdetiController),
         const SizedBox(width: 10),
+        // Toplam tutar gösteriliyor
         Column(
           children: [
+             // Satış fiyatı ve ürün adeti giriş alanları oluşturuluyor
             const CustomTextWidget(text: "Toplam Tutar"),
             SizedBox(
                 height: 50,
@@ -273,7 +280,7 @@ class _SalesState extends State<Sales> {
       ],
     );
   }
-
+  // Veri giriş alanı oluşturuluyor
   Widget _buildDataInputField(
       String labelText, TextEditingController controller) {
     return Column(
@@ -283,7 +290,7 @@ class _SalesState extends State<Sales> {
       ],
     );
   }
-
+  // Özel metin giriş alanı oluşturuluyor
   Widget customTextFieldTwo(TextEditingController controller) {
     return Container(
       width: 116,
@@ -297,19 +304,20 @@ class _SalesState extends State<Sales> {
           style: const TextStyle(color: Colors.white)),
     );
   }
-
+   // Müşteri verileri getiriliyor
   Future<void> bringCustomers() async {
     customers = await dataBaseService
         .fetchCustomerAndSuppliers(AuthService().getCurrentUser()!.uid)
         .whenComplete(() => setState(() {}));
   }
 
+  // Ürün verileri getiriliyor
   Future<void> bringProducts() async {
     products = await dataBaseService
         .fetchProducts(AuthService().getCurrentUser()!.uid)
         .whenComplete(() => setState(() {}));
   }
-
+//// Satılan işlemlerin listesi getiriliyor
   Future<void> bringSoldProcesses() async {
     soldProcessList = await dataBaseService
         .fetchProcess(
