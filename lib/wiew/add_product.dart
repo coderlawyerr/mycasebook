@@ -8,7 +8,6 @@ import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/models/process_model.dart';
 import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/widgets/button.dart';
-import 'package:flutter_application_1/widgets/textfield.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
 import 'package:flutter_application_1/wiew/overview.dart';
 
@@ -197,7 +196,19 @@ class AddProduct extends StatelessWidget {
       ),
     );
   }
-
+Widget customTextField({TextEditingController? controller}) {
+  return Container(
+    width: 372,
+    height: 42,
+    decoration: const BoxDecoration(
+      color: Color(0xFF5D5353),
+    ),
+    child:  TextField(
+      controller: controller,
+        decoration: const InputDecoration(border: InputBorder.none),
+        style: const TextStyle(color: Colors.white)),
+  );
+}
   // Uygulama çubuğunda "Ürün Ekle" başlığı
   AppBar _appbar(BuildContext context) {
     return AppBar(

@@ -2,6 +2,7 @@
  Bu sayfa, kullanıcıların tedarikçi ve müşteri listesini görüntüler ve silme işlemini gerçekleştirir.
 */
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
@@ -9,17 +10,16 @@ import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/models/supliercustomer_model.dart';
 import 'package:flutter_application_1/widgets/card.dart';
 import 'package:flutter_application_1/widgets/search.dart';
-import 'package:flutter_application_1/wiew/overview.dart';
 import 'package:flutter_application_1/wiew/suplier_and_customer_add.dart';
 
-class supplier_and_customer extends StatefulWidget {
-  supplier_and_customer({Key? key});
+class SupplierAndCustomer extends StatefulWidget {
+  const SupplierAndCustomer({super.key});
 
   @override
-  State<supplier_and_customer> createState() => _ProductState();
+  State<SupplierAndCustomer> createState() => _ProductState();
 }
 
-class _ProductState extends State<supplier_and_customer> {
+class _ProductState extends State<SupplierAndCustomer> {
   TextEditingController searchController = TextEditingController();
   DataBaseService dataBaseService = DataBaseService();
   List<SuplierCustomerModel> customerlist = []; // Müşteri listesi
@@ -36,7 +36,9 @@ class _ProductState extends State<supplier_and_customer> {
       if (isCustomerFetched &&
           customerlist.isNotEmpty &&
           searchController.text.length > 2) {
-        print("Filtrelendi");
+        if (kDebugMode) {
+          print("Filtrelendi");
+        }
         // Filtreleme işlemi
         for (var customer in customerlist) {
           if (customer.username.contains(searchController.text)) {
@@ -97,7 +99,7 @@ class _ProductState extends State<supplier_and_customer> {
           showAreYouSureDialog(context, message: "Silmek istiyormusunuz?")
               .then((value) async {
             if (value != null && value) {
-             // databaseden sılme
+              // databaseden sılme
               await dataBaseService
                   .deleteSuplierOrCustomer(
                       userId: AuthService().getCurrentUser()!.uid,
@@ -120,7 +122,7 @@ class _ProductState extends State<supplier_and_customer> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Supplier_And_Customeradd(
+              builder: (context) => SupplierAndCustomerAdd(
                 mod: SupplierPageMode.edit,
                 data: customer,
               ),

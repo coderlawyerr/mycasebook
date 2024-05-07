@@ -38,6 +38,7 @@ class ForgotPassword extends StatelessWidget {
             Center(
               child: GestureDetector(
                 onTap: (){
+                  ///sıfre sıfırlanıyo
                   AuthService()
                         .passwordReset(email);
                 },

@@ -21,7 +21,7 @@ class Product extends StatefulWidget {
 
 class _ProductState extends State<Product> {
   // Arama yapmak için kullanılacak metin denetleyicisi
-  TextEditingController searchController = TextEditingController();
+  TextEditingController searchController = TextEditingController(text: "");
   // Veritabanı işlemlerini gerçekleştirmek için servis nesnesi
   DataBaseService dataBaseService = DataBaseService();
   // Tüm ürünlerin listesi
@@ -33,30 +33,41 @@ class _ProductState extends State<Product> {
 
   @override
   void initState() {
-    bringProducts(); // Ürünleri getirme işlemi
-    searchController.addListener(() {
-      filteredProcesses.clear();
-      // Ürünler getirildiyse ve arama metni minimum uzunluğa ulaştıysa
-      if (isProductsFetched &&
-          processes.isNotEmpty &&
-          searchController.text.length > 2) {
-        //print("Filtrelendi");
-        for (var process in processes) {
-          if (process.product.productName.contains(searchController.text)) {
-            filteredProcesses.add(process);
-          }
+    bringProducts().whenComplete(() {
+      setState(() {
+        filteredProcesses.addAll(processes);
+      });
+      searchController.addListener(() {
+        if (searchController.text.length <= 2) {
+          filteredProcesses.clear();
+          filteredProcesses.addAll(processes);
+          setState(() {});
         }
 
-        setState(() {});
-      }
-    });
+        // Ürünler getirildiyse ve arama metni minimum uzunluğa ulaştıysa
+        if (isProductsFetched &&
+            processes.isNotEmpty &&
+            searchController.text.length > 2) {
+          filteredProcesses.clear();
+          for (var process in processes) {
+            if (process.product.productName.contains(searchController.text)) {
+              filteredProcesses.add(process);
+            }
+          }
+
+          setState(() {});
+        }
+      });
+    }); // Ürünleri getirme işlemi
+
     super.initState();
   }
 
   // Veritabanından ürünleri getirme işlemi
   Future<void> bringProducts() async {
     processes = await dataBaseService
-        .fetchProcess(userID:AuthService().getCurrentUser()!.uid,tip: IslemTipi.alis)
+        .fetchProcess(
+            userID: AuthService().getCurrentUser()!.uid, tip: IslemTipi.alis)
         .whenComplete(() => setState(() {
               isProductsFetched = true;
             }));
@@ -121,14 +132,14 @@ class _ProductState extends State<Product> {
           },
           onEdit: () {
             Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddProduct(
-                mod: AddProductMod.edit,
-                data: process,
+              context,
+              MaterialPageRoute(
+                builder: (context) => AddProduct(
+                  mod: AddProductMod.edit,
+                  data: process,
+                ),
               ),
-            ),
-          );
+            );
           },
           text:
               "Ürün Adı: ${process.product.productName}\nAlış Fiyat: ${process.product.buyPrice}TL\nSatış Fiyat: ${process.product.sellPrice}\nAdet: ${process.product.productAmount}\nTarih:${tarih}", // Ürün bilgileri içeren metin

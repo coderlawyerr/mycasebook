@@ -20,10 +20,10 @@ class Sales extends StatefulWidget {
 }
 
 class _SalesState extends State<Sales> {
-  TextEditingController satisFiyatController = TextEditingController();
-
+  double satisFiyati = 0.0;
+  final _formkey = GlobalKey<FormState>();
   TextEditingController urunAdetiController = TextEditingController();
-
+  int maxUrunAdeti = 0x7FFFFFFFFFFFFFFF;
   DateTime? tarih = DateTime.now();
   List<SuplierCustomerModel> customers = [];
   List<ProductModel> products = [];
@@ -32,7 +32,7 @@ class _SalesState extends State<Sales> {
   DataBaseService dataBaseService = DataBaseService();
   List<ProcessModel> soldProcessList = [];
 
-  int toplamFiyat = 0;
+  double toplamFiyat = 0.0;
 
   @override
   void initState() {
@@ -40,22 +40,10 @@ class _SalesState extends State<Sales> {
     bringCustomers();
     bringProducts();
     bringSoldProcesses();
-    satisFiyatController.addListener(() {
-      //// Satış fiyatını al
-      int? satis = int.tryParse(satisFiyatController.text);
-      // Ürün adedini al
-      int? adet = int.tryParse(urunAdetiController.text);
-      setState(() {
-        // Eğer her ikisi de null değilse, toplam fiyatı güncelle
-        if (satis != null && adet != null) toplamFiyat = satis * adet;
-      });
-    });
     urunAdetiController.addListener(() {
-      int? satis = int.tryParse(satisFiyatController.text);
-      int? adet = int.tryParse(urunAdetiController.text);
-      // Eğer her ikisi de null değilse, toplam fiyatı güncelle
+      double? adet = double.tryParse(urunAdetiController.text);
       setState(() {
-        if (satis != null && adet != null) toplamFiyat = satis * adet;
+        if (adet != null) toplamFiyat = satisFiyati * adet;
       });
     });
     super.initState();
@@ -64,7 +52,6 @@ class _SalesState extends State<Sales> {
   @override
   void dispose() {
     // Text controller'ları temizle
-    satisFiyatController.dispose();
     urunAdetiController.dispose();
     super.dispose();
   }
@@ -74,66 +61,67 @@ class _SalesState extends State<Sales> {
     return Scaffold(
       appBar: _buildAppBar(context),
       body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-                _buildDateTimeRow(),
-                const SizedBox(height: 8),
-                _buildDropdownRow(),
-                const SizedBox(height: 8),
-                _buildDataInputRow(),
-                const SizedBox(height: 8),
-                CustomButton(
-                  text: "KAYDET",
-                  toDo: () async {
-                    if (selectedCustomer != null &&
-                        selectedProduct != null &&
-                        satisFiyatController.text.isNotEmpty &&
-                        urunAdetiController.text.isNotEmpty &&
-                        tarih != null) {
-                           // Yeni bir işlem modeli oluşturuluyor
-                      ProcessModel processModel = ProcessModel.predefined(
-                          product: selectedProduct!,
-                          date: tarih!,
-                          customerName: selectedCustomer!.username,
-                          processType: IslemTipi.satis);
-                     // Satış fiyatı ve ürün adedi ekleniyor
-                      processModel.product.sellPrice =
-                          double.tryParse(satisFiyatController.text) ?? 0;
-                      processModel.product.productAmount =
-                          int.tryParse(urunAdetiController.text) ?? 0;
+        child: Form(
+          key: _formkey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+                  _buildDateTimeRow(),
+                  const SizedBox(height: 8),
+                  _buildDropdownRow(),
+                  const SizedBox(height: 8),
+                  _buildDataInputRow(),
+                  const SizedBox(height: 8),
+                  CustomButton(
+                    text: "KAYDET",
+                    toDo: () async {
+                      if (selectedCustomer != null &&
+                          selectedProduct != null &&
+                          urunAdetiController.text.isNotEmpty &&
+                          int.parse(urunAdetiController.text) <= maxUrunAdeti &&
+                          tarih != null) {
+                        // Yeni bir işlem modeli oluşturuluyor
+                        ProcessModel processModel = ProcessModel.predefined(
+                            product: selectedProduct!,
+                            date: tarih!,
+                            customerName: selectedCustomer!.username,
+                            processType: IslemTipi.satis);
+                        // Satış fiyatı ve ürün adedi ekleniyor
+                        processModel.product.productAmount =
+                            int.tryParse(urunAdetiController.text) ?? 0;
 
-                      await dataBaseService
-                          .createSaleProcess(
-                              userId: AuthService().getCurrentUser()!.uid,
-                              processModel: processModel)
-                          .then((value) {
-                            // Ekleme başarılıysa bilgilendirme gösteriliyor
-                        if (value != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                  content: Text("Satış Başarıyla  Eklendi")));
-                         // Alanlar temizleniyor ve satılan işlemler yeniden getiriliyor
-                          setState(() {
-                            selectedCustomer = null;
-                            selectedProduct = null;
-                            satisFiyatController.text = "";
-                            urunAdetiController.text = "";
-                            toplamFiyat = 0;
-                            tarih = DateTime.now();
-                            bringSoldProcesses();
-                          });
-                        }
-                      });
-                    }
-                  },
-                ),
-                const SizedBox(height: 8),
-              ] +
+                        await dataBaseService
+                            .createSaleProcess(
+                                userId: AuthService().getCurrentUser()!.uid,
+                                processModel: processModel)
+                            .then((value) {
+                          // Ekleme başarılıysa bilgilendirme gösteriliyor
+                          if (value != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text("Satış Başarıyla  Eklendi")));
+                            // Alanlar temizleniyor ve satılan işlemler yeniden getiriliyor
+                            setState(() {
+                              selectedCustomer = null;
+                              selectedProduct = null;
+                              urunAdetiController.text = "0";
+                              toplamFiyat = 0;
+                              satisFiyati = 0.0;
+                              tarih = DateTime.now();
+                              bringSoldProcesses();
+                            });
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                ] +
 
-             // Satılan işlemlerin listesi oluşturuluyor
+                // Satılan işlemlerin listesi oluşturuluyor
 
-              dataCardList(context, soldProcessList, 2),
+                dataCardList(context, soldProcessList, 2),
+          ),
         ),
       ),
     );
@@ -229,7 +217,8 @@ class _SalesState extends State<Sales> {
           });
         });
   }
- // Ürün dropdown bileşeni oluşturuluyor
+
+  // Ürün dropdown bileşeni oluşturuluyor
   DropdownButton<ProductModel> productsDropDown() {
     return DropdownButton<ProductModel>(
         value: selectedProduct,
@@ -249,23 +238,40 @@ class _SalesState extends State<Sales> {
         onChanged: (selected) {
           setState(() {
             selectedProduct = selected;
+            satisFiyati = selected!.sellPrice;
+            urunAdetiController.text = selected.productAmount.toString();
+            maxUrunAdeti = int.parse(urunAdetiController.text);
           });
         });
   }
- // Veri giriş satırı oluşturuluyor
+
+  // Veri giriş satırı oluşturuluyor
   Widget _buildDataInputRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildDataInputField("Satış Fiyatı", satisFiyatController),
+        Column(
+          children: [
+            // Satış fiyatı ve ürün adeti giriş alanları oluşturuluyor
+            const CustomTextWidget(text: "Satış Fiyatı"),
+            SizedBox(
+                height: 50,
+                child: Center(
+                  child: Text(
+                    satisFiyati.toString(),
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                ))
+          ],
+        ),
         const SizedBox(width: 10),
         _buildDataInputField("Ürün Adedi", urunAdetiController),
         const SizedBox(width: 10),
         // Toplam tutar gösteriliyor
         Column(
           children: [
-             // Satış fiyatı ve ürün adeti giriş alanları oluşturuluyor
+            // Satış fiyatı ve ürün adeti giriş alanları oluşturuluyor
             const CustomTextWidget(text: "Toplam Tutar"),
             SizedBox(
                 height: 50,
@@ -280,6 +286,7 @@ class _SalesState extends State<Sales> {
       ],
     );
   }
+
   // Veri giriş alanı oluşturuluyor
   Widget _buildDataInputField(
       String labelText, TextEditingController controller) {
@@ -290,21 +297,38 @@ class _SalesState extends State<Sales> {
       ],
     );
   }
+
   // Özel metin giriş alanı oluşturuluyor
   Widget customTextFieldTwo(TextEditingController controller) {
     return Container(
       width: 116,
-      height: 41,
+      height: 50,
       decoration: const BoxDecoration(
         color: Color(0xFF5D5353),
       ),
-      child: TextField(
+      child: TextFormField(
           controller: controller,
+          keyboardType: TextInputType.number,
+          //dragStartBehavior: DragStartBehavior.down,
+          maxLines: 1,
           decoration: const InputDecoration(border: InputBorder.none),
+          validator: (value) {
+            if (value!.isEmpty) {
+              return "Urun Adeti giriniz!";
+            } else if (int.parse(value) > maxUrunAdeti) {
+              return "Urun adeti en fazla $maxUrunAdeti kadar olabilir";
+            } else {
+              return null;
+            }
+          },
+          onChanged: (value) {
+            _formkey.currentState!.validate();
+          },
           style: const TextStyle(color: Colors.white)),
     );
   }
-   // Müşteri verileri getiriliyor
+
+  // Müşteri verileri getiriliyor
   Future<void> bringCustomers() async {
     customers = await dataBaseService
         .fetchCustomerAndSuppliers(AuthService().getCurrentUser()!.uid)
@@ -317,6 +341,7 @@ class _SalesState extends State<Sales> {
         .fetchProducts(AuthService().getCurrentUser()!.uid)
         .whenComplete(() => setState(() {}));
   }
+
 //// Satılan işlemlerin listesi getiriliyor
   Future<void> bringSoldProcesses() async {
     soldProcessList = await dataBaseService

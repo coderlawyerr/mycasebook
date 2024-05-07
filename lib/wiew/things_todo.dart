@@ -3,6 +3,7 @@ import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/models/process_model.dart';
+import 'package:flutter_application_1/models/userModel.dart';
 import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/dataList.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
@@ -22,13 +23,15 @@ class _MyWidgetState extends State<Todo> {
   DataBaseService dataBaseService = DataBaseService();
   double toplamSatis = 0.0;
   double toplamAlis = 0.0;
-  double bakiye = 10000.0;
+  double bakiye = 0.0;
   bool showCards = false;
   List<ProcessModel> data = [];
   List<ProcessModel> filteredData = [];
+  late UserModel userdata;
 
   @override
   void initState() {
+    bringUserData();
     bringProcesses();
     super.initState();
   }
@@ -181,5 +184,17 @@ class _MyWidgetState extends State<Todo> {
     data = await dataBaseService
         .fetchAllProcess(userID: AuthService().getCurrentUser()!.uid)
         .whenComplete(() => setState(() {}));
+  }
+
+  Future<void> bringUserData() async {
+    var d =
+        await dataBaseService.findUserbyID(AuthService().getCurrentUser()!.uid);
+    if (d != null) {
+      userdata = UserModel(userID: AuthService().getCurrentUser()!.uid);
+      userdata.parseMap(d);
+      setState(() {
+        bakiye = userdata.bakiye;
+      });
+    }
   }
 }

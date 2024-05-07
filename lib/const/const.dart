@@ -30,9 +30,9 @@ String dateFormat(DateTime date, {bool hoursIncluded = false}) {
   var gun = date.day;
   var saat = "${date.hour}:${date.minute}:${date.second}";
   if (hoursIncluded) {
-    return "$yil/$ay/$gun  -  $saat";
+    return "$gun/$ay/$yil  -  $saat";
   } else {
-    return "$yil/$ay/$gun";
+    return "$gun/$ay/$yil";
   }
 }
 

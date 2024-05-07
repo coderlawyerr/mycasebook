@@ -7,8 +7,9 @@ Widget customTextField({TextEditingController? controller}) {
     decoration: const BoxDecoration(
       color: Color(0xFF5D5353),
     ),
-    child:  TextField(
-      controller: controller,
+    child: TextFormField(
+        controller: controller,
+        validator: (value) => value!.isEmpty ? " Boş bırakmayınız" : null,
         decoration: const InputDecoration(border: InputBorder.none),
         style: const TextStyle(color: Colors.white)),
   );

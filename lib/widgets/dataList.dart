@@ -23,6 +23,20 @@ List<Widget> dataCardList(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: cardType == 1
                 ? ([
+                      Row(
+                        children: [
+                          const Text("İşlem Tipi:  ",
+                              style: TextStyle(color: Colors.white)),
+                          Text(
+                            data[index].processType.name.toUpperCase(),
+                            style: TextStyle(
+                                color: data[index].processType == IslemTipi.alis
+                                    ? Colors.black
+                                    : Colors.amber,
+                                fontSize: 15),
+                          ),
+                        ],
+                      ),
                       Text(
                         "Tarih :${dateFormat(data[index].date, hoursIncluded: true)}",
                         style:
@@ -38,20 +52,6 @@ List<Widget> dataCardList(
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
-                      Row(
-                        children: [
-                          const Text("İşlem Tipi:  ",
-                              style: TextStyle(color: Colors.white)),
-                          Text(
-                            data[index].processType.name,
-                            style: TextStyle(
-                                color: data[index].processType == IslemTipi.alis
-                                    ? Colors.black
-                                    : Colors.amber,
-                                fontSize: 15),
-                          ),
-                        ],
-                      ),
                       Text(
                         "Alış fiyatı :${data[index].product.buyPrice}",
                         style:
@@ -60,7 +60,7 @@ List<Widget> dataCardList(
                       Visibility(
                         visible: data[index].processType == IslemTipi.alis,
                         child: Text(
-                          "Toplam Tutar :${data[index].giderHesapla()}",
+                          "Toplam Tutar :${data[index].gelirHesapla()}",
                           style: const TextStyle(
                               color: Colors.white, fontSize: 15),
                         ),
@@ -74,7 +74,7 @@ List<Widget> dataCardList(
                                   color: Colors.white, fontSize: 15),
                             ),
                             Text(
-                              "Kar Zarar Durumu :${data[index].profitState?? data[index].profitState!.name}",
+                              "Kar Zarar Durumu :${data[index].profitState != null ? data[index].profitState!.name.toUpperCase() : ""}",
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 15),
                             ),
@@ -107,7 +107,7 @@ List<Widget> dataCardList(
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Toplam Tutar :${data[index].giderHesapla()}",
+                      "Toplam Tutar :${data[index].gelirHesapla()}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                   ],

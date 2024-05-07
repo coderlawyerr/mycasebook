@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 class AuthService {
   // FirebaseAuth örneği oluşturulur.
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  // Mevcut kullanıcıyı döndüren bir metot.
+  //  Bu metodd mevcut oturum açmış kullanıcıyı döndürür. 
   User? getCurrentUser() => _auth.currentUser;
   // Kullanıcı giriş işlemi için e-posta ve şifre ile oturum açma işlemi gerçekleştirir.
   Future<String?> signIn(String email, String password) async {
@@ -31,7 +31,7 @@ class AuthService {
         .user;
     return user!.uid;
   }
-
+  //sıfre deg
   Future<bool> passwordReset(String email) async {
     return await _auth
         .sendPasswordResetEmail(email: email)
@@ -43,7 +43,7 @@ class AuthService {
       return false;
     });
   }
-
+  // Bu fonksiyon, bir şifre sıfırlama işleminin onaylanmasını sağlar.
   Future<bool> confirmPasswordReset(
       {required String code, required String newPassword}) async {
     return await _auth

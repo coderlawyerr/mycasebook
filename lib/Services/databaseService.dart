@@ -39,8 +39,7 @@ class DataBaseService {
     }
   }
 
-//// urun  ekleme sayfasınıa aıt
-  ///
+//// urun  ekleme sayfasında / ürün ekler / ürün alış işlemi modelin içindedir
   Future<bool?> addNewProduct(String userId, ProductModel data) async {
     try {
       data.productID = AutoIdGenerator.autoId();
@@ -49,13 +48,18 @@ class DataBaseService {
       ProcessModel processModel = ProcessModel.predefined(
           product: data, date: DateTime.now(), processType: IslemTipi.alis);
       processModel.processId = AutoIdGenerator.autoId();
-      return await _ref
+      await _ref
           .collection('users')
           .doc(userId)
           .collection('Processes')
           .doc(processModel.processId)
-          .set(processModel.toMap())
-          .then((value) => true);
+          .set(processModel.toMap());
+
+      await _ref.collection('users').doc(userId).update({
+        "bakiye": FieldValue.increment(-(data.buyPrice * data.productAmount))
+      });
+
+      return true;
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -64,7 +68,7 @@ class DataBaseService {
     }
   }
 
-  //urun satıs
+  //urun satıs işlemi modeli oluşturup firebase e kaydeder
   Future<bool?> createSaleProcess({
     required String userId,
     required ProcessModel processModel,
@@ -72,13 +76,18 @@ class DataBaseService {
     try {
       processModel.processId = AutoIdGenerator.autoId();
 
-      return await _ref
+      await _ref
           .collection('users')
           .doc(userId)
           .collection('Processes')
           .doc(processModel.processId)
-          .set(processModel.toMap())
-          .then((value) => true);
+          .set(processModel.toMap());
+
+      await _ref.collection('users').doc(userId).update({
+        "bakiye": FieldValue.increment((processModel.product.sellPrice *
+            processModel.product.productAmount))
+      });
+      return true;
     } catch (e) {
       if (kDebugMode) {
         print(e);
@@ -87,7 +96,7 @@ class DataBaseService {
     }
   }
 
-  //ürünlerım sayfası//getıme
+  //ürünlerım sayfası// alış işlemlerini getirir
   Future<List<ProcessModel>> fetchProcess(
       {required String userID, required IslemTipi tip}) async {
     try {
@@ -104,6 +113,10 @@ class DataBaseService {
           p.parseMap(process.data());
           productList.add(p);
         }
+        productList.sort((a, b) =>
+            a.date.microsecondsSinceEpoch < b.date.microsecondsSinceEpoch
+                ? 1
+                : 0);
         return productList;
       });
     } catch (e) {
@@ -114,7 +127,7 @@ class DataBaseService {
     }
   }
 
-  //urun cagıırma
+  //bütün işlemleri getirir / işlemlerin içinde ürünler var
   Future<List<ProcessModel>> fetchAllProcess({required String userID}) async {
     try {
       List<ProcessModel> processList = [];
@@ -139,7 +152,7 @@ class DataBaseService {
     }
   }
 
-  ///urun gerıme
+  ///sadece alış işlemlerindeki ürünlerin listesini getiriyor
   Future<List<ProductModel>> fetchProducts(String userID) async {
     try {
       List<ProductModel> productList = [];
@@ -184,7 +197,7 @@ class DataBaseService {
     }
   }
 
-//musetero getırme
+//müşteri&Tedarikçi modellerinin listesini döndürür
   Future<List<SuplierCustomerModel>> fetchCustomerAndSuppliers(
       String userID) async {
     try {
@@ -214,34 +227,35 @@ class DataBaseService {
     }
   }
 
-  // Future<List<SuplierCustomerModel>> fetchCustomers(String userID) async {
-  //   try {
-  //     List<SuplierCustomerModel> customerlist = [];
-  //     await _ref
-  //         .collection('users')
-  //         .doc(userID)
-  //         .collection("Customer&Supplier")
-  //         .where("currentType", isEqualTo: 1)
-  //         .get()
-  //         .then((customer) {
-  //       if (customer.size > 0) {
-  //         for (var customer in customer.docs) {
-  //           SuplierCustomerModel c = SuplierCustomerModel();
-  //           c.parseMap(customer.data());
-  //           c.id = customer.id;
-  //           customerlist.add(c);
-  //         }
-  //       }
-  //     });
+//sadece müşterileri döndürür
+  Future<List<SuplierCustomerModel>> fetchCustomers(String userID) async {
+    try {
+      List<SuplierCustomerModel> customerlist = [];
+      await _ref
+          .collection('users')
+          .doc(userID)
+          .collection("Customer&Supplier")
+          .where("currentType", isEqualTo: 1)
+          .get()
+          .then((customer) {
+        if (customer.size > 0) {
+          for (var customer in customer.docs) {
+            SuplierCustomerModel c = SuplierCustomerModel();
+            c.parseMap(customer.data());
+            c.id = customer.id;
+            customerlist.add(c);
+          }
+        }
+      });
 
-  //     return customerlist;
-  //   } catch (e) {
-  //     if (kDebugMode) {
-  //       print(e);
-  //     }
-  //     return [];
-  //   }
-  // }
+      return customerlist;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return [];
+    }
+  }
 
 //// sılme ıslemı
   Future<bool> deleteSuplierOrCustomer(
@@ -352,13 +366,13 @@ class DataBaseService {
 
       double totalIncome = 0;
       double totalOutcome = 0;
-      processesList.forEach((process) {
+      for (var process in processesList) {
         if (process.processType == IslemTipi.satis) {
           totalIncome += process.gelirHesapla();
         } else {
           totalOutcome += process.giderHesapla();
         }
-      });
+      }
 
       double total = totalIncome + totalOutcome;
 

@@ -69,7 +69,7 @@ class _OverviewState extends State<Overview> {
       body: FutureBuilder(
           future: DataBaseService()
               .bringStatistics(userID: AuthService().getCurrentUser()!.uid),
-          builder: (_, snap) {
+          builder: (_con, snap) {
             if (snap.connectionState == ConnectionState.done) {
               dataMap = snap.data!;
               return main(context);
@@ -173,7 +173,7 @@ class _OverviewState extends State<Overview> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => Supplier_And_Customeradd()),
+                    builder: (context) => SupplierAndCustomerAdd()),
               );
             },
           ),
@@ -183,8 +183,7 @@ class _OverviewState extends State<Overview> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) => supplier_and_customer()),
+                MaterialPageRoute(builder: (context) => SupplierAndCustomer()),
               );
             },
           ),
@@ -202,7 +201,7 @@ class _OverviewState extends State<Overview> {
             title: "Çıkış", // Menü öğesi: Çıkış
             onTap: () {
               AuthService().signOut();
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(builder: (context) => LoginPage()),
               );
