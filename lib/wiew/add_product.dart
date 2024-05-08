@@ -95,23 +95,20 @@ class AddProduct extends StatelessWidget {
                               // Yeni bir ürün modeli oluştur
                               ProductModel product = ProductModel();
 
-                              // Alış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
-                              double? buyPriceValue =
-                                  double.tryParse(buyPrice.text);
-                              product.buyPrice = buyPriceValue ?? 0.0;
+                              // Alış fiyatını doğrudan double'a dönüştür ve ürün nesnesine ata, dönüşüm başarısız olursa 0.0 olarak ata
+                              product.buyPrice =
+                                  double.tryParse(buyPrice.text) ?? 0.0;
 
                               // Satış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
-                              double? sellPriceValue =
-                                  double.tryParse(sellPrice.text);
-                              product.sellPrice = sellPriceValue ?? 0.0;
+                              product.sellPrice =
+                                  double.tryParse(sellPrice.text) ?? 0.0;
 
                               // Ürün adını ata
                               product.productName = productName.text;
 
                               // Ürün miktarını al, int'e dönüştür, dönüşüm başarısız olursa 0 olarak ata
-                              int? productAmountValue =
-                                  int.tryParse(productAmount.text);
-                              product.productAmount = productAmountValue ?? 0;
+                              product.productAmount =
+                                  int.tryParse(productAmount.text) ?? 0;
 
                               // Yeni ürünü veritabanına eklemek için databaseService kullanarak işlemi gerçekleştir
                               databaseService
@@ -136,33 +133,20 @@ class AddProduct extends StatelessWidget {
                             } else {
                               // Eğer işlem güncelleme modunda ise
                               // Alış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
-                              double? buyPriceValue =
-                                  double.tryParse(buyPrice.text);
-                              data!.product.buyPrice = buyPriceValue ?? 0.0;
+                              data!.product.buyPrice =
+                                  double.tryParse(buyPrice.text) ?? 0.0;
 
-                              ////
-
-                            // double? buyPriceValue = double.tryParse(buyPrice.text);
-                           // if (buyPriceValue != null) {
-                          //   data!.product.buyPrice = buyPriceValue;
-                          // } else {
-                         //   data!.product.buyPrice = 0.0;
-                           // }
-
-                             //////
+                              //////
                               // Satış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
-                              double? sellPriceValue =
-                                  double.tryParse(sellPrice.text);
-                              data!.product.sellPrice = sellPriceValue ?? 0.0;
+                              data!.product.sellPrice =
+                                  double.tryParse(sellPrice.text) ?? 0.0;
 
                               // Ürün adını ata
                               data!.product.productName = productName.text;
 
                               // Ürün miktarını al, int'e dönüştür, dönüşüm başarısız olursa 0 olarak ata
-                              int? productAmountValue =
-                                  int.tryParse(productAmount.text);
                               data!.product.productAmount =
-                                  productAmountValue ?? 0;
+                                  int.tryParse(productAmount.text) ?? 0;
 
                               // İşlemi güncellemek için databaseService kullanarak işlemi gerçekleştir
                               databaseService
@@ -183,7 +167,6 @@ class AddProduct extends StatelessWidget {
                                   Navigator.pop(context);
                                 }
                               });
-
                             }
                           }
                         }),
@@ -196,19 +179,21 @@ class AddProduct extends StatelessWidget {
       ),
     );
   }
-Widget customTextField({TextEditingController? controller}) {
-  return Container(
-    width: 372,
-    height: 42,
-    decoration: const BoxDecoration(
-      color: Color(0xFF5D5353),
-    ),
-    child:  TextField(
-      controller: controller,
-        decoration: const InputDecoration(border: InputBorder.none),
-        style: const TextStyle(color: Colors.white)),
-  );
-}
+
+  Widget customTextField({TextEditingController? controller}) {
+    return Container(
+      width: 372,
+      height: 42,
+      decoration: const BoxDecoration(
+        color: Color(0xFF5D5353),
+      ),
+      child: TextField(
+          controller: controller,
+          decoration: const InputDecoration(border: InputBorder.none),
+          style: const TextStyle(color: Colors.white)),
+    );
+  }
+
   // Uygulama çubuğunda "Ürün Ekle" başlığı
   AppBar _appbar(BuildContext context) {
     return AppBar(

@@ -70,9 +70,10 @@ class _OverviewState extends State<Overview> {
           future: DataBaseService()
               .bringStatistics(userID: AuthService().getCurrentUser()?.uid),
           builder: (_con, snap) {
+            // Bağlantı durumu tamamlandığında
             if (snap.connectionState == ConnectionState.done) {
-              dataMap = snap.data!;
-              return main(context);
+              dataMap = snap.data!;// Veriyi al ve map'e ata
+              return main(context); // Ana işlevi geri döndür
             } else {
               return const Center(child: CircularProgressIndicator());
             }

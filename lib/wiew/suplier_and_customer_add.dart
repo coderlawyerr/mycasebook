@@ -25,9 +25,8 @@ class SupplierAndCustomerAdd extends StatefulWidget {
 }
 
 class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
-  // Veri değişkeni
   final DataBaseService _databaseService = DataBaseService();
-  // Veritabanı servisi örneği
+
   final _formKey = GlobalKey<FormState>();
   late TextEditingController username;
 

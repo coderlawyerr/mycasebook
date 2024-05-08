@@ -33,10 +33,12 @@ class _ProductState extends State<Product> {
 
   @override
   void initState() {
+    // Widget oluşturulduğunda verilerin getirilmesi ve arama işlevselliğinin başlatılması
     bringProducts().whenComplete(() {
       setState(() {
         filteredProcesses.addAll(processes);
       });
+      //ARAMA METNİ DEGISTIGINDE FILTRELENECEK URUNLERIN GUNCELLENMESI
       searchController.addListener(() {
         if (searchController.text.length <= 2) {
           filteredProcesses.clear();

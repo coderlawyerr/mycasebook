@@ -54,7 +54,7 @@ class DataBaseService {
           .collection('Processes')
           .doc(processModel.processId)
           .set(processModel.toMap());
-
+     // Kullanıcının bakiyesini güncelle
       await _ref.collection('users').doc(userId).update({
         "bakiye": FieldValue.increment(-(data.buyPrice * data.productAmount))
       });
@@ -123,6 +123,7 @@ class DataBaseService {
       {required String userID, required IslemTipi tip}) async {
     try {
       List<ProcessModel> productList = [];
+      // Firestore'dan belirli bir kullanıcının işlemlerini getirmek için sorgu yapılıyor
       return await _ref
           .collection('users')
           .doc(userID)
@@ -130,11 +131,14 @@ class DataBaseService {
           .where("processType", isEqualTo: tip.index)
           .get()
           .then((processes) {
-        for (var process in processes.docs) {
-          ProcessModel p = ProcessModel();
-          p.parseMap(process.data());
+       // `processes.docs` içindeki her belge için döngü oluşturuluyor
+        processes.docs.forEach((process) {
+          // Boş bir `ProcessModel` örneği oluşturuluyor ve `parseMap` fonksiyonu ile verileri işleniyor
+          ProcessModel p = ProcessModel()..parseMap(process.data());
           productList.add(p);
-        }
+        });
+
+        // Tarihine göre sıralama yapılıyor
         productList.sort((a, b) =>
             a.date.microsecondsSinceEpoch < b.date.microsecondsSinceEpoch
                 ? 1
