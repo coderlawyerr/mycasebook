@@ -26,9 +26,9 @@ class _SalesState extends State<Sales> {
   int maxUrunAdeti = 0x7FFFFFFFFFFFFFFF;
   DateTime? tarih = DateTime.now();
   List<SuplierCustomerModel> customers = [];
-  List<ProductModel> products = [];
+  List<ProcessModel> products = [];
   SuplierCustomerModel? selectedCustomer;
-  ProductModel? selectedProduct;
+  ProcessModel? selectedProduct;
   DataBaseService dataBaseService = DataBaseService();
   List<ProcessModel> soldProcessList = [];
 
@@ -81,8 +81,9 @@ class _SalesState extends State<Sales> {
                           int.parse(urunAdetiController.text) <= maxUrunAdeti &&
                           tarih != null) {
                         // Yeni bir işlem modeli oluşturuluyor
+                        var temp = selectedProduct!.product.toMap();
                         ProcessModel processModel = ProcessModel.predefined(
-                            product: selectedProduct!,
+                            product: ProductModel().parseMap(temp),
                             date: tarih!,
                             customerName: selectedCustomer!.username,
                             processType: IslemTipi.satis);
@@ -93,6 +94,7 @@ class _SalesState extends State<Sales> {
                         await dataBaseService
                             .createSaleProcess(
                                 userId: AuthService().getCurrentUser()!.uid,
+                                otherProcess: selectedProduct!,
                                 processModel: processModel)
                             .then((value) {
                           // Ekleme başarılıysa bilgilendirme gösteriliyor
@@ -109,6 +111,7 @@ class _SalesState extends State<Sales> {
                               satisFiyati = 0.0;
                               tarih = DateTime.now();
                               bringSoldProcesses();
+                              bringProducts();
                             });
                           }
                         });
@@ -219,27 +222,28 @@ class _SalesState extends State<Sales> {
   }
 
   // Ürün dropdown bileşeni oluşturuluyor
-  DropdownButton<ProductModel> productsDropDown() {
-    return DropdownButton<ProductModel>(
+  DropdownButton<ProcessModel> productsDropDown() {
+    return DropdownButton<ProcessModel>(
         value: selectedProduct,
         style: Constants.textStyle,
         //dropdownColor: Colors.red,
         // isExpanded: true,
-        hint: const Text(
-          "Ürün Seç",
-          style: TextStyle(color: Colors.grey),
+        hint: Text(
+          products.isEmpty ? "Ürün Yok!" : "Ürün Seç",
+          style: const TextStyle(color: Colors.grey),
         ),
         items: products.isEmpty
             ? null
             : products
-                .map((e) => DropdownMenuItem<ProductModel>(
-                    value: e, child: Text(e.productName)))
+                .map((e) => DropdownMenuItem<ProcessModel>(
+                    value: e, child: Text(e.product.productName)))
                 .toList(),
         onChanged: (selected) {
           setState(() {
             selectedProduct = selected;
-            satisFiyati = selected!.sellPrice;
-            urunAdetiController.text = selected.productAmount.toString();
+            satisFiyati = selected!.product.sellPrice;
+            urunAdetiController.text =
+                selected.product.productAmount.toString();
             maxUrunAdeti = int.parse(urunAdetiController.text);
           });
         });
@@ -339,7 +343,14 @@ class _SalesState extends State<Sales> {
   Future<void> bringProducts() async {
     products = await dataBaseService
         .fetchProducts(AuthService().getCurrentUser()!.uid)
-        .whenComplete(() => setState(() {}));
+        .then((val) {
+      if (val.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            backgroundColor: Colors.red,
+            content: Text("Satılabilecek Ürün kalmadı!")));
+      }
+      return val;
+    }).whenComplete(() => setState(() {}));
   }
 
 //// Satılan işlemlerin listesi getiriliyor

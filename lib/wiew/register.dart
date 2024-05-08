@@ -82,8 +82,6 @@ class Register extends StatelessWidget {
                           emailController.text
                               .isNotEmpty && // E-posta alanı boş değilse devam edilir
                           telNoController.text.isNotEmpty) {
-                        // Telefon numarası alanı boş değilse devam edilir
-
                         // AuthService sınıfından bir örnek alınır
                         // Bu, kullanıcı girişi ve kaydı işlemlerini gerçekleştirmek için kullanılır
                         await authService

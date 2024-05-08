@@ -68,7 +68,7 @@ class _OverviewState extends State<Overview> {
       drawer: _drawerr(context), // Yan menüyü oluştur
       body: FutureBuilder(
           future: DataBaseService()
-              .bringStatistics(userID: AuthService().getCurrentUser()!.uid),
+              .bringStatistics(userID: AuthService().getCurrentUser()?.uid),
           builder: (_con, snap) {
             if (snap.connectionState == ConnectionState.done) {
               dataMap = snap.data!;

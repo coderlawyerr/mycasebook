@@ -72,6 +72,7 @@ class DataBaseService {
   Future<bool?> createSaleProcess({
     required String userId,
     required ProcessModel processModel,
+    required ProcessModel otherProcess,
   }) async {
     try {
       processModel.processId = AutoIdGenerator.autoId();
@@ -87,6 +88,27 @@ class DataBaseService {
         "bakiye": FieldValue.increment((processModel.product.sellPrice *
             processModel.product.productAmount))
       });
+
+      if (processModel.product.productAmount ==
+          otherProcess.product.productAmount) {
+        await _ref
+            .collection('users')
+            .doc(userId)
+            .collection('Processes')
+            .doc(otherProcess.processId)
+            .delete();
+      } else {
+        otherProcess.product.productAmount -=
+            processModel.product.productAmount;
+        var tem = otherProcess.product.toMap();
+        await _ref
+            .collection('users')
+            .doc(userId)
+            .collection('Processes')
+            .doc(otherProcess.processId)
+            .update({"product": tem});
+      }
+
       return true;
     } catch (e) {
       if (kDebugMode) {
@@ -153,9 +175,9 @@ class DataBaseService {
   }
 
   ///sadece alış işlemlerindeki ürünlerin listesini getiriyor
-  Future<List<ProductModel>> fetchProducts(String userID) async {
+  Future<List<ProcessModel>> fetchProducts(String userID) async {
     try {
-      List<ProductModel> productList = [];
+      List<ProcessModel> processList = [];
       return await _ref
           .collection('users')
           .doc(userID)
@@ -166,9 +188,9 @@ class DataBaseService {
         for (var process in processes.docs) {
           ProcessModel d = ProcessModel();
           d.parseMap(process.data());
-          productList.add(d.product);
+          processList.add(d);
         }
-        return productList;
+        return processList;
       });
     } catch (e) {
       if (kDebugMode) {
@@ -359,7 +381,8 @@ class DataBaseService {
   }
 
 //over vıew  grafık
-  Future<Map<String, double>> bringStatistics({required String userID}) async {
+  Future<Map<String, double>> bringStatistics({required String? userID}) async {
+    if (userID == null) return {};
     try {
       Map<String, double> data = {};
       List<ProcessModel> processesList = await fetchAllProcess(userID: userID);
@@ -376,8 +399,8 @@ class DataBaseService {
 
       double total = totalIncome + totalOutcome;
 
-      data["Gelir"] = (100.0 * totalIncome) / total;
-      data["Gider"] = (100.0 * totalOutcome) / total;
+      data["Alım"] = (100.0 * totalIncome) / total;
+      data["Satım"] = (100.0 * totalOutcome) / total;
 
       return data;
     } catch (e) {
