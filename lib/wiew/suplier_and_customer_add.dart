@@ -43,10 +43,15 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
 
   @override
   void initState() {
-    username = TextEditingController(text: widget.data?.username);
-    tel = TextEditingController(text: widget.data?.tel.toString());
-    adres = TextEditingController(text: widget.data?.adress);
+    // Eğer widget.data null değilse ve içinde username değeri varsa, o değer alınır; aksi halde varsayılan olarak boş bir değer atanır.
+    username = TextEditingController(text: widget.data?.username ?? '');
+    // Eğer widget.data null değilse ve içinde tel değeri varsa, bu değer string'e dönüştürülür; aksi halde varsayılan olarak boş bir değer atanır.
+    tel = TextEditingController(text: widget.data?.tel?.toString() ?? '');
+    // Eğer widget.data null değilse ve içinde adress değeri varsa, o değer alınır; aksi halde varsayılan olarak boş bir değer atanır.
+    adres = TextEditingController(text: widget.data?.adress ?? '');
+    // Eğer widget.data null değilse, widget.data'nın currentType değeri alınır; aksi halde null atanır.
     currentType = widget.data?.currentType;
+
     super.initState();
   }
 
@@ -81,6 +86,7 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                     iconEnabledColor: Colors.white,
                     isExpanded: true,
                     dropdownColor: const Color(0xFF5D5353),
+                    ////carı tıpı secımı
                     validator: (value) =>
                         value == null ? " Cari tipi Seçiniz" : null,
                     onChanged: (String? newValue) {
@@ -90,6 +96,7 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                             : CurrentType.tedarikci;
                       });
                     },
+                    //dropdownıtem
                     items: list.map<DropdownMenuItem<String>>((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -113,7 +120,8 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                 const CustomTextWidget(
                   text: "Telefon", // Adres metni
                 ),
-                customTextField(controller: tel), // Özel metin giriş alanı
+                customTextField(
+                    controller: tel, isNumber: true), // Özel metin giriş alanı
                 Constants.sizedbox, // Sabit boyutlu bir boşluk
                 const CustomTextWidget(
                   text: "Adres", // Adres metni
@@ -130,12 +138,18 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                           tel.text.isNotEmpty &&
                           adres.text.isNotEmpty &&
                           currentType != null) {
+                        // Yeni tedarikçi/müşteri ekleme işlemi
                         if (widget.mod == SupplierPageMode.add) {
-                          // Yeni tedarikçi/müşteri ekleme işlemi
+                          // Yeni bir SuplierCustomerModel nesnesi oluşturuyoruz.
                           widget.data = SuplierCustomerModel();
+                          // Eğer dönüşüm başarısız olursa, varsayılan olarak 0 değerini atıyoruz.
                           widget.data!.tel = int.tryParse(tel.text) ?? 0;
+                          // Kullanıcıdan alınan kullanıcı adını SuplierCustomerModel içindeki 'username' alanına atıyoruz.
                           widget.data!.username = username.text;
+                          // Kullanıcıdan alınan adres bilgisini SuplierCustomerModel içindeki 'adress' alanına atıyoruz.
+
                           widget.data!.adress = adres.text;
+                          // Burada currentType değişkeninin null olmadığını varsayıyoruz
                           widget.data!.currentType = currentType!;
 
                           _databaseService
@@ -181,7 +195,6 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                         }
                       }
                     },
-                    // Tedarikçi ve Müşteri sayfasına geçişi sağlayan sayfa
                   ),
                 ),
               ],
@@ -192,7 +205,8 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
     );
   }
 
-  Widget customTextField({TextEditingController? controller}) {
+  Widget customTextField(
+      {TextEditingController? controller, bool isNumber = false}) {
     return Container(
       width: 372,
       height: 42,
@@ -200,6 +214,7 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
         color: Color(0xFF5D5353),
       ),
       child: TextFormField(
+          keyboardType: isNumber ? TextInputType.number : null,
           validator: (value) => value!.isEmpty ? " Boş bırakmayınız" : null,
           controller: controller,
           decoration: const InputDecoration(border: InputBorder.none),

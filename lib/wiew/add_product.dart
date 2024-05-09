@@ -61,21 +61,21 @@ class AddProduct extends StatelessWidget {
                   // Ürün alış fiyatı giriş alanı
                   const CustomTextWidget(text: "Ürün Alış Fiyatı"),
                   // Ürün alış fiyatı metin giriş alanı
-                  customTextField(controller: buyPrice),
+                  customTextField(controller: buyPrice, isNumber: true),
                   // Boşluk
                   Constants.sizedbox,
 
                   // Ürün satış fiyatı giriş alanı
                   const CustomTextWidget(text: "Ürün Satış Fiyatı"),
                   // Ürün satış fiyatı metin giriş alanı
-                  customTextField(controller: sellPrice),
+                  customTextField(controller: sellPrice,isNumber: true),
                   // Boşluk ekleyin
                   Constants.sizedbox,
 
                   // Adet giriş alanı
                   const CustomTextWidget(text: "Adet"),
                   // Adet metin giriş alanı
-                  customTextField(controller: productAmount),
+                  customTextField(controller: productAmount,isNumber: true),
                   // Boşluk ekleyin
                   Constants.sizedbox,
                   Center(
@@ -180,7 +180,8 @@ class AddProduct extends StatelessWidget {
     );
   }
 
-  Widget customTextField({TextEditingController? controller}) {
+  Widget customTextField(
+      {TextEditingController? controller, bool isNumber = false}) {
     return Container(
       width: 372,
       height: 42,
@@ -188,6 +189,7 @@ class AddProduct extends StatelessWidget {
         color: Color(0xFF5D5353),
       ),
       child: TextField(
+          keyboardType: isNumber ? TextInputType.number : null,
           controller: controller,
           decoration: const InputDecoration(border: InputBorder.none),
           style: const TextStyle(color: Colors.white)),

@@ -34,7 +34,7 @@ class _OverviewState extends State<Overview> {
     bringUserData();
     super.initState();
   }
-
+//kullanıcı verılerı getıre
   Future<void> bringUserData() async {
     await DataBaseService()
         .findUserbyID(AuthService().getCurrentUser()!.uid)

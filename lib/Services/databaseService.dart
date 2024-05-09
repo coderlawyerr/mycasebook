@@ -235,10 +235,15 @@ class DataBaseService {
           .get()
           .then((customer) {
         if (customer.size > 0) {
+           // Her bir müşteri veya tedarikçi belgesi için döngü oluşturuyoruz.
           for (var customer in customer.docs) {
+             // Yeni bir SuplierCustomerModel nesnesi oluşturuyoruz.
             SuplierCustomerModel c = SuplierCustomerModel();
+            // Firestore'dan alınan verileri SuplierCustomerModel nesnesine dönüştürüp atıyoruz.
             c.parseMap(customer.data());
+             // Müşteri veya tedarikçi belgesinin kimliğini ilgili modele atıyoruz.
             c.id = customer.id;
+             // Oluşturduğumuz müşteri veya tedarikçi modelini listeye ekliyoruz.
             customerlist.add(c);
           }
         }

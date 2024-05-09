@@ -30,8 +30,16 @@ class _ProductState extends State<SupplierAndCustomer> {
 
   @override
   void initState() {
-    bringCustomer(); // Müşterileri getiren fonksiyon çağrılır
+    bringCustomer().whenComplete(() {
+      filterlist.addAll(customerlist);
+    }); // Müşterileri getiren fonksiyon çağrılır
+
     searchController.addListener(() {
+      if (searchController.text.length <= 2) {
+        filterlist.clear();
+        filterlist.addAll(customerlist);
+        setState(() {});
+      }
       filterlist.clear();
       if (isCustomerFetched &&
           customerlist.isNotEmpty &&

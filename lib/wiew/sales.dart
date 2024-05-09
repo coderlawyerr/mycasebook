@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/Services/authService.dart';
-import 'package:flutter_application_1/Services/databaseService.dart';
-import 'package:flutter_application_1/const/const.dart';
-import 'package:flutter_application_1/models/process_model.dart';
-import 'package:flutter_application_1/models/product_model.dart';
-import 'package:flutter_application_1/models/supliercustomer_model.dart';
-import 'package:flutter_application_1/widgets/button.dart';
-import 'package:flutter_application_1/widgets/dateandclock.dart';
-import 'package:flutter_application_1/widgets/dataList.dart';
-import 'package:flutter_application_1/widgets/textwidget.dart';
-import 'package:omni_datetime_picker/omni_datetime_picker.dart';
-import 'overview.dart';
+import 'package:flutter_application_1/Services/authService.dart'; // Yetkilendirme servisi
+import 'package:flutter_application_1/Services/databaseService.dart'; // Veritabanı servisi
+import 'package:flutter_application_1/const/const.dart'; // Sabitler dosyası
+import 'package:flutter_application_1/models/process_model.dart'; // İşlem modeli
+import 'package:flutter_application_1/models/product_model.dart'; // Ürün modeli
+import 'package:flutter_application_1/models/supliercustomer_model.dart'; // Tedarikçi/Müşteri modeli
+import 'package:flutter_application_1/widgets/button.dart'; // Özel düğme bileşeni
+import 'package:flutter_application_1/widgets/dateandclock.dart'; // Tarih ve saat göstergesi bileşeni
+import 'package:flutter_application_1/widgets/dataList.dart'; // Veri listesi bileşeni
+import 'package:flutter_application_1/widgets/textwidget.dart'; // Özel metin bileşeni
+import 'package:omni_datetime_picker/omni_datetime_picker.dart'; // Tarih/saat seçici
+import 'overview.dart'; // Genel bakış sayfası
 
+// Satış işlemlerinin yapıldığı bileşen
 class Sales extends StatefulWidget {
   const Sales({super.key});
 
@@ -20,38 +21,43 @@ class Sales extends StatefulWidget {
 }
 
 class _SalesState extends State<Sales> {
-  double satisFiyati = 0.0;
-  final _formkey = GlobalKey<FormState>();
-  TextEditingController urunAdetiController = TextEditingController();
-  int maxUrunAdeti = 0x7FFFFFFFFFFFFFFF;
-  DateTime? tarih = DateTime.now();
-  List<SuplierCustomerModel> customers = [];
-  List<ProcessModel> products = [];
-  SuplierCustomerModel? selectedCustomer;
-  ProcessModel? selectedProduct;
-  DataBaseService dataBaseService = DataBaseService();
-  List<ProcessModel> soldProcessList = [];
+  // Değişkenlerin tanımlanması
+  double satisFiyati = 0.0; // Satış fiyatı
+  final _formkey = GlobalKey<FormState>(); // Form anahtarı
+  TextEditingController urunAdetiController =
+      TextEditingController(); // Ürün adeti kontrolcüsü
+  int maxUrunAdeti = 0x7FFFFFFFFFFFFFFF; // Maksimum ürün adeti
+  DateTime? tarih = DateTime.now(); // Tarih
+  List<SuplierCustomerModel> customers = []; // Müşteriler listesi
+  List<ProcessModel> products = []; // Ürünler listesi
+  SuplierCustomerModel? selectedCustomer; // Seçili müşteri
+  ProcessModel? selectedProduct; // Seçili ürün
+  DataBaseService dataBaseService = DataBaseService(); // Veritabanı servisi
+  List<ProcessModel> soldProcessList = []; // Satılan işlemlerin listesi
 
-  double toplamFiyat = 0.0;
+  double toplamFiyat = 0.0; // Toplam fiyat
 
   @override
   void initState() {
-    // Satis fiyatı alanının değişikliklerini dinleyen listener
-    bringCustomers();
-    bringProducts();
-    bringSoldProcesses();
+    // İlk durum ayarı
+    bringCustomers(); // Müşterileri getir
+    bringProducts(); // Ürünleri getir
+    bringSoldProcesses(); // Satılan işlemleri getir
+    // Ürün adeti kontrolcüsü dinleniyor
     urunAdetiController.addListener(() {
+       // Giriş alanından alınan değer double türüne çeviriliyor
       double? adet = double.tryParse(urunAdetiController.text);
       setState(() {
         if (adet != null) toplamFiyat = satisFiyati * adet;
       });
     });
+
     super.initState();
   }
 
   @override
   void dispose() {
-    // Text controller'ları temizle
+    // Kontrolcülerin temizlenmesi
     urunAdetiController.dispose();
     super.dispose();
   }
@@ -59,28 +65,29 @@ class _SalesState extends State<Sales> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context),
+      appBar: _buildAppBar(context), // Üst çubuk
       body: SingleChildScrollView(
         child: Form(
           key: _formkey,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-                  _buildDateTimeRow(),
+                  _buildDateTimeRow(), // Tarih ve saat satırı
                   const SizedBox(height: 8),
-                  _buildDropdownRow(),
+                  _buildDropdownRow(), // Dropdown satırı
                   const SizedBox(height: 8),
-                  _buildDataInputRow(),
+                  _buildDataInputRow(), // Veri girişi satırı
                   const SizedBox(height: 8),
                   CustomButton(
-                    text: "KAYDET",
+                    text: "KAYDET", // Düğme metni
                     toDo: () async {
+                      // Seçilen müşteri, ürün, ürün adedi ve tarih kontrol edilir
                       if (selectedCustomer != null &&
                           selectedProduct != null &&
                           urunAdetiController.text.isNotEmpty &&
                           int.parse(urunAdetiController.text) <= maxUrunAdeti &&
                           tarih != null) {
-                        // Yeni bir işlem modeli oluşturuluyor
+                        // Yeni bir işlem oluşturuluyor
                         var temp = selectedProduct!.product.toMap();
                         ProcessModel processModel = ProcessModel.predefined(
                             product: ProductModel().parseMap(temp),
@@ -90,7 +97,7 @@ class _SalesState extends State<Sales> {
                         // Satış fiyatı ve ürün adedi ekleniyor
                         processModel.product.productAmount =
                             int.tryParse(urunAdetiController.text) ?? 0;
-
+                        // Veritabanı hizmeti üzerinden satış işlemi oluşturuluyor
                         await dataBaseService
                             .createSaleProcess(
                                 userId: AuthService().getCurrentUser()!.uid,
@@ -130,6 +137,7 @@ class _SalesState extends State<Sales> {
     );
   }
 
+  // Üst çubuk bileşeni
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.transparent,
@@ -146,13 +154,13 @@ class _SalesState extends State<Sales> {
         },
       ),
       title: const Text(
-        "Satış",
+        "Satış", // Başlık metni
         style: Constants.textStyle,
       ),
     );
   }
 
-  // Tarih ve saat satırı oluşturuluyor
+  // Tarih ve saat satırı bileşeni
   Widget _buildDateTimeRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -187,27 +195,32 @@ class _SalesState extends State<Sales> {
     );
   }
 
-  ///dropdown menu satırını olusuturuyor
+  ///dropdown menü satırını oluşturuyor
   Widget _buildDropdownRow() {
-    return Column(
-      children: [
-        customersDropDown(),
-        const SizedBox(height: 20),
-        productsDropDown()
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          customersDropDown(), // Müşteri dropdown bileşeni
+          const SizedBox(height: 20),
+          productsDropDown() // Ürün dropdown bileşeni
+        ],
+      ),
     );
   }
 
-  DropdownButton<SuplierCustomerModel> customersDropDown() {
-    return DropdownButton<SuplierCustomerModel>(
+  // Müşteri dropdown bileşeni
+  Widget customersDropDown() {
+    return DropdownButtonFormField<SuplierCustomerModel>(
         value: selectedCustomer,
         style: Constants.textStyle,
-        //dropdownColor: Colors.red,
-        // isExpanded: true,
         hint: const Text(
-          "Müşteri Seç",
+          "Müşteri Seç", // Varsayılan metin
           style: TextStyle(color: Colors.grey),
         ),
+        validator: (value) => value == null ? "Müşteri Seçiniz!" : null,
+        autovalidateMode: AutovalidateMode.always,
         items: customers.isEmpty
             ? null
             : customers
@@ -221,17 +234,19 @@ class _SalesState extends State<Sales> {
         });
   }
 
-  // Ürün dropdown bileşeni oluşturuluyor
-  DropdownButton<ProcessModel> productsDropDown() {
-    return DropdownButton<ProcessModel>(
+  // Ürün dropdown bileşeni
+  Widget productsDropDown() {
+    return DropdownButtonFormField<ProcessModel>(
         value: selectedProduct,
         style: Constants.textStyle,
         //dropdownColor: Colors.red,
         // isExpanded: true,
         hint: Text(
-          products.isEmpty ? "Ürün Yok!" : "Ürün Seç",
+          products.isEmpty ? "Ürün Yok!" : "Ürün Seç", // Varsayılan metin
           style: const TextStyle(color: Colors.grey),
         ),
+        validator: (value) => value == null ? "Ürün Seçiniz!" : null,
+        autovalidateMode: AutovalidateMode.always,
         items: products.isEmpty
             ? null
             : products
@@ -249,7 +264,7 @@ class _SalesState extends State<Sales> {
         });
   }
 
-  // Veri giriş satırı oluşturuluyor
+  // Veri giriş satırı bileşeni
   Widget _buildDataInputRow() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -257,7 +272,7 @@ class _SalesState extends State<Sales> {
       children: [
         Column(
           children: [
-            // Satış fiyatı ve ürün adeti giriş alanları oluşturuluyor
+            // Satış fiyatı ve ürün adeti giriş alanları
             const CustomTextWidget(text: "Satış Fiyatı"),
             SizedBox(
                 height: 50,
@@ -270,12 +285,13 @@ class _SalesState extends State<Sales> {
           ],
         ),
         const SizedBox(width: 10),
-        _buildDataInputField("Ürün Adedi", urunAdetiController),
+        _buildDataInputField(
+            "Ürün Adedi", urunAdetiController), // Ürün adeti giriş alanı
         const SizedBox(width: 10),
         // Toplam tutar gösteriliyor
         Column(
           children: [
-            // Satış fiyatı ve ürün adeti giriş alanları oluşturuluyor
+            // Satış fiyatı ve ürün adeti giriş alanları
             const CustomTextWidget(text: "Toplam Tutar"),
             SizedBox(
                 height: 50,
@@ -291,7 +307,7 @@ class _SalesState extends State<Sales> {
     );
   }
 
-  // Veri giriş alanı oluşturuluyor
+  // Veri giriş alanı bileşeni
   Widget _buildDataInputField(
       String labelText, TextEditingController controller) {
     return Column(
@@ -302,7 +318,7 @@ class _SalesState extends State<Sales> {
     );
   }
 
-  // Özel metin giriş alanı oluşturuluyor
+  // Özel metin giriş alanı bileşeni
   Widget customTextFieldTwo(TextEditingController controller) {
     return Container(
       width: 116,
@@ -332,14 +348,14 @@ class _SalesState extends State<Sales> {
     );
   }
 
-  // Müşteri verileri getiriliyor
+  // Müşteri verilerini getir
   Future<void> bringCustomers() async {
     customers = await dataBaseService
         .fetchCustomerAndSuppliers(AuthService().getCurrentUser()!.uid)
         .whenComplete(() => setState(() {}));
   }
 
-  // Ürün verileri getiriliyor
+  // Ürün verilerini getir
   Future<void> bringProducts() async {
     products = await dataBaseService
         .fetchProducts(AuthService().getCurrentUser()!.uid)
@@ -353,7 +369,7 @@ class _SalesState extends State<Sales> {
     }).whenComplete(() => setState(() {}));
   }
 
-//// Satılan işlemlerin listesi getiriliyor
+  // Satılan işlemleri getir
   Future<void> bringSoldProcesses() async {
     soldProcessList = await dataBaseService
         .fetchProcess(
