@@ -25,12 +25,23 @@ double widthSize(BuildContext context, double value) {
 }
 
 String dateFormat(DateTime date, {bool hoursIncluded = false}) {
-  var yil = date.year;
-  var ay = date.month;
-  var gun = date.day;
-  var saat = "${date.hour}:${date.minute}:${date.second}";
+  String yil = date.year.toString();
+  String ay = date.month.toString();
+  String gun = date.day.toString();
+  String saat = date.hour.toString();
+  String dakika = date.minute.toString();
+  String saniye = date.second.toString();
+
+  if (date.month < 10) ay = "0${date.month}";
+  if (date.day < 10) gun = "0${date.day}";
+  if (date.hour < 10) saat = "0${date.hour}";
+  if (date.minute < 10) dakika = "0${date.minute}";
+  if (date.second < 10) saniye = "0${date.second}";
+
+  String vakit = "$saat:$dakika:$saniye";
+
   if (hoursIncluded) {
-    return "$gun/$ay/$yil  -  $saat";
+    return "$gun/$ay/$yil  -  $vakit";
   } else {
     return "$gun/$ay/$yil";
   }

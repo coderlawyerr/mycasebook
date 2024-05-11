@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
-import 'package:flutter_application_1/models/process_model.dart';
 import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
@@ -16,7 +15,7 @@ enum AddProductMod { add, edit }
 class AddProduct extends StatelessWidget {
   AddProductMod mod;
 
-  ProcessModel? data;
+  ProductModel? data;
 
   AddProduct({super.key, this.mod = AddProductMod.add, this.data});
 
@@ -32,11 +31,10 @@ class AddProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    productName = TextEditingController(text: data?.product.productName);
-    buyPrice = TextEditingController(text: data?.product.buyPrice.toString());
-    sellPrice = TextEditingController(text: data?.product.sellPrice.toString());
-    productAmount =
-        TextEditingController(text: data?.product.productAmount.toString());
+    productName = TextEditingController(text: data?.productName);
+    buyPrice = TextEditingController(text: data?.buyPrice.toString());
+    sellPrice = TextEditingController(text: data?.sellPrice.toString());
+    productAmount = TextEditingController(text: data?.productAmount.toString());
 
     return Scaffold(
       appBar: _appbar(context),
@@ -68,14 +66,14 @@ class AddProduct extends StatelessWidget {
                   // Ürün satış fiyatı giriş alanı
                   const CustomTextWidget(text: "Ürün Satış Fiyatı"),
                   // Ürün satış fiyatı metin giriş alanı
-                  customTextField(controller: sellPrice,isNumber: true),
+                  customTextField(controller: sellPrice, isNumber: true),
                   // Boşluk ekleyin
                   Constants.sizedbox,
 
                   // Adet giriş alanı
                   const CustomTextWidget(text: "Adet"),
                   // Adet metin giriş alanı
-                  customTextField(controller: productAmount,isNumber: true),
+                  customTextField(controller: productAmount, isNumber: true),
                   // Boşluk ekleyin
                   Constants.sizedbox,
                   Center(
@@ -133,24 +131,24 @@ class AddProduct extends StatelessWidget {
                             } else {
                               // Eğer işlem güncelleme modunda ise
                               // Alış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
-                              data!.product.buyPrice =
+                              data!.buyPrice =
                                   double.tryParse(buyPrice.text) ?? 0.0;
 
                               //////
                               // Satış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
-                              data!.product.sellPrice =
+                              data!.sellPrice =
                                   double.tryParse(sellPrice.text) ?? 0.0;
 
                               // Ürün adını ata
-                              data!.product.productName = productName.text;
+                              data!.productName = productName.text;
 
                               // Ürün miktarını al, int'e dönüştür, dönüşüm başarısız olursa 0 olarak ata
-                              data!.product.productAmount =
+                              data!.productAmount =
                                   int.tryParse(productAmount.text) ?? 0;
 
                               // İşlemi güncellemek için databaseService kullanarak işlemi gerçekleştir
                               databaseService
-                                  .updateProcess(
+                                  .updateProduct(
                                       userID:
                                           AuthService().getCurrentUser()!.uid,
                                       newData: data!)

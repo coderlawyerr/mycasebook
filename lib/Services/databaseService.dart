@@ -40,13 +40,30 @@ class DataBaseService {
   }
 
 //// urun  ekleme sayfasında / ürün ekler / ürün alış işlemi modelin içindedir
-  Future<bool?> addNewProduct(String userId, ProductModel data) async {
+  Future<bool?> addNewProduct(String userId, ProductModel product) async {
     try {
-      data.productID = AutoIdGenerator.autoId();
-      data.date = DateTime.now().millisecondsSinceEpoch;
+      product.productID = AutoIdGenerator.autoId();
+      product.date = DateTime.now().millisecondsSinceEpoch;
+
+      await _ref
+          .collection('users')
+          .doc(userId)
+          .collection('Products')
+          .doc(product.productID)
+          .set(product.toMap());
+
+      var pref = _ref
+          .collection('users')
+          .doc(userId)
+          .collection('Products')
+          .doc(product.productID);
+
       // İşlem modelini oluştur
       ProcessModel processModel = ProcessModel.predefined(
-          product: data, date: DateTime.now(), processType: IslemTipi.alis);
+          product: product, date: DateTime.now(), processType: IslemTipi.alis);
+
+      processModel.productRef = pref;
+
       processModel.processId = AutoIdGenerator.autoId();
       await _ref
           .collection('users')
@@ -56,7 +73,8 @@ class DataBaseService {
           .set(processModel.toMap());
       // Kullanıcının bakiyesini güncelle
       await _ref.collection('users').doc(userId).update({
-        "bakiye": FieldValue.increment(-(data.buyPrice * data.productAmount))
+        "bakiye":
+            FieldValue.increment(-(product.buyPrice * product.productAmount))
       });
 
       return true;
@@ -72,11 +90,17 @@ class DataBaseService {
   Future<bool?> createSaleProcess({
     required String userId,
     required ProcessModel processModel,
-    required ProcessModel otherProcess,
   }) async {
     try {
       processModel.processId = AutoIdGenerator.autoId();
 
+      var pref = _ref
+          .collection('users')
+          .doc(userId)
+          .collection("Products")
+          .doc(processModel.product.productID);
+
+      processModel.productRef = pref;
       await _ref
           .collection('users')
           .doc(userId)
@@ -84,19 +108,15 @@ class DataBaseService {
           .doc(processModel.processId)
           .set(processModel.toMap());
 
-      await _ref.collection('users').doc(userId).update({
+      /* await _ref.collection('users').doc(userId).update({
         "bakiye": FieldValue.increment((processModel.product.sellPrice *
             processModel.product.productAmount))
-      });
+      });*/
 
-      otherProcess.product.productAmount -= processModel.product.productAmount;
-      var tem = otherProcess.product.toMap();
-      await _ref
-          .collection('users')
-          .doc(userId)
-          .collection('Processes')
-          .doc(otherProcess.processId)
-          .update({"product": tem});
+      await _ref.doc(pref.path).update({
+        "productAmount":
+            FieldValue.increment(processModel.product.productAmount * -1)
+      });
 
       return true;
     } catch (e) {
@@ -111,7 +131,7 @@ class DataBaseService {
   Future<List<ProcessModel>> fetchProcess(
       {required String userID, required IslemTipi tip}) async {
     try {
-      List<ProcessModel> productList = [];
+      List<ProcessModel> processList = [];
       // Firestore'dan belirli bir kullanıcının işlemlerini getirmek için sorgu yapılıyor
       return await _ref
           .collection('users')
@@ -121,18 +141,19 @@ class DataBaseService {
           .get()
           .then((processes) {
         // `processes.docs` içindeki her belge için döngü oluşturuluyor
-        processes.docs.forEach((process) {
+        processes.docs.forEach((process) async {
           // Boş bir `ProcessModel` örneği oluşturuluyor ve `parseMap` fonksiyonu ile verileri işleniyor
-          ProcessModel p = ProcessModel()..parseMap(process.data());
-          productList.add(p);
+          ProcessModel p = ProcessModel();
+          p.parseMap(map: process.data());
+          processList.add(p);
         });
 
         // Tarihine göre sıralama yapılıyor
-        productList.sort((a, b) =>
+        processList.sort((a, b) =>
             a.date.microsecondsSinceEpoch < b.date.microsecondsSinceEpoch
                 ? 1
                 : 0);
-        return productList;
+        return processList;
       });
     } catch (e) {
       if (kDebugMode) {
@@ -153,10 +174,13 @@ class DataBaseService {
           .get()
           .then((processes) {
         for (var process in processes.docs) {
+          // Boş bir `ProcessModel` örneği oluşturuluyor ve `parseMap` fonksiyonu ile verileri işleniyor
           ProcessModel p = ProcessModel();
-          p.parseMap(process.data());
+          p.parseMap(map: process.data());
           processList.add(p);
         }
+        processList.sort(((a, b) =>
+            b.date.millisecondsSinceEpoch - a.date.millisecondsSinceEpoch));
         return processList;
       });
     } catch (e) {
@@ -168,22 +192,21 @@ class DataBaseService {
   }
 
   ///sadece alış işlemlerindeki ürünlerin listesini getiriyor
-  Future<List<ProcessModel>> fetchProducts(String userID) async {
+  Future<List<ProductModel>> fetchProducts(String userID) async {
     try {
-      List<ProcessModel> processList = [];
+      List<ProductModel> productsList = [];
       return await _ref
           .collection('users')
           .doc(userID)
-          .collection('Processes')
-          .where("processType", isEqualTo: IslemTipi.alis.index)
+          .collection('Products')
           .get()
-          .then((processes) {
-        for (var process in processes.docs) {
-          ProcessModel d = ProcessModel();
-          d.parseMap(process.data());
-          processList.add(d);
+          .then((products) {
+        for (var product in products.docs) {
+          ProductModel p = ProductModel();
+          p.parseMap(product.data());
+          productsList.add(p);
         }
-        return processList;
+        return productsList;
       });
     } catch (e) {
       if (kDebugMode) {
@@ -297,14 +320,14 @@ class DataBaseService {
   }
 
 //guncelleme urun sayfası
-  Future<bool> updateProcess(
-      {required String userID, required ProcessModel newData}) async {
+  Future<bool> updateProduct(
+      {required String userID, required ProductModel newData}) async {
     try {
       return await _ref
           .collection('users')
           .doc(userID)
-          .collection("Processes")
-          .doc(newData.processId)
+          .collection("Products")
+          .doc(newData.productID)
           .update(newData.toMap())
           .then((value) => true);
     } catch (e) {
@@ -316,17 +339,17 @@ class DataBaseService {
   }
 
 //sılme ıslemı urun
-  Future<bool> deleteProcess(
-      {required String userId, required ProcessModel data}) async {
+  Future<bool> deleteProduct(
+      {required String userId, required ProductModel data}) async {
     try {
       await _ref
           .collection('users')
           .doc(userId)
-          .collection("Processes")
-          .doc(data.processId)
+          .collection("Products")
+          .doc(data.productID)
           .delete();
       if (kDebugMode) {
-        print("process sİlindi");
+        print("product silindi");
       }
       return true;
     } catch (e) {
@@ -397,8 +420,8 @@ class DataBaseService {
 
       double total = totalIncome + totalOutcome;
 
-      data["Alım"] = (100.0 * totalIncome) / total;
-      data["Satım"] = (100.0 * totalOutcome) / total;
+      data["Gelirler - $totalIncome TL"] = (100.0 * totalIncome) / total;
+      data["Giderler - $totalOutcome TL"] = (100.0 * totalOutcome) / total;
 
       return data;
     } catch (e) {

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_1/models/product_model.dart';
 
 // KarZarar enum sınıfı, bir ürünün kar, zarar veya stabil olduğunu belirtir.
@@ -10,6 +11,7 @@ class ProcessModel {
   late String processId;
   late DateTime date;
   late ProductModel product;
+  late DocumentReference<Map<String, dynamic>> productRef;
   late String? customerName;
   late KarZarar? profitState;
   late IslemTipi processType;
@@ -38,7 +40,6 @@ class ProcessModel {
     return kazancFiyat;
   }
 
-  
   double giderHesapla() {
     return product.productAmount.toDouble() * product.buyPrice;
   }
@@ -47,6 +48,7 @@ class ProcessModel {
     return {
       'id': processId,
       'product': product.toMap(),
+      'productRef': productRef,
       'date': date.millisecondsSinceEpoch,
       'customerName': customerName ?? "",
       'profitState':
@@ -55,7 +57,9 @@ class ProcessModel {
     };
   }
 
-  void parseMap(Map<String, dynamic> map) {
+  void parseMap({
+    required Map<String, dynamic> map,
+  }) {
     processId = map["id"];
     date = DateTime.fromMillisecondsSinceEpoch(map["date"]);
     product = ProductModel();
@@ -63,5 +67,6 @@ class ProcessModel {
     customerName = map["customerName"];
     profitState = KarZarar.values[map["profitState"]];
     processType = IslemTipi.values[map["processType"]];
+    productRef = map["productRef"];
   }
 }

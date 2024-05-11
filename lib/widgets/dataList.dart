@@ -43,17 +43,17 @@ List<Widget> dataCardList(
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Text(
-                        "Ürün Adı :${data[index].product.productName}",
+                        "Ürün Adı :${data[index].product!.productName}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Text(
-                        "Ürun Adeti :${data[index].product.productAmount}",
+                        "Ürun Adeti :${data[index].product!.productAmount}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Text(
-                        "Alış fiyatı :${data[index].product.buyPrice}",
+                        "Alış fiyatı :${data[index].product!.buyPrice}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
@@ -69,7 +69,7 @@ List<Widget> dataCardList(
                     (data[index].processType == IslemTipi.satis
                         ? [
                             Text(
-                              "Satış fiyatı :${data[index].product.sellPrice}",
+                              "Satış fiyatı :${data[index].product!.sellPrice}",
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 15),
                             ),
@@ -95,15 +95,15 @@ List<Widget> dataCardList(
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Ürün Adı :${data[index].product.productName}",
+                      "Ürün Adı :${data[index].product!.productName}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Urun Adeti :${data[index].product.productAmount}",
+                      "Urun Adeti :${data[index].product!.productAmount}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Satış fiyatı :${data[index].product.sellPrice}",
+                      "Satış fiyatı :${data[index].product!.sellPrice}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(

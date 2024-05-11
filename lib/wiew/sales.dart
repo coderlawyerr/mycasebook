@@ -29,9 +29,9 @@ class _SalesState extends State<Sales> {
   int maxUrunAdeti = 0x7FFFFFFFFFFFFFFF; // Maksimum ürün adeti
   DateTime? tarih = DateTime.now(); // Tarih
   List<SuplierCustomerModel> customers = []; // Müşteriler listesi
-  List<ProcessModel> products = []; // Ürünler listesi
+  List<ProductModel> products = []; // Ürünler listesi
   SuplierCustomerModel? selectedCustomer; // Seçili müşteri
-  ProcessModel? selectedProduct; // Seçili ürün
+  ProductModel? selectedProduct; // Seçili ürün
   DataBaseService dataBaseService = DataBaseService(); // Veritabanı servisi
   List<ProcessModel> soldProcessList = []; // Satılan işlemlerin listesi
 
@@ -88,20 +88,19 @@ class _SalesState extends State<Sales> {
                           int.parse(urunAdetiController.text) <= maxUrunAdeti &&
                           tarih != null) {
                         // Yeni bir işlem oluşturuluyor
-                        var temp = selectedProduct!.product.toMap();
+                        var temp = selectedProduct!.toMap();
                         ProcessModel processModel = ProcessModel.predefined(
                             product: ProductModel().parseMap(temp),
                             date: tarih!,
                             customerName: selectedCustomer!.username,
                             processType: IslemTipi.satis);
                         // Satış fiyatı ve ürün adedi ekleniyor
-                        processModel.product.productAmount =
+                        processModel.product!.productAmount =
                             int.tryParse(urunAdetiController.text) ?? 0;
                         // Veritabanı hizmeti üzerinden satış işlemi oluşturuluyor
                         await dataBaseService
                             .createSaleProcess(
                                 userId: AuthService().getCurrentUser()!.uid,
-                                otherProcess: selectedProduct!,
                                 processModel: processModel)
                             .then((value) {
                           // Ekleme başarılıysa bilgilendirme gösteriliyor
@@ -236,7 +235,7 @@ class _SalesState extends State<Sales> {
 
   // Ürün dropdown bileşeni
   Widget productsDropDown() {
-    return DropdownButtonFormField<ProcessModel>(
+    return DropdownButtonFormField<ProductModel>(
         value: selectedProduct,
         style: Constants.textStyle,
         //dropdownColor: Colors.red,
@@ -250,15 +249,15 @@ class _SalesState extends State<Sales> {
         items: products.isEmpty
             ? null
             : products
-                .map((e) => DropdownMenuItem<ProcessModel>(
-                    value: e, child: Text(e.product.productName)))
+                .map((e) => DropdownMenuItem<ProductModel>(
+                    value: e, child: Text(e.productName)))
                 .toList(),
         onChanged: (selected) {
           setState(() {
             selectedProduct = selected;
-            satisFiyati = selected!.product.sellPrice;
+            satisFiyati = selected!.sellPrice;
             //urunAdetiController.text = "1";
-            maxUrunAdeti = selected.product.productAmount;
+            maxUrunAdeti = selected.productAmount;
           });
         });
   }

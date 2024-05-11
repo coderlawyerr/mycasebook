@@ -118,7 +118,9 @@ class _ProductState extends State<SupplierAndCustomer> {
                     customerlist.clear();
                     isCustomerFetched = false;
                     filterlist.clear();
-                    bringCustomer().whenComplete(() => setState(() {}));
+                    bringCustomer().whenComplete(() => setState(() {
+                          filterlist.addAll(customerlist);
+                        }));
                   });
                 }
               });
@@ -135,7 +137,9 @@ class _ProductState extends State<SupplierAndCustomer> {
                 data: customer,
               ),
             ),
-          );
+          ).whenComplete(() {
+            bringCustomer().whenComplete(() => setState(() {}));
+          });
         },
         text:
             "Cari Tipi: ${customer.currentType.name}\nAd-Soyad: ${customer.username}\nTel: ${customer.tel}\nAdres: ${customer.adress}", // Müşteri bilgileri
