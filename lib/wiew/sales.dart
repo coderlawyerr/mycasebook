@@ -45,7 +45,7 @@ class _SalesState extends State<Sales> {
     bringSoldProcesses(); // Satılan işlemleri getir
     // Ürün adeti kontrolcüsü dinleniyor
     urunAdetiController.addListener(() {
-       // Giriş alanından alınan değer double türüne çeviriliyor
+      // Giriş alanından alınan değer double türüne çeviriliyor
       double? adet = double.tryParse(urunAdetiController.text);
       setState(() {
         if (adet != null) toplamFiyat = satisFiyati * adet;
@@ -257,16 +257,15 @@ class _SalesState extends State<Sales> {
           setState(() {
             selectedProduct = selected;
             satisFiyati = selected!.product.sellPrice;
-            urunAdetiController.text =
-                selected.product.productAmount.toString();
-            maxUrunAdeti = int.parse(urunAdetiController.text);
+            //urunAdetiController.text = "1";
+            maxUrunAdeti = selected.product.productAmount;
           });
         });
   }
 
   // Veri giriş satırı bileşeni
   Widget _buildDataInputRow() {
-    return Row(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -321,7 +320,7 @@ class _SalesState extends State<Sales> {
   // Özel metin giriş alanı bileşeni
   Widget customTextFieldTwo(TextEditingController controller) {
     return Container(
-      width: 116,
+      width: widthSize(context, 90),
       height: 50,
       decoration: const BoxDecoration(
         color: Color(0xFF5D5353),

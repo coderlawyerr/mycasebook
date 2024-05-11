@@ -54,7 +54,7 @@ class DataBaseService {
           .collection('Processes')
           .doc(processModel.processId)
           .set(processModel.toMap());
-     // Kullanıcının bakiyesini güncelle
+      // Kullanıcının bakiyesini güncelle
       await _ref.collection('users').doc(userId).update({
         "bakiye": FieldValue.increment(-(data.buyPrice * data.productAmount))
       });
@@ -89,25 +89,14 @@ class DataBaseService {
             processModel.product.productAmount))
       });
 
-      if (processModel.product.productAmount ==
-          otherProcess.product.productAmount) {
-        await _ref
-            .collection('users')
-            .doc(userId)
-            .collection('Processes')
-            .doc(otherProcess.processId)
-            .delete();
-      } else {
-        otherProcess.product.productAmount -=
-            processModel.product.productAmount;
-        var tem = otherProcess.product.toMap();
-        await _ref
-            .collection('users')
-            .doc(userId)
-            .collection('Processes')
-            .doc(otherProcess.processId)
-            .update({"product": tem});
-      }
+      otherProcess.product.productAmount -= processModel.product.productAmount;
+      var tem = otherProcess.product.toMap();
+      await _ref
+          .collection('users')
+          .doc(userId)
+          .collection('Processes')
+          .doc(otherProcess.processId)
+          .update({"product": tem});
 
       return true;
     } catch (e) {
@@ -131,7 +120,7 @@ class DataBaseService {
           .where("processType", isEqualTo: tip.index)
           .get()
           .then((processes) {
-       // `processes.docs` içindeki her belge için döngü oluşturuluyor
+        // `processes.docs` içindeki her belge için döngü oluşturuluyor
         processes.docs.forEach((process) {
           // Boş bir `ProcessModel` örneği oluşturuluyor ve `parseMap` fonksiyonu ile verileri işleniyor
           ProcessModel p = ProcessModel()..parseMap(process.data());
@@ -235,15 +224,15 @@ class DataBaseService {
           .get()
           .then((customer) {
         if (customer.size > 0) {
-           // Her bir müşteri veya tedarikçi belgesi için döngü oluşturuyoruz.
+          // Her bir müşteri veya tedarikçi belgesi için döngü oluşturuyoruz.
           for (var customer in customer.docs) {
-             // Yeni bir SuplierCustomerModel nesnesi oluşturuyoruz.
+            // Yeni bir SuplierCustomerModel nesnesi oluşturuyoruz.
             SuplierCustomerModel c = SuplierCustomerModel();
             // Firestore'dan alınan verileri SuplierCustomerModel nesnesine dönüştürüp atıyoruz.
             c.parseMap(customer.data());
-             // Müşteri veya tedarikçi belgesinin kimliğini ilgili modele atıyoruz.
+            // Müşteri veya tedarikçi belgesinin kimliğini ilgili modele atıyoruz.
             c.id = customer.id;
-             // Oluşturduğumuz müşteri veya tedarikçi modelini listeye ekliyoruz.
+            // Oluşturduğumuz müşteri veya tedarikçi modelini listeye ekliyoruz.
             customerlist.add(c);
           }
         }

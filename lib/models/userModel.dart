@@ -31,6 +31,6 @@ class UserModel {
     email = map["Email"] ?? "null";
     // Haritadan kullanıcı telefon numarasını alır, null ise 0 olarak ayarlar
     telNo = map["PhoneNumber"] ?? 0;
-    bakiye = map["bakiye"] as double;
+    bakiye = map["bakiye"] * 1.0;
   }
 }

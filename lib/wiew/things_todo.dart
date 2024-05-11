@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
@@ -41,7 +42,7 @@ class _MyWidgetState extends State<Todo> {
   @override
   void initState() {
     // Kullanıcı verilerini ve işlemleri getiren fonksiyonlar çağrılır.
-    bringUserData();
+    // bringUserData();
     // Tüm işlemleri getiren asenkron fonksiyon.
     bringProcesses();
     super.initState();
@@ -82,7 +83,9 @@ class _MyWidgetState extends State<Todo> {
       }
     }
 
-    setState(() {});
+    setState(() {
+      bakiye = toplamSatis - toplamAlis;
+    });
   }
 
   @override
@@ -109,13 +112,13 @@ class _MyWidgetState extends State<Todo> {
                   ),
                   Constants.sizedbox,
                   // Toplam satış, alış ve bakiye miktarlarını gösteren sütunlar oluşturulur.
-                  Row(
+                  Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Column(
                           children: [
                             const CustomTextWidget(
-                              text: 'Toplam Satış',
+                              text: 'Toplam Satış Fiyatı',
                             ),
                             const SizedBox(
                               height: 2,
@@ -129,7 +132,7 @@ class _MyWidgetState extends State<Todo> {
                         Column(
                           children: [
                             const CustomTextWidget(
-                              text: 'Toplam Alış',
+                              text: 'Toplam Alış Fiyatı',
                             ),
                             const SizedBox(
                               height: 2,
@@ -188,11 +191,8 @@ class _MyWidgetState extends State<Todo> {
           ),
           onPressed: () {
             // Genel bakış sayfasına geri dönüş işlemi
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        const Overview()));
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => const Overview()));
           }),
     );
   }
