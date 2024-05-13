@@ -32,15 +32,22 @@ class AuthService {
     return user!.uid;
   }
 
-  //sıfre deg
+// Şifre sıfırlama işlemi için bir metod.
   Future<bool> passwordReset(String email) async {
+    // _auth nesnesinin sendPasswordResetEmail metodu aracılığıyla şifre sıfırlama e-postası gönderilir.
+    // Bu işlem asenkron olduğu için await kullanılır ve işlemin tamamlanması beklenir.
     return await _auth
         .sendPasswordResetEmail(email: email)
+        // Eğer e-posta gönderme işlemi başarılı olursa, true değeri döndürülür.
         .then((value) => true)
+        // Eğer bir hata oluşursa, onError metoduyla bu hatayı yakalarız.
         .onError((error, stackTrace) {
+      // Hatanın hata ayıklama modunda (debug mode) olup olmadığını kontrol ederiz.
       if (kDebugMode) {
+        // Hata ayıklama modunda ise hatayı konsola yazdırırız.
         print(error);
       }
+      // Sonuç olarak false döndürülür, çünkü şifre sıfırlama işlemi başarısız oldu.
       return false;
     });
   }

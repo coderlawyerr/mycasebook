@@ -1,3 +1,5 @@
+//model urun
+
 class ProductModel {
   late String productID;
   late String productName;

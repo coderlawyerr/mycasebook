@@ -151,7 +151,7 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                           widget.data!.adress = adres.text;
                           // Burada currentType değişkeninin null olmadığını varsayıyoruz
                           widget.data!.currentType = currentType!;
-
+                        
                           _databaseService
                               .addSupplierOrCustomer(
                                   userId: AuthService().getCurrentUser()!.uid,

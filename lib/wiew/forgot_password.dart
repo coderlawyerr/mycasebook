@@ -20,7 +20,7 @@ class ForgotPassword extends StatelessWidget {
             const SizedBox(
               height: 125,
             ),
-            //Center(child: CustomSquare()), // Özel Kareyi ortala
+            
             const SizedBox(
               height: 100,
             ),
@@ -28,10 +28,7 @@ class ForgotPassword extends StatelessWidget {
               "E-postanıza kod gönderildi", // Bilgi metni: E-postanıza kod gönderildi
               style: TextStyle(color: Colors.grey, fontSize: 20),
             ),
-            /*const Text(
-              "Kodun Süresi Doluyor 5 sn", // Bilgi metni: Kodun Süresi Doluyor 5 sn
-              style: TextStyle(color: Colors.grey, fontSize: 15),
-            ),*/
+           
             const SizedBox(
               height: 50,
             ),

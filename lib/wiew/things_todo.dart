@@ -28,7 +28,7 @@ class _MyWidgetState extends State<Todo> {
   double toplamAlis = 0.0;
   double bakiye = 0.0;
 
-  // Kartları gösterme durumu kontrolü için bayrak.
+  // Kartları gösterme durumu kontrolü için
   bool showCards = false;
 
   // Tüm işlemlerin orijinal ve filtrelenmiş listeleri oluşturulur.
@@ -41,8 +41,7 @@ class _MyWidgetState extends State<Todo> {
   @override
   void initState() {
     // Kullanıcı verilerini ve işlemleri getiren fonksiyonlar çağrılır.
-    // bringUserData();
-    // Tüm işlemleri getiren asenkron fonksiyon.
+
     bringProcesses();
     super.initState();
   }

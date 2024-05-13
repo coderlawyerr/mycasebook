@@ -41,7 +41,9 @@ class _ProductState extends State<Product> {
       //ARAMA METNİ DEGISTIGINDE FILTRELENECEK URUNLERIN GUNCELLENMESI
       searchController.addListener(() {
         if (searchController.text.length <= 2) {
+           // Tüm ürünleri döngü ile kontrol et
           filteredProducts.clear();
+            // Filtrelenmiş ürünler listesine ekle
           filteredProducts.addAll(products);
           setState(() {});
         }
@@ -51,8 +53,11 @@ class _ProductState extends State<Product> {
             products.isNotEmpty &&
             searchController.text.length > 2) {
           filteredProducts.clear();
+
           for (var pro in products) {
+            // Eğer ürün adı, arama metni içeriyorsa
             if (pro.productName.contains(searchController.text)) {
+              // Filtrelenmiş ürünler listesine ekle
               filteredProducts.add(pro);
             }
           }
@@ -109,6 +114,7 @@ class _ProductState extends State<Product> {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: customCard(
+        ///silme işlemei için
           onDelete: () {
             showAreYouSureDialog(context, message: "Eminmisiniz?")
                 .then((value) {
@@ -118,7 +124,7 @@ class _ProductState extends State<Product> {
                         userId: AuthService().getCurrentUser()!.uid, data: pro)
                     .then((value) {
                   if (value) {
-                    products.clear();
+                    products.clear();//ürün sil
                     isProductsFetched = false;
                     filteredProducts.clear();
                     bringProducts().whenComplete(() => setState(() {
@@ -129,11 +135,13 @@ class _ProductState extends State<Product> {
               }
             });
           },
+          //edıt ıslemı ıcın
           onEdit: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => AddProduct(
+                  
                   mod: AddProductMod.edit,
                   data: pro,
                 ),

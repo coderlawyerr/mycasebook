@@ -31,9 +31,10 @@ class _OverviewState extends State<Overview> {
 
   @override
   void initState() {
-    bringUserData();
+    bringUserData(); //cagırarak kulanıcının verılerını getırıyoruz
     super.initState();
   }
+
 //kullanıcı verılerı getıre
   Future<void> bringUserData() async {
     await DataBaseService()
@@ -69,10 +70,11 @@ class _OverviewState extends State<Overview> {
       body: FutureBuilder(
           future: DataBaseService()
               .bringStatistics(userID: AuthService().getCurrentUser()?.uid),
+          // Veri geldiğinde ne yapılacağını belirt
           builder: (_con, snap) {
             // Bağlantı durumu tamamlandığında
             if (snap.connectionState == ConnectionState.done) {
-              dataMap = snap.data!;// Veriyi al ve map'e ata
+              dataMap = snap.data!; // Veriyi al ve map'e ata
               return main(context); // Ana işlevi geri döndür
             } else {
               return const Center(child: CircularProgressIndicator());
@@ -184,7 +186,8 @@ class _OverviewState extends State<Overview> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const SupplierAndCustomer()),
+                MaterialPageRoute(
+                    builder: (context) => const SupplierAndCustomer()),
               );
             },
           ),

@@ -39,19 +39,20 @@ class DataBaseService {
     }
   }
 
+
 //// urun  ekleme sayfasında / ürün ekler / ürün alış işlemi modelin içindedir
   Future<bool?> addNewProduct(String userId, ProductModel product) async {
     try {
-      product.productID = AutoIdGenerator.autoId();
-      product.date = DateTime.now().millisecondsSinceEpoch;
-
+      product.productID = AutoIdGenerator.autoId();// Ürün ID'sini otomatik oluştur
+      product.date = DateTime.now().millisecondsSinceEpoch;// Ürünün oluşturulma tarihini kaydet
+// Ürünü veritabanına eklemek için belirli bir kullanıcının koleksiyonuna ve belirli bir belgeye ulaş
       await _ref
           .collection('users')
           .doc(userId)
           .collection('Products')
           .doc(product.productID)
           .set(product.toMap());
-
+ // Ürün için referans belirle
       var pref = _ref
           .collection('users')
           .doc(userId)
@@ -61,10 +62,11 @@ class DataBaseService {
       // İşlem modelini oluştur
       ProcessModel processModel = ProcessModel.predefined(
           product: product, date: DateTime.now(), processType: IslemTipi.alis);
-
+  // İşlem için ürün referansını belirle
       processModel.productRef = pref;
-
+// İşlem ID'sini otomatik oluştur
       processModel.processId = AutoIdGenerator.autoId();
+        // Kullanıcının bakiyesini güncelle
       await _ref
           .collection('users')
           .doc(userId)
@@ -74,6 +76,8 @@ class DataBaseService {
       // Kullanıcının bakiyesini güncelle
       await _ref.collection('users').doc(userId).update({
         "bakiye":
+      //değerlerini çarparak toplam satın alma maliyetini hesaplar, sonra sonucu negatif işaretle çarparak azaltır, ve son olarak bu 
+      //azaltılmış değeri ilgili alanın değerine ekler, böylece toplam maliyeti günceller.
             FieldValue.increment(-(product.buyPrice * product.productAmount))
       });
 
@@ -85,6 +89,7 @@ class DataBaseService {
       return false;
     }
   }
+
 
   //urun satıs işlemi modeli oluşturup firebase e kaydeder
   Future<bool?> createSaleProcess({
@@ -320,9 +325,14 @@ class DataBaseService {
   }
 
 //guncelleme urun sayfası
+// Firestore üzerinde belirli bir kullanıcının ürün bilgisini güncellemek için kullanılan metod.
   Future<bool> updateProduct(
       {required String userID, required ProductModel newData}) async {
     try {
+      // Firestore referansı ile belirli bir kullanıcının ürün koleksiyonuna erişiyoruz.
+      // Ardından belirli bir ürün belgesini (document) seçiyoruz. Bu belge, güncellenecek ürünü temsil eder.
+      // Güncelleme işlemi gerçekleştirilirken, ProductModel'deki verileri Firestore'un anlayabileceği bir formata dönüştürmek için toMap() metodu kullanılır.
+      // update() metodu, belirli bir belgeyi yeni verilerle günceller. Güncelleme işlemi başarılı olursa true döndürülür.
       return await _ref
           .collection('users')
           .doc(userID)
@@ -331,6 +341,8 @@ class DataBaseService {
           .update(newData.toMap())
           .then((value) => true);
     } catch (e) {
+      // Eğer güncelleme işlemi sırasında bir hata oluşursa, bu hata yakalanır ve işlem hata ayıklama modunda (debug mode) ise konsola yazdırılır.
+      // Güncelleme işlemi başarısız olduğu için false döndürülür.
       if (kDebugMode) {
         print(e);
       }
@@ -402,32 +414,50 @@ class DataBaseService {
   }
 
 //over vıew  grafık
+// Kullanıcı istatistiklerini getirmek için kullanılan fonksiyon
+// Parametre olarak kullanıcı kimliği alır
   Future<Map<String, double>> bringStatistics({required String? userID}) async {
+    // Eğer kullanıcı kimliği null ise, boş bir harita döndür
     if (userID == null) return {};
+
     try {
+      // Veri haritası oluştur
       Map<String, double> data = {};
+
+      // Kullanıcının tüm işlemlerini al
       List<ProcessModel> processesList = await fetchAllProcess(userID: userID);
 
+      // Toplam gelir ve gider miktarlarını saklamak için değişkenler oluştur
       double totalIncome = 0;
       double totalOutcome = 0;
+
+      // İşlemler listesini döngüye alarak toplam gelir ve gider miktarlarını hesapla
       for (var process in processesList) {
+        // İşlem türüne göre gelir ve gider miktarlarını hesapla
         if (process.processType == IslemTipi.satis) {
+          // Gelir hesabı yap ve toplam gelire ekle
           totalIncome += process.gelirHesapla();
         } else {
+          // Gider hesabı yap ve toplam gider miktarına ekle
           totalOutcome += process.giderHesapla();
         }
       }
 
+      // Toplam gelir ve gider miktarlarının toplamını hesapla
       double total = totalIncome + totalOutcome;
 
+      // Veri haritasına gelir ve gider yüzdelerini ekle
       data["Gelirler - $totalIncome TL"] = (100.0 * totalIncome) / total;
       data["Giderler - $totalOutcome TL"] = (100.0 * totalOutcome) / total;
 
+      // İstatistik verilerini düzenle ve döndür
       return data;
     } catch (e) {
+      // Hata durumunda hata mesajını konsola yazdır
       if (kDebugMode) {
         print(e);
       }
+      // Boş bir harita döndür
       return {};
     }
   }

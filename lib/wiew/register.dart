@@ -94,7 +94,7 @@ class Register extends StatelessWidget {
                             UserModel userdata = UserModel(userID: userid);
                             // Kullanıcının e-posta bilgisi alınır ve UserModel'de saklanır
                             userdata.email = emailController.text;
-                            // Kullanıcının telefon numarası bilgisi alınır, eğer dönüşüm başarısız olursa null atanır
+                            // Kullanıcının telefon numarası bilgisi alınır,
                             userdata.telNo = int.tryParse(telNoController.text);
                             // Kullanıcının ad ve soyad bilgisi alınır
                             userdata.name = adsoyadController.text;

@@ -48,8 +48,11 @@ class _SalesState extends State<Sales> {
       // Giriş alanından alınan değer double türüne çeviriliyor
       double? adet = double.tryParse(urunAdetiController.text);
       setState(() {
-        if (adet != null) toplamFiyat = satisFiyati * adet;
-      });
+  // 'toplamFiyat', satış fiyatı ile adet çarpılarak hesaplanır ve 'toplamFiyat' değişkenine atanır.
+  if (adet != null) {
+    toplamFiyat = satisFiyati * adet;
+  }
+});
     });
 
     super.initState();
@@ -90,10 +93,10 @@ class _SalesState extends State<Sales> {
                         // Yeni bir işlem oluşturuluyor
                         var temp = selectedProduct!.toMap();
                         ProcessModel processModel = ProcessModel.predefined(
-                            product: ProductModel().parseMap(temp),
-                            date: tarih!,
-                            customerName: selectedCustomer!.username,
-                            processType: IslemTipi.satis);
+                            product: ProductModel().parseMap(temp), // Seçilen ürünün bilgileri işleme eklenir
+                            date: tarih!, // Seçilen tarih işleme eklenir,
+                            customerName: selectedCustomer!.username, // Müşteri adı işleme eklenir
+                            processType: IslemTipi.satis);// İşlem tipi "satış" olarak belirlenir
                         // Satış fiyatı ve ürün adedi ekleniyor
                         processModel.product!.productAmount =
                             int.tryParse(urunAdetiController.text) ?? 0;
