@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class Constants {
   static const SizedBox sizedbox =
-      SizedBox(height: 53); //textfield arası bosluk
+      SizedBox(height: 25); //textfield arası bosluk
 
   static const TextStyle textStyle =
       TextStyle(fontSize: 24, color: Colors.grey); //bu baslıkların rengı

@@ -41,7 +41,12 @@ class ProcessModel {
   }
 
   double giderHesapla() {
+    // Alış adeti ile alış birim fiyatının çarpılması
     return product.productAmount.toDouble() * product.buyPrice;
+  }
+
+  double karHesapla() {
+    return gelirHesapla() - giderHesapla();
   }
 
   Map<String, dynamic> toMap() {

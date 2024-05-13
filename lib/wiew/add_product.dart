@@ -2,6 +2,8 @@
  bu sayda urunlerı ekleme sayfası
 */
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
@@ -132,7 +134,7 @@ class AddProduct extends StatelessWidget {
                               // Eğer işlem güncelleme modunda ise
                               // Alış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
                               data!.buyPrice =
-                                  double.tryParse(buyPrice.text) ?? 0.0;
+                                  double.tryParse(buyPrice.text.trim()) ?? 0.0;
 
                               //////
                               // Satış fiyatını al, double'a dönüştür, dönüşüm başarısız olursa 0.0 olarak ata
@@ -144,7 +146,7 @@ class AddProduct extends StatelessWidget {
 
                               // Ürün miktarını al, int'e dönüştür, dönüşüm başarısız olursa 0 olarak ata
                               data!.productAmount =
-                                  int.tryParse(productAmount.text) ?? 0;
+                                  int.tryParse(productAmount.text.trim()) ?? 0;
 
                               // İşlemi güncellemek için databaseService kullanarak işlemi gerçekleştir
                               databaseService
@@ -186,11 +188,19 @@ class AddProduct extends StatelessWidget {
       decoration: const BoxDecoration(
         color: Color(0xFF5D5353),
       ),
-      child: TextField(
-          keyboardType: isNumber ? TextInputType.number : null,
-          controller: controller,
-          decoration: const InputDecoration(border: InputBorder.none),
-          style: const TextStyle(color: Colors.white)),
+      child: TextFormField(
+        keyboardType: isNumber ? TextInputType.number : null,
+        controller: controller,
+        autovalidateMode: AutovalidateMode.always,
+        validator: (value) => value!.isEmpty ? "Boş bırakmayınız" : null,
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          errorStyle: TextStyle(
+              color: Colors
+                  .black), // Burada errorStyle kullanarak hata rengini ayarlayın
+        ),
+        style: const TextStyle(color: Colors.white),
+      ),
     );
   }
 

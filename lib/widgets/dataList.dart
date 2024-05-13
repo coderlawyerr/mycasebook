@@ -13,7 +13,7 @@ List<Widget> dataCardList(
             color: Colors.grey,
             borderRadius: BorderRadius.all(Radius.circular(10))),
         height: cardType == 1 && data[index].processType == IslemTipi.satis
-            ? heightSize(context, 25)
+            ? heightSize(context, 30)
             : heightSize(context, 18),
         width: widthSize(context, 90),
         child: Padding(
@@ -48,19 +48,22 @@ List<Widget> dataCardList(
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Text(
-                        "Ürun Adeti :${data[index].product!.productAmount}",
+                        (data[index].processType == IslemTipi.alis
+                                ? "Alış"
+                                : "Satış") +
+                            " Adeti :${data[index].product.productAmount}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Text(
-                        "Alış fiyatı :${data[index].product!.buyPrice}",
+                        "Alış Birim Fiyatı :${data[index].product.buyPrice}",
                         style:
                             const TextStyle(color: Colors.white, fontSize: 15),
                       ),
                       Visibility(
                         visible: data[index].processType == IslemTipi.alis,
                         child: Text(
-                          "Toplam Tutar :${data[index].gelirHesapla()}",
+                          "Toplam Tutar : ${data[index].product.productAmount * data[index].product.buyPrice}",
                           style: const TextStyle(
                               color: Colors.white, fontSize: 15),
                         ),
@@ -69,17 +72,22 @@ List<Widget> dataCardList(
                     (data[index].processType == IslemTipi.satis
                         ? [
                             Text(
-                              "Satış fiyatı :${data[index].product!.sellPrice}",
+                              "Satış Birim fiyatı : ${data[index].product!.sellPrice}",
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 15),
                             ),
                             Text(
-                              "Kar Zarar Durumu :${data[index].profitState != null ? data[index].profitState!.name.toUpperCase() : ""}",
+                              "Kar Zarar Durumu : ${data[index].profitState != null ? data[index].profitState!.name.toUpperCase() : ""}",
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 15),
                             ),
                             Text(
-                              "Toplam Kazanç :${data[index].gelirHesapla()}",
+                              "Satış Toplam Tutarı: ${data[index].gelirHesapla()}",
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 15),
+                            ),
+                            Text(
+                              "Kar Toplam Tutarı: ${data[index].karHesapla()}",
                               style: const TextStyle(
                                   color: Colors.white, fontSize: 15),
                             ),
@@ -103,7 +111,7 @@ List<Widget> dataCardList(
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(
-                      "Satış fiyatı :${data[index].product!.sellPrice}",
+                      "Satış Birim fiyatı :${data[index].product!.sellPrice}",
                       style: const TextStyle(color: Colors.white, fontSize: 15),
                     ),
                     Text(

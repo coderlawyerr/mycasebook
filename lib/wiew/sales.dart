@@ -26,7 +26,8 @@ class _SalesState extends State<Sales> {
   final _formkey = GlobalKey<FormState>(); // Form anahtarı
   TextEditingController urunAdetiController =
       TextEditingController(); // Ürün adeti kontrolcüsü
-  int maxUrunAdeti = 0x7FFFFFFFFFFFFFFF; // Maksimum ürün adeti
+  int maxUrunAdeti =
+      2147483647; // Flutter'da en büyük int değeri // Maksimum ürün adeti
   DateTime? tarih = DateTime.now(); // Tarih
   List<SuplierCustomerModel> customers = []; // Müşteriler listesi
   List<ProductModel> products = []; // Ürünler listesi
@@ -46,13 +47,13 @@ class _SalesState extends State<Sales> {
     // Ürün adeti kontrolcüsü dinleniyor
     urunAdetiController.addListener(() {
       // Giriş alanından alınan değer double türüne çeviriliyor
-      double? adet = double.tryParse(urunAdetiController.text);
+      double? adet = double.tryParse(urunAdetiController.text.trim());
       setState(() {
-  // 'toplamFiyat', satış fiyatı ile adet çarpılarak hesaplanır ve 'toplamFiyat' değişkenine atanır.
-  if (adet != null) {
-    toplamFiyat = satisFiyati * adet;
-  }
-});
+        // 'toplamFiyat', satış fiyatı ile adet çarpılarak hesaplanır ve 'toplamFiyat' değişkenine atanır.
+        if (adet != null) {
+          toplamFiyat = satisFiyati * adet;
+        }
+      });
     });
 
     super.initState();
@@ -76,11 +77,11 @@ class _SalesState extends State<Sales> {
             mainAxisSize: MainAxisSize.min,
             children: [
                   _buildDateTimeRow(), // Tarih ve saat satırı
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 10),
                   _buildDropdownRow(), // Dropdown satırı
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 15),
                   _buildDataInputRow(), // Veri girişi satırı
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 15),
                   CustomButton(
                     text: "KAYDET", // Düğme metni
                     toDo: () async {
@@ -93,10 +94,13 @@ class _SalesState extends State<Sales> {
                         // Yeni bir işlem oluşturuluyor
                         var temp = selectedProduct!.toMap();
                         ProcessModel processModel = ProcessModel.predefined(
-                            product: ProductModel().parseMap(temp), // Seçilen ürünün bilgileri işleme eklenir
+                            product: ProductModel().parseMap(
+                                temp), // Seçilen ürünün bilgileri işleme eklenir
                             date: tarih!, // Seçilen tarih işleme eklenir,
-                            customerName: selectedCustomer!.username, // Müşteri adı işleme eklenir
-                            processType: IslemTipi.satis);// İşlem tipi "satış" olarak belirlenir
+                            customerName: selectedCustomer!
+                                .username, // Müşteri adı işleme eklenir
+                            processType: IslemTipi
+                                .satis); // İşlem tipi "satış" olarak belirlenir
                         // Satış fiyatı ve ürün adedi ekleniyor
                         processModel.product!.productAmount =
                             int.tryParse(urunAdetiController.text) ?? 0;
@@ -288,7 +292,7 @@ class _SalesState extends State<Sales> {
         const SizedBox(width: 10),
         _buildDataInputField(
             "Ürün Adedi", urunAdetiController), // Ürün adeti giriş alanı
-        const SizedBox(width: 10),
+        const SizedBox(width: 15),
         // Toplam tutar gösteriliyor
         Column(
           children: [

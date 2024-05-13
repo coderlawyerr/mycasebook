@@ -127,6 +127,9 @@ class _MyWidgetState extends State<Todo> {
                             ),
                           ],
                         ),
+                        SizedBox(
+                          height: 15,
+                        ),
                         Column(
                           children: [
                             const CustomTextWidget(
@@ -140,6 +143,9 @@ class _MyWidgetState extends State<Todo> {
                               style: Constants.textStyle,
                             ),
                           ],
+                        ),
+                        SizedBox(
+                          height: 15,
                         ),
                         Column(
                           children: [
@@ -156,7 +162,9 @@ class _MyWidgetState extends State<Todo> {
                           ],
                         ),
                       ]),
-                  Constants.sizedbox,
+                  SizedBox(
+                    height: 5,
+                  ),
                   // "Raporla" butonu oluşturulur.
                   CustomButton(
                       text: "Raporla",

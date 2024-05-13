@@ -27,7 +27,7 @@ class Overview extends StatefulWidget {
 
 class _OverviewState extends State<Overview> {
   UserModel? userdata;
-  Map<String, double> dataMap = {"": 100};
+  Map<String, double> dataMap = {"%": 100};
 
   @override
   void initState() {

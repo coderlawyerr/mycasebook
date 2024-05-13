@@ -7,7 +7,6 @@ class MyPieChart extends StatelessWidget {
   Map<String, double> dataMapold = {
     "GELİR": 32,
     "GİDER": 28,
-    //"BORÇ": 16,
     "ANA PARA": 24,
   };
 
@@ -15,7 +14,7 @@ class MyPieChart extends StatelessWidget {
     const Color.fromARGB(255, 127, 96, 3),
     const Color.fromARGB(255, 4, 46, 80),
     Colors.black,
-    Colors.grey 
+    Colors.grey
   ];
 
   @override
@@ -31,7 +30,7 @@ class MyPieChart extends StatelessWidget {
             color: Colors.white, fontSize: 20), // Yazı rengini beyaz yap
       ),
       chartValuesOptions: const ChartValuesOptions(
-        showChartValuesInPercentage: false,
+        showChartValuesInPercentage: true,
         chartValueStyle: TextStyle(fontSize: 20, color: Colors.black),
       ),
     );

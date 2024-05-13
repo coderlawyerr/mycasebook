@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-Widget customTextField({TextEditingController? controller}) {
+Widget customTextField({TextEditingController? controller, String? hint}) {
   return Container(
     width: 372,
     height: 42,
@@ -9,8 +9,14 @@ Widget customTextField({TextEditingController? controller}) {
     ),
     child: TextFormField(
         controller: controller,
+        enableSuggestions: true,
+        decoration: InputDecoration(
+            border: InputBorder.none,
+            hintText: hint,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            hintStyle: const TextStyle(color: Colors.grey)),
+        autovalidateMode: AutovalidateMode.always,
         validator: (value) => value!.isEmpty ? " Boş bırakmayınız" : null,
-        decoration: const InputDecoration(border: InputBorder.none),
         style: const TextStyle(color: Colors.white)),
   );
 }

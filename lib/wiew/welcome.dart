@@ -5,7 +5,7 @@ Sayfanın amacı: Kullanıcı girişi yapmak veya kayıt olmak için kullanılan
 */
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/widgets/button.dart';

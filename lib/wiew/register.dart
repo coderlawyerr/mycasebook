@@ -50,22 +50,27 @@ class Register extends StatelessWidget {
               children: [
                 // Ad-Soyad metin alanı ve giriş kutusu
                 const CustomTextWidget(text: " Ad-Soyad"),
-                customTextField(controller: adsoyadController),
+                customTextField(
+                     controller: adsoyadController),
                 Constants.sizedbox,
 
                 // Telefon numarası metin alanı ve giriş kutusu
                 const CustomTextWidget(text: "Telefon"),
-                customTextField(controller: telNoController),
+                customTextField( controller: telNoController),
                 Constants.sizedbox,
 
                 // E-Posta metin alanı ve giriş kutusu
                 const CustomTextWidget(text: "E-Posta"),
-                customTextField(controller: emailController),
+                customTextField(
+                    
+                    controller: emailController,
+                    hint: "example@example.com"),
                 Constants.sizedbox,
 
                 // Şifre metin alanı ve giriş kutusu
-                const CustomTextWidget(text: "Şifre"),
-                customTextField(controller: passwordController),
+                const CustomTextWidget(text: "Şifre (6 haneli giriniz)"),
+                customTextField(
+                     controller: passwordController),
                 const SizedBox(
                   height: 100,
                 ),
