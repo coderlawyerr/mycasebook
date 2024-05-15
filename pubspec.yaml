@@ -45,6 +45,8 @@ dependencies:
   firebase_auth:
   cloud_firestore:
   omni_datetime_picker:
+  firebase_storage: ^11.7.5
+  image_picker: ^0.8.4+4
 
 dev_dependencies:
   flutter_test:

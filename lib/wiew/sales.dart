@@ -216,57 +216,77 @@ class _SalesState extends State<Sales> {
     );
   }
 
-  // Müşteri dropdown bileşeni
+// Müşteri dropdown bileşeni
   Widget customersDropDown() {
     return DropdownButtonFormField<SuplierCustomerModel>(
-        value: selectedCustomer,
-        style: Constants.textStyle,
-        hint: const Text(
-          "Müşteri Seç", // Varsayılan metin
-          style: TextStyle(color: Colors.grey),
-        ),
-        validator: (value) => value == null ? "Müşteri Seçiniz!" : null,
-        autovalidateMode: AutovalidateMode.always,
-        items: customers.isEmpty
-            ? null
-            : customers
-                .map((e) => DropdownMenuItem<SuplierCustomerModel>(
-                    value: e, child: Text(e.username)))
-                .toList(),
-        onChanged: (selected) {
-          setState(() {
-            selectedCustomer = selected;
-          });
+      value: selectedCustomer,
+      style: TextStyle(color: Colors.black), // Metin rengini siyah yap
+      hint: const Text(
+        "Müşteri Seç", // Varsayılan metin
+        style: TextStyle(color: Colors.grey),
+      ),
+      isExpanded: true,
+      dropdownColor: const Color(0xFF5D5353),
+      validator: (value) => value == null ? "Müşteri Seçiniz!" : null,
+      autovalidateMode: AutovalidateMode.always,
+      items: customers.isEmpty
+          ? null
+          : customers
+              .map((e) => DropdownMenuItem<SuplierCustomerModel>(
+                  value: e, child: Text(e.username)))
+              .toList(),
+      onChanged: (selected) {
+        setState(() {
+          selectedCustomer = selected;
         });
+      },
+      decoration: InputDecoration(
+        errorStyle: const TextStyle(
+            color: Colors.black), // Validator metni için siyah renk
+        errorBorder: OutlineInputBorder(
+          // Hata durumunda çerçeve rengi
+          borderSide:
+              const BorderSide(color: Colors.transparent), // Şeffaf bir çizgi
+        ),
+      ),
+    );
   }
 
-  // Ürün dropdown bileşeni
+// Ürün dropdown bileşeni
   Widget productsDropDown() {
     return DropdownButtonFormField<ProductModel>(
-        value: selectedProduct,
-        style: Constants.textStyle,
-        //dropdownColor: Colors.red,
-        // isExpanded: true,
-        hint: Text(
-          products.isEmpty ? "Ürün Yok!" : "Ürün Seç", // Varsayılan metin
-          style: const TextStyle(color: Colors.grey),
-        ),
-        validator: (value) => value == null ? "Ürün Seçiniz!" : null,
-        autovalidateMode: AutovalidateMode.always,
-        items: products.isEmpty
-            ? null
-            : products
-                .map((e) => DropdownMenuItem<ProductModel>(
-                    value: e, child: Text(e.productName)))
-                .toList(),
-        onChanged: (selected) {
-          setState(() {
-            selectedProduct = selected;
-            satisFiyati = selected!.sellPrice;
-            //urunAdetiController.text = "1";
-            maxUrunAdeti = selected.productAmount;
-          });
+      value: selectedProduct,
+      style: TextStyle(color: Colors.black), // Metin rengini siyah yap
+      hint: Text(
+        products.isEmpty ? "Ürün Yok!" : "Ürün Seç", // Varsayılan metin
+        style: const TextStyle(color: Colors.grey),
+      ),
+      validator: (value) => value == null ? "Ürün Seçiniz!" : null,
+      autovalidateMode: AutovalidateMode.always,
+      items: products.isEmpty
+          ? null
+          : products
+              .map((e) => DropdownMenuItem<ProductModel>(
+                  value: e, child: Text(e.productName)))
+              .toList(),
+      onChanged: (selected) {
+        setState(() {
+          selectedProduct = selected;
+          satisFiyati = selected!.sellPrice;
+          //urunAdetiController.text = "1";
+          maxUrunAdeti = selected.productAmount;
         });
+      },
+      decoration: InputDecoration(
+        errorStyle: const TextStyle(
+            color: Colors.black), // Validator metni için siyah renk
+        errorBorder: OutlineInputBorder(
+          // Hata durumunda çerçeve rengi
+          borderSide:
+              const BorderSide(color: Colors.transparent), // Şeffaf bir çizgi
+        ),
+      ),
+    );
   }
 
   // Veri giriş satırı bileşeni

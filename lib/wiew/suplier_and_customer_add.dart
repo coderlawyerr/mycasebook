@@ -106,6 +106,17 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                       );
                     }).toList(),
                     style: const TextStyle(color: Colors.white),
+                    decoration: const InputDecoration(
+                      errorStyle: TextStyle(color: Colors.black),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black),
+                      ),
+                      errorBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Colors
+                                .black), // Hata durumunda çizgi rengini kırmızı olarak ayarla
+                      ),
+                    ),
                   ),
                 ),
 
@@ -151,7 +162,7 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                           widget.data!.adress = adres.text;
                           // Burada currentType değişkeninin null olmadığını varsayıyoruz
                           widget.data!.currentType = currentType!;
-                        
+
                           _databaseService
                               .addSupplierOrCustomer(
                                   userId: AuthService().getCurrentUser()!.uid,
@@ -217,7 +228,9 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
           keyboardType: isNumber ? TextInputType.number : null,
           validator: (value) => value!.isEmpty ? " Boş bırakmayınız" : null,
           controller: controller,
-          decoration: const InputDecoration(border: InputBorder.none),
+          decoration: const InputDecoration(
+              border: InputBorder.none,
+              errorStyle: TextStyle(color: Colors.black)),
           style: const TextStyle(color: Colors.white)),
     );
   }

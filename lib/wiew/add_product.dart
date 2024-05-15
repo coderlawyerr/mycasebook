@@ -9,6 +9,7 @@ import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/widgets/button.dart';
+import 'package:flutter_application_1/widgets/photo.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
 import 'package:flutter_application_1/wiew/overview.dart';
 
@@ -78,6 +79,10 @@ class AddProduct extends StatelessWidget {
                   customTextField(controller: productAmount, isNumber: true),
                   // Boşluk ekleyin
                   Constants.sizedbox,
+
+                  ///ürün fotografı
+                  const CustomTextWidget(text: "Ürün Fotografı"),
+                  ProductPhoto(),
                   Center(
                     child: CustomButton(
                         // Onayla butonu
