@@ -41,9 +41,9 @@ class _ProductState extends State<Product> {
       //ARAMA METNİ DEGISTIGINDE FILTRELENECEK URUNLERIN GUNCELLENMESI
       searchController.addListener(() {
         if (searchController.text.length <= 2) {
-           // Tüm ürünleri döngü ile kontrol et
+          // Tüm ürünleri döngü ile kontrol et
           filteredProducts.clear();
-            // Filtrelenmiş ürünler listesine ekle
+          // Filtrelenmiş ürünler listesine ekle
           filteredProducts.addAll(products);
           setState(() {});
         }
@@ -114,22 +114,30 @@ class _ProductState extends State<Product> {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: customCard(
-        ///silme işlemei için
+          imageUrl: pro.photoURL,
+
+          ///silme işlemei için
           onDelete: () {
-            showAreYouSureDialog(context, message: "Eminmisiniz?")
+            showAreYouSureDialog(context, message: "Emin misiniz?")
                 .then((value) {
+              print(AuthService().getCurrentUser()!.uid);
               if (value != null && value as bool) {
                 dataBaseService
                     .deleteProduct(
                         userId: AuthService().getCurrentUser()!.uid, data: pro)
                     .then((value) {
                   if (value) {
-                    products.clear();//ürün sil
-                    isProductsFetched = false;
-                    filteredProducts.clear();
-                    bringProducts().whenComplete(() => setState(() {
-                          filteredProducts.addAll(products);
-                        }));
+                    if (value == true) {
+                      print("silindi");
+                      products.clear(); //ürün sil
+                      isProductsFetched = false;
+                      filteredProducts.clear();
+                      bringProducts().whenComplete(() => setState(() {
+                            filteredProducts.addAll(products);
+                          }));
+                    } else {
+                      print("silinmedi");
+                    }
                   }
                 });
               }
@@ -141,7 +149,6 @@ class _ProductState extends State<Product> {
               context,
               MaterialPageRoute(
                 builder: (context) => AddProduct(
-                  
                   mod: AddProductMod.edit,
                   data: pro,
                 ),

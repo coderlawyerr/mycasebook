@@ -101,10 +101,11 @@ class _ProductState extends State<SupplierAndCustomer> {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: customCard(
+        imageUrl: "",
         context: context,
         onDelete: () async {
           // Silme işlemi
-          showAreYouSureDialog(context, message: "Silmek istiyormusunuz?")
+          showAreYouSureDialog(context, message: "Silmek istiyor musunuz?")
               .then((value) async {
             if (value != null && value) {
               // databaseden sılme

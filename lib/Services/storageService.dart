@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
@@ -37,5 +36,25 @@ class StorageService {
         'uploaded_at': DateTime.now(),
       });
     }
+  }
+
+  Future<String> uploadProductImage({XFile? imagePath}) async {
+    if (imagePath != null) {
+      // Dosyayı File türüne dönüştürün
+      final File file = File(imagePath.path);
+
+      // Firebase Storage'a yükleyin
+      String fileName =
+          'images/${DateTime.now().millisecondsSinceEpoch.toString()}';
+      Reference storageRef = _storage.ref().child(fileName);
+      UploadTask uploadTask = storageRef.putFile(file);
+
+      // Yükleme tamamlandığında URL'yi alın
+      TaskSnapshot snapshot = await uploadTask;
+
+      return await snapshot.ref.getDownloadURL();
+    }
+    throw Exception(
+        'Image path is null.'); // Add a throw statement to handle the case when imagePath is null.
   }
 }

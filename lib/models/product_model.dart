@@ -8,14 +8,10 @@ class ProductModel {
   late int productAmount;
   late int date;
   late String photoURL;
-
-  late String imageURL;
-
   Map<String, dynamic> toMap() {
     return {
-      'productID': productID,
       'id': productID,
-      'productName': productName,///kafam akrıstı bılrıkte yapalım mı esıtleme kısmını o daha mantıklı
+      'productName': productName,
       'buyPrice': buyPrice,
       'sellPrice': sellPrice,
       'productAmount': productAmount,

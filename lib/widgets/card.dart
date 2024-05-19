@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/const/const.dart';
 
-Widget customCard(
-    {required String text,
-    required BuildContext context,
-    Function()? onDelete,
-    Function()? onEdit}) {
+Widget customCard({
+  required String text,
+  required BuildContext context,
+  Function()? onDelete,
+  Function()? onEdit,
+  required String imageUrl,
+}) {
   return Container(
     decoration: const BoxDecoration(
         color: Colors.grey,
@@ -15,6 +17,17 @@ Widget customCard(
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
+        Image.network(
+          imageUrl,
+          width: widthSize(context, 20),
+          loadingBuilder: (context, child, loadingProgress) =>
+              loadingProgress == null
+                  ? child
+                  : const Center(
+                      child: CircularProgressIndicator(),
+                    ),
+          errorBuilder: (context, error, stackTrace) => const SizedBox(),
+        ),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.all(20),

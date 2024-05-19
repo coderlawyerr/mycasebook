@@ -1,7 +1,7 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
@@ -16,6 +16,8 @@ import 'package:flutter_application_1/wiew/overview.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
+import '../Services/storageService.dart';
+
 // resmi nerede seçtiriyorsun?
 enum AddProductMod { add, edit }
 
@@ -24,8 +26,7 @@ class AddProduct extends StatefulWidget {
 
   ProductModel? data;
 
-  AddProduct({Key? key, this.mod = AddProductMod.add, this.data})
-      : super(key: key);
+  AddProduct({super.key, this.mod = AddProductMod.add, this.data});
 
   @override
   State<AddProduct> createState() => _AddProductState();
@@ -38,23 +39,23 @@ class _AddProductState extends State<AddProduct> {
 
   FirebaseAuth auth = FirebaseAuth.instance;
   String? indirmeBaglantisi;
-  File? selectedImage;
+  XFile? selectedImage;
   @override
   void initState() {
     super.initState();
   }
 
- Future galeridenYukle() async {
+  Future galeridenYukle() async {
     // bu fonksiyonu başka bir yerden çağırmamışsın. çalışmaz
     var alinanDosya = await ImagePicker().getImage(source: ImageSource.gallery);
     setState(() async {
       yuklenecekDosya = File(alinanDosya!.path);
-   
+
       final storageRef = FirebaseStorage.instance
           .ref()
           .child("productphoto")
           .child("${const Uuid().v1()}.png");
-  
+
       UploadTask yuklemeGorevi = storageRef.putFile(yuklenecekDosya!);
       TaskSnapshot snapshot = await yuklemeGorevi;
       String url = await snapshot.ref.getDownloadURL();
@@ -156,18 +157,22 @@ class _AddProductState extends State<AddProduct> {
 
                   ///ürün fotografı
                   const CustomTextWidget(text: "Ürün Fotografı"),
+
                   ProductPhoto(
-                    onPhotoSelected: (resim) {
-                      setState(() {
-                        debugPrint("Seçilen resim: ${resim.path}");
-                        // bir resim seç yeniden seç
-                        // buada zaten resim seçildiğinde dönüyor
-                        yuklenecekDosya = resim;
-                        // resim seçildiğinde b otomatik doldurlacak.
-                        // onayla butonuna bsatığında bu "yuklenecekDosya" değişkeninin dolu olduğunu kontrol et
-                        // dolu ise storageye kaydet
-                        var secilenResim = resim;
-                      });
+                    onPhotoSelected: (resim) async {
+                      final picker = ImagePicker();
+                      selectedImage =
+                          await picker.pickImage(source: ImageSource.gallery);
+                      log("Resim seçildi: ${selectedImage!.path}");
+
+                      debugPrint("Seçilen resim: ${resim.path}");
+                      // bir resim seç yeniden seç
+                      // buada zaten resim seçildiğinde dönüyor
+                      yuklenecekDosya = resim;
+                      // resim seçildiğinde b otomatik doldurlacak.
+                      // onayla butonuna bsatığında bu "yuklenecekDosya" değişkeninin dolu olduğunu kontrol et
+                      // dolu ise storageye kaydet
+                      var secilenResim = resim;
                     },
                   ), //
 
@@ -185,8 +190,11 @@ class _AddProductState extends State<AddProduct> {
                             productAmount.text.isNotEmpty) {
                           //
                           // Eğer işlem ekleme modunda ise
+                           final photoUrl = await StorageService()
+                                .uploadProductImage(
+                                    imagePath: selectedImage); // resmi yükle
                           if (widget.mod == AddProductMod.add) {
-                            
+                           
                             // Yeni bir ürün modeli oluştur
                             ProductModel product = ProductModel();
                             // urun adı yazınca  urun alıs fıyatını yazınca ondan oncekı yazdıklarım kayboluyor boyle oljmuyordu normalde
@@ -205,14 +213,14 @@ class _AddProductState extends State<AddProduct> {
                             product.productAmount =
                                 int.tryParse(productAmount.text) ?? 0;
 
-                                
+                            product.photoURL = photoUrl;
 
                             // Yeni ürünü veritabanına eklemek için databaseService kullanarak işlemi gerçekleştir
                             databaseService
                                 .addNewProduct(
                               AuthService().getCurrentUser()!.uid,
                               product,
-                              File("ürün resimleri"),
+                              File(selectedImage!.path),
                             ) //yolu nasıl vereceg
                                 .then((value) {
                               // Eğer işlem başarılı olduysa (değer null değilse)
@@ -246,6 +254,7 @@ class _AddProductState extends State<AddProduct> {
                             widget.data!.productAmount =
                                 int.tryParse(productAmount.text.trim()) ?? 0;
 
+                            widget.data!.photoURL =photoUrl;
                             // İşlemi güncellemek için databaseService kullanarak işlemi gerçekleştir
                             databaseService
                                 .updateProduct(

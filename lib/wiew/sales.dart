@@ -83,54 +83,55 @@ class _SalesState extends State<Sales> {
                   _buildDataInputRow(), // Veri girişi satırı
                   const SizedBox(height: 15),
                   CustomButton(
-                    text: "KAYDET", // Düğme metni
-                    toDo: () async {
-                      // Seçilen müşteri, ürün, ürün adedi ve tarih kontrol edilir
-                      if (selectedCustomer != null &&
-                          selectedProduct != null &&
-                          urunAdetiController.text.isNotEmpty &&
-                          int.parse(urunAdetiController.text) <= maxUrunAdeti &&
-                          tarih != null) {
-                        // Yeni bir işlem oluşturuluyor
-                        var temp = selectedProduct!.toMap();
-                        ProcessModel processModel = ProcessModel.predefined(
-                            product: ProductModel().parseMap(
-                                temp), // Seçilen ürünün bilgileri işleme eklenir
-                            date: tarih!, // Seçilen tarih işleme eklenir,
-                            customerName: selectedCustomer!
-                                .username, // Müşteri adı işleme eklenir
-                            processType: IslemTipi
-                                .satis); // İşlem tipi "satış" olarak belirlenir
-                        // Satış fiyatı ve ürün adedi ekleniyor
-                        processModel.product!.productAmount =
-                            int.tryParse(urunAdetiController.text) ?? 0;
-                        // Veritabanı hizmeti üzerinden satış işlemi oluşturuluyor
-                        await dataBaseService
-                            .createSaleProcess(
-                                userId: AuthService().getCurrentUser()!.uid,
-                                processModel: processModel)
-                            .then((value) {
-                          // Ekleme başarılıysa bilgilendirme gösteriliyor
-                          if (value != null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("Satış Başarıyla  Eklendi")));
-                            // Alanlar temizleniyor ve satılan işlemler yeniden getiriliyor
-                            setState(() {
-                              selectedCustomer = null;
-                              selectedProduct = null;
-                              urunAdetiController.text = "0";
-                              toplamFiyat = 0;
-                              satisFiyati = 0.0;
-                              tarih = DateTime.now();
-                              bringSoldProcesses();
-                              bringProducts();
-                            });
-                          }
-                        });
-                      }
-                    },
-                  ),
+                      text: "KAYDET", // Düğme metni
+                      toDo: () async {
+                        // Seçilen müşteri, ürün, ürün adedi ve tarih kontrol edilir
+                        if (selectedCustomer != null &&
+                            selectedProduct != null &&
+                            urunAdetiController.text.isNotEmpty &&
+                            int.parse(urunAdetiController.text) <=
+                                maxUrunAdeti &&
+                            tarih != null) {
+                          // Yeni bir işlem oluşturuluyor
+                          var temp = selectedProduct!.toMap();
+                          ProcessModel processModel = ProcessModel.predefined(
+                              product: ProductModel().parseMap(
+                                  temp), // Seçilen ürünün bilgileri işleme eklenir
+                              date: tarih!, // Seçilen tarih işleme eklenir,
+                              customerName: selectedCustomer!
+                                  .username, // Müşteri adı işleme eklenir
+                              processType: IslemTipi
+                                  .satis); // İşlem tipi "satış" olarak belirlenir
+                          // Satış fiyatı ve ürün adedi ekleniyor
+                          processModel.product.productAmount =
+                              int.tryParse(urunAdetiController.text) ?? 0;
+                          // Veritabanı hizmeti üzerinden satış işlemi oluşturuluyor
+                          await dataBaseService
+                              .createSaleProcess(
+                                  userId: AuthService().getCurrentUser()!.uid,
+                                  processModel: processModel)
+                              .then((value) {
+                            // Ekleme başarılıysa bilgilendirme gösteriliyor
+                            if (value != null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content:
+                                          Text("Satış Başarıyla  Eklendi")));
+                              // Alanlar temizleniyor ve satılan işlemler yeniden getiriliyor
+                              setState(() {
+                                selectedCustomer = null;
+                                selectedProduct = null;
+                                urunAdetiController.text = "0";
+                                toplamFiyat = 0;
+                                satisFiyati = 0.0;
+                                tarih = DateTime.now();
+                                bringSoldProcesses();
+                                bringProducts();
+                              });
+                            }
+                          });
+                        }
+                      }),
                   const SizedBox(height: 8),
                 ] +
 
@@ -220,7 +221,7 @@ class _SalesState extends State<Sales> {
   Widget customersDropDown() {
     return DropdownButtonFormField<SuplierCustomerModel>(
       value: selectedCustomer,
-      style: TextStyle(color: Colors.black), // Metin rengini siyah yap
+      style: const TextStyle(color: Colors.black), // Metin rengini siyah yap
       hint: const Text(
         "Müşteri Seç", // Varsayılan metin
         style: TextStyle(color: Colors.grey),
@@ -240,13 +241,12 @@ class _SalesState extends State<Sales> {
           selectedCustomer = selected;
         });
       },
-      decoration: InputDecoration(
-        errorStyle: const TextStyle(
-            color: Colors.black), // Validator metni için siyah renk
+      decoration: const InputDecoration(
+        errorStyle:
+            TextStyle(color: Colors.black), // Validator metni için siyah renk
         errorBorder: OutlineInputBorder(
           // Hata durumunda çerçeve rengi
-          borderSide:
-              const BorderSide(color: Colors.transparent), // Şeffaf bir çizgi
+          borderSide: BorderSide(color: Colors.transparent), // Şeffaf bir çizgi
         ),
       ),
     );
@@ -256,7 +256,7 @@ class _SalesState extends State<Sales> {
   Widget productsDropDown() {
     return DropdownButtonFormField<ProductModel>(
       value: selectedProduct,
-      style: TextStyle(color: Colors.black), // Metin rengini siyah yap
+      style: const TextStyle(color: Colors.black), // Metin rengini siyah yap
       hint: Text(
         products.isEmpty ? "Ürün Yok!" : "Ürün Seç", // Varsayılan metin
         style: const TextStyle(color: Colors.grey),
@@ -277,13 +277,12 @@ class _SalesState extends State<Sales> {
           maxUrunAdeti = selected.productAmount;
         });
       },
-      decoration: InputDecoration(
-        errorStyle: const TextStyle(
-            color: Colors.black), // Validator metni için siyah renk
+      decoration: const InputDecoration(
+        errorStyle:
+            TextStyle(color: Colors.black), // Validator metni için siyah renk
         errorBorder: OutlineInputBorder(
           // Hata durumunda çerçeve rengi
-          borderSide:
-              const BorderSide(color: Colors.transparent), // Şeffaf bir çizgi
+          borderSide: BorderSide(color: Colors.transparent), // Şeffaf bir çizgi
         ),
       ),
     );

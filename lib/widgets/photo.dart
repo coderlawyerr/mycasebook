@@ -1,24 +1,20 @@
 import 'dart:io';
-import 'package:uuid/uuid.dart';
-
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProductPhoto extends StatefulWidget {
   final void Function(File)?
       onPhotoSelected; // e varmış zaten bda baktif mi kullanıyor msuun? ısde dosyayı secebılıyorum max hersey bırbırıne gırdıı suan kafam karıstıı
-  ProductPhoto({Key? key, this.onPhotoSelected}) : super(key: key);
+  const ProductPhoto({super.key, this.onPhotoSelected});
   @override
-  _ProductPhotoState createState() => _ProductPhotoState();
+  State<ProductPhoto> createState() => _ProductPhotoState();
 }
 
 class _ProductPhotoState extends State<ProductPhoto> {
   File? _image;
 
 // buraya bir fonksiyon ekliyebilirsin dışarıdan alınan. bu fonksiyon geriye seçilen resmi döndürür
-  Future<void> dosyayukle() async {
+  /*  Future<void> dosyayukle() async {
     // ben hızlı olsun diye kopyaladım. sen sonra düzenlersin kodları
     final storageRef = FirebaseStorage.instance
         .ref()
@@ -38,20 +34,20 @@ class _ProductPhotoState extends State<ProductPhoto> {
       debugPrint(
           "HATA"); // dosyayukle bunu çalıştırmadık ki boşta bekliyor!! yukleme butonun nerede
     }
-  }
+  } */
 
   final picker = ImagePicker();
 //kullanıcı galerıden bır resım  sectiğinde bu işlev calısır
   Future getImage() async {
     // bu fonksiyon çalıştığında geri döndürdüğü resim kullanıcınn seçtiği resim. sen bunu ekrana yazdırıyorsun.
     // düzenlemen gereken onayla butonuyla keydetme işlemini gerçekleştirmek. ben test etmek için hızlıca ekledim sadece. textfieldi düzeltince eklersin onayla butonuna.
-    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     setState(() {
       //eger bır resım secılmısse secılen resımı gostermek ııcn
       if (pickedFile != null) {
         _image = File(pickedFile.path);
-        dosyayukle();
+        //();
         // denermisimn sorun su  text feıeldlerı dolduramadıgımız ıcın onaylayıp acaba
         if (widget.onPhotoSelected != null) {
           widget.onPhotoSelected!(_image!); // Callback fonksiyonunu çağır
@@ -76,7 +72,7 @@ class _ProductPhotoState extends State<ProductPhoto> {
               // Özel çizim işlevini kullanarak kesik çizgili çerçeve oluştur
               painter: DottedBorderPainter(),
               child: _image == null
-                  ? Center(
+                  ? const Center(
                       child: Text(
                         'Resim Seç',
                         style: TextStyle(color: Colors.grey, fontSize: 16),
@@ -105,8 +101,8 @@ class DottedBorderPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round; // Çizgi uçlarını yuvarlak yap
 
     // Kesik çizgilerin uzunluğu ve aralığını belirle
-    final dashWidth = 5;
-    final dashSpace = 5;
+    const dashWidth = 5;
+    const dashSpace = 5;
     // Yatay kesik çizgileri çiz
     double startY = 0;
     while (startY < size.height) {
