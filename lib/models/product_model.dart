@@ -7,15 +7,20 @@ class ProductModel {
   late double sellPrice;
   late int productAmount;
   late int date;
+  late String photoURL;
+
+  late String imageURL;
 
   Map<String, dynamic> toMap() {
     return {
+      'productID': productID,
       'id': productID,
-      'productName': productName,
+      'productName': productName,///kafam akrıstı bılrıkte yapalım mı esıtleme kısmını o daha mantıklı
       'buyPrice': buyPrice,
       'sellPrice': sellPrice,
       'productAmount': productAmount,
       'date': date,
+      'photoURL': photoURL,
     };
   }
 
@@ -27,6 +32,7 @@ class ProductModel {
     productID = map["id"];
     date = map["date"];
     productAmount = map["productAmount"];
+    photoURL = map["photoURL"]; // Resim URL'si
     return this;
   }
 }

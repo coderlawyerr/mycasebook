@@ -15,6 +15,7 @@ class ProcessModel {
   late String? customerName;
   late KarZarar? profitState;
   late IslemTipi processType;
+  String? photoURL;
 
   ProcessModel(); //Constractor
 

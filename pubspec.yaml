@@ -42,12 +42,13 @@ dependencies:
   #data_table_2: ^2.5.12
   auto_size_text: ^3.0.0
   firebase_core:
-  firebase_auth:
+  firebase_auth: ^4.19.5
   cloud_firestore:
   omni_datetime_picker:
   firebase_storage: ^11.7.5
   image_picker: ^0.8.4+4
-
+  gallery_picker: ^0.5.1
+  uuid: ^4.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1,5 +1,10 @@
+
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
+
+
 import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/models/process_model.dart';
 import 'package:flutter_application_1/models/product_model.dart';
@@ -41,46 +46,48 @@ class DataBaseService {
 
 
 //// urun  ekleme sayfasında / ürün ekler / ürün alış işlemi modelin içindedir
-  Future<bool?> addNewProduct(String userId, ProductModel product) async {
+  Future<bool?> addNewProduct(String userId, ProductModel product, File imageFile) async {
     try {
-      product.productID = AutoIdGenerator.autoId();// Ürün ID'sini otomatik oluştur
-      product.date = DateTime.now().millisecondsSinceEpoch;// Ürünün oluşturulma tarihini kaydet
-// Ürünü veritabanına eklemek için belirli bir kullanıcının koleksiyonuna ve belirli bir belgeye ulaş
-      await _ref
+      product.productID = AutoIdGenerator.autoId();
+      product.date = DateTime.now().millisecondsSinceEpoch;
+
+      DocumentReference productRef = await _ref
           .collection('users')
           .doc(userId)
           .collection('Products')
-          .doc(product.productID)
-          .set(product.toMap());
- // Ürün için referans belirle
+          .add(product.toMap());
+
+      String productId = productRef.id;
+      // Fotoğrafı Firebase Storage'a yükle
+      String imageURL = await uploadImage(imageFile, productId);
+      // Firestore'da ürün belgesini güncelle, fotoğraf URL'si ekleyerek
+      await productRef.update({'photoURL': imageURL});
+    
+    // İşlem modelini oluştur ve Firestore'a gönder
       var pref = _ref
           .collection('users')
           .doc(userId)
           .collection('Products')
           .doc(product.productID);
 
-      // İşlem modelini oluştur
       ProcessModel processModel = ProcessModel.predefined(
           product: product, date: DateTime.now(), processType: IslemTipi.alis);
-  // İşlem için ürün referansını belirle
+
       processModel.productRef = pref;
-// İşlem ID'sini otomatik oluştur
+
       processModel.processId = AutoIdGenerator.autoId();
-        // Kullanıcının bakiyesini güncelle
+
       await _ref
           .collection('users')
           .doc(userId)
           .collection('Processes')
           .doc(processModel.processId)
           .set(processModel.toMap());
-      // Kullanıcının bakiyesini güncelle
+  // Kullanıcının bakiyesini güncelle (opsiyonel)
       await _ref.collection('users').doc(userId).update({
         "bakiye":
-      //değerlerini çarparak toplam satın alma maliyetini hesaplar, sonra sonucu negatif işaretle çarparak azaltır, ve son olarak bu 
-      //azaltılmış değeri ilgili alanın değerine ekler, böylece toplam maliyeti günceller.
             FieldValue.increment(-(product.buyPrice * product.productAmount))
       });
-
       return true;
     } catch (e) {
       if (kDebugMode) {
@@ -90,6 +97,75 @@ class DataBaseService {
     }
   }
 
+   Future<String> uploadImage(File imageFile, String productId) async {
+    try {
+      String imagePath = 'images/$productId.jpg';
+      final Reference ref = FirebaseStorage.instance.ref().child(imagePath);
+
+      final UploadTask uploadTask = ref.putFile(imageFile);
+      final TaskSnapshot snapshot = await uploadTask.whenComplete(() => null);
+
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      throw e;
+    }
+  }
+
+    Future<bool> deleteProductImage(String userId, String productId) async {
+    try {
+      await FirebaseStorage.instance
+          .ref()
+          .child('images/$productId.jpg')
+          .delete();
+      return true;
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return false;
+    }
+  }
+
+Future<bool> updateProductImage(String userId, String productId, File? newImageFile) async {
+  try {
+    if (newImageFile != null) { // Dosya nesnesi null değilse işlem yap
+      await FirebaseStorage.instance
+          .ref()
+          .child('images/$productId.jpg')
+          .putFile(newImageFile);
+      return true;
+    } else {
+      // Dosya nesnesi null ise işlem yapma
+      if (kDebugMode) {
+        print('Yeni resim dosyası bulunamadı.');
+      }
+      return false;
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print(e);
+    }
+    return false;
+  }
+}
+
+
+  Future<String?> getProductImageURL(String userId, String productId,File? newImageFile) async {
+    try {
+      return await FirebaseStorage.instance
+          .ref()
+          .child('images/$productId.jpg')
+          .getDownloadURL();
+    } catch (e) {
+      if (kDebugMode) {
+        print(e);
+      }
+      return null;
+    }
+  }
 
   //urun satıs işlemi modeli oluşturup firebase e kaydeder
   Future<bool?> createSaleProcess({
@@ -113,10 +189,7 @@ class DataBaseService {
           .doc(processModel.processId)
           .set(processModel.toMap());
 
-      /* await _ref.collection('users').doc(userId).update({
-        "bakiye": FieldValue.increment((processModel.product.sellPrice *
-            processModel.product.productAmount))
-      });*/
+     
 
       await _ref.doc(pref.path).update({
         "productAmount":
@@ -132,41 +205,44 @@ class DataBaseService {
     }
   }
 
-  //ürünlerım sayfası// alış işlemlerini getirir
-  Future<List<ProcessModel>> fetchProcess(
-      {required String userID, required IslemTipi tip}) async {
-    try {
-      List<ProcessModel> processList = [];
-      // Firestore'dan belirli bir kullanıcının işlemlerini getirmek için sorgu yapılıyor
-      return await _ref
-          .collection('users')
-          .doc(userID)
-          .collection('Processes')
-          .where("processType", isEqualTo: tip.index)
-          .get()
-          .then((processes) {
-        // `processes.docs` içindeki her belge için döngü oluşturuluyor
-        processes.docs.forEach((process) async {
-          // Boş bir `ProcessModel` örneği oluşturuluyor ve `parseMap` fonksiyonu ile verileri işleniyor
-          ProcessModel p = ProcessModel();
-          p.parseMap(map: process.data());
-          processList.add(p);
-        });
+Future<List<ProcessModel>> fetchProcess({required String userID, required IslemTipi tip}) async {
+  try {
+    List<ProcessModel> processList = [];
+    
+    // Firestore'dan belirli bir kullanıcının işlemlerini getirmek için sorgu yapılıyor
+    QuerySnapshot<Map<String, dynamic>> processes = await _ref
+        .collection('users')
+        .doc(userID)
+        .collection('Processes')
+        .where("processType", isEqualTo: tip.index)
+        .get();
 
-        // Tarihine göre sıralama yapılıyor
-        processList.sort((a, b) =>
-            a.date.microsecondsSinceEpoch < b.date.microsecondsSinceEpoch
-                ? 1
-                : 0);
-        return processList;
-      });
-    } catch (e) {
-      if (kDebugMode) {
-        print(e);
+    // Her bir işlem belgesi için döngü oluşturuluyor
+    for (var process in processes.docs) {
+      // Boş bir `ProcessModel` örneği oluşturuluyor ve `parseMap` fonksiyonu ile verileri işleniyor
+      ProcessModel p = ProcessModel();
+      p.parseMap(map: process.data());
+      
+      // İşlem belgesinde fotoğraf URL'si varsa, fotoğraf bilgisini al ve `ProcessModel` örneğine ekle
+      if (process.data().containsKey('photoURL')) {
+        p.photoURL = process.data()['photoURL'];
       }
-      return [];
+      
+      // İşlem listesine ekle
+      processList.add(p);
     }
+
+    // Tarihe göre sıralama yapılıyor
+    processList.sort((a, b) => a.date.compareTo(b.date));
+    
+    return processList;
+  } catch (e) {
+    if (kDebugMode) {
+      print(e);
+    }
+    return [];
   }
+}
 
   //bütün işlemleri getirir / işlemlerin içinde ürünler var
   Future<List<ProcessModel>> fetchAllProcess({required String userID}) async {
@@ -329,10 +405,6 @@ class DataBaseService {
   Future<bool> updateProduct(
       {required String userID, required ProductModel newData}) async {
     try {
-      // Firestore referansı ile belirli bir kullanıcının ürün koleksiyonuna erişiyoruz.
-      // Ardından belirli bir ürün belgesini (document) seçiyoruz. Bu belge, güncellenecek ürünü temsil eder.
-      // Güncelleme işlemi gerçekleştirilirken, ProductModel'deki verileri Firestore'un anlayabileceği bir formata dönüştürmek için toMap() metodu kullanılır.
-      // update() metodu, belirli bir belgeyi yeni verilerle günceller. Güncelleme işlemi başarılı olursa true döndürülür.
       return await _ref
           .collection('users')
           .doc(userID)
@@ -462,3 +534,6 @@ class DataBaseService {
     }
   }
 }
+
+//////////////////////////////
+
