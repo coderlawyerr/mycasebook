@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -18,7 +19,6 @@ import 'package:uuid/uuid.dart';
 
 import '../Services/storageService.dart';
 
-// resmi nerede seçtiriyorsun?
 enum AddProductMod { add, edit }
 
 class AddProduct extends StatefulWidget {
@@ -33,9 +33,7 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
-  File?
-      yuklenecekDosya; // burada image için bir dosya oluşturmuşsun zaten bunu eşitlemelisin seçilen resim ile.
-  // onayla butonuna basıldığında buradaki resim kontrol edilir boş mu değil mi diye. dolu ise storageye yukelem işlemini yaparsın
+  File? yuklenecekDosya;
 
   FirebaseAuth auth = FirebaseAuth.instance;
   String? indirmeBaglantisi;
@@ -45,53 +43,7 @@ class _AddProductState extends State<AddProduct> {
     super.initState();
   }
 
-  Future galeridenYukle() async {
-    // bu fonksiyonu başka bir yerden çağırmamışsın. çalışmaz
-    var alinanDosya = await ImagePicker().getImage(source: ImageSource.gallery);
-    setState(() async {
-      yuklenecekDosya = File(alinanDosya!.path);
-
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child("productphoto")
-          .child("${const Uuid().v1()}.png");
-
-      UploadTask yuklemeGorevi = storageRef.putFile(yuklenecekDosya!);
-      TaskSnapshot snapshot = await yuklemeGorevi;
-      String url = await snapshot.ref.getDownloadURL();
-      setState(() {
-        indirmeBaglantisi = url;
-      });
-    });
-  }
-
-  kameradanYukle() async {
-    // kameradan resim ya da galeriden resim seçildiğinde storageye yukleme yapmamalısın. ??
-    // resim seçildiğinde image dosyasını ayarlamalısın. diğer bilgilerle beraber kullanıcı doldurudğunda onayla butonunda storageye yukleme yapman gerek. resimm yuklemeeyle beraber diğer bilgileri de veri tabanına kaydetmelisin
-
-    var alinanDosya = await ImagePicker().getImage(source: ImageSource.camera);
-
-    //burda alınanDosya yı doldurman yeterli ama bu resmin seçilmiş olması ürünün ekleneceği anlamına gelmez
-// iptal de edilebilir işlem
-    setState(() async {
-      yuklenecekDosya = File(alinanDosya!.path);
-      String fileName =
-          "${const Uuid().v1()}.png"; // Farklı dosya adı oluşturuldu
-      Reference referansYol = FirebaseStorage.instance
-          .ref()
-          .child("urunresimleri")
-          .child(auth.currentUser!.uid)
-          .child(
-              fileName); // Oluşturulan dosya adını kullanarak referans oluşturuldu
-
-      UploadTask yuklemeGorevi = referansYol.putFile(yuklenecekDosya!);
-      TaskSnapshot snapshot = await yuklemeGorevi;
-      String url = await snapshot.ref.getDownloadURL();
-      setState(() {
-        indirmeBaglantisi = url;
-      });
-    });
-  }
+ 
 
   DataBaseService databaseService = DataBaseService();
 
@@ -127,7 +79,7 @@ class _AddProductState extends State<AddProduct> {
                   const CustomTextWidget(text: "Ürün Adı"),
                   // Ürün adı metin giriş alanı
                   // Ürün adı metin giriş alanı
-                  customTextField(
+                  customOutlinedTextField(
                     controller: productName,
                   ),
 
@@ -137,21 +89,23 @@ class _AddProductState extends State<AddProduct> {
                   // Ürün alış fiyatı giriş alanı
                   const CustomTextWidget(text: "Ürün Alış Fiyatı"),
                   // Ürün alış fiyatı metin giriş alanı
-                  customTextField(controller: buyPrice, isNumber: true),
+                  customOutlinedTextField(controller: buyPrice, isNumber: true),
                   // Boşluk
                   Constants.sizedbox,
 
                   // Ürün satış fiyatı giriş alanı
                   const CustomTextWidget(text: "Ürün Satış Fiyatı"),
                   // Ürün satış fiyatı metin giriş alanı
-                  customTextField(controller: sellPrice, isNumber: true),
+                  customOutlinedTextField(
+                      controller: sellPrice, isNumber: true),
                   // Boşluk ekleyin
                   Constants.sizedbox,
 
                   // Adet giriş alanı
                   const CustomTextWidget(text: "Adet"),
                   // Adet metin giriş alanı
-                  customTextField(controller: productAmount, isNumber: true),
+                  customOutlinedTextField(
+                      controller: productAmount, isNumber: true),
                   // Boşluk ekleyin
                   Constants.sizedbox,
 
@@ -175,7 +129,7 @@ class _AddProductState extends State<AddProduct> {
                       var secilenResim = resim;
                     },
                   ), //
-
+                  SizedBox(height: 20),
                   Center(
                     child: CustomButton(
                       // Onayla butonu
@@ -190,11 +144,10 @@ class _AddProductState extends State<AddProduct> {
                             productAmount.text.isNotEmpty) {
                           //
                           // Eğer işlem ekleme modunda ise
-                           final photoUrl = await StorageService()
-                                .uploadProductImage(
-                                    imagePath: selectedImage); // resmi yükle
+                          final photoUrl = await StorageService()
+                              .uploadProductImage(
+                                  imagePath: selectedImage); // resmi yükle
                           if (widget.mod == AddProductMod.add) {
-                           
                             // Yeni bir ürün modeli oluştur
                             ProductModel product = ProductModel();
                             // urun adı yazınca  urun alıs fıyatını yazınca ondan oncekı yazdıklarım kayboluyor boyle oljmuyordu normalde
@@ -213,7 +166,9 @@ class _AddProductState extends State<AddProduct> {
                             product.productAmount =
                                 int.tryParse(productAmount.text) ?? 0;
 
-                            product.photoURL = photoUrl;
+                            product.photoURL = photoUrl ?? "";
+                            product.photoURL =
+                                product.photoURL.split('token').first;
 
                             // Yeni ürünü veritabanına eklemek için databaseService kullanarak işlemi gerçekleştir
                             databaseService
@@ -254,7 +209,7 @@ class _AddProductState extends State<AddProduct> {
                             widget.data!.productAmount =
                                 int.tryParse(productAmount.text.trim()) ?? 0;
 
-                            widget.data!.photoURL =photoUrl;
+                            widget.data!.photoURL = photoUrl ?? "";
                             // İşlemi güncellemek için databaseService kullanarak işlemi gerçekleştir
                             databaseService
                                 .updateProduct(
@@ -288,26 +243,28 @@ class _AddProductState extends State<AddProduct> {
     );
   }
 
-  Widget customTextField(
-      {TextEditingController? controller, bool isNumber = false}) {
+  Widget customOutlinedTextField({
+    TextEditingController? controller,
+    bool isNumber = false,
+  }) {
     return Container(
       width: 372,
       height: 42,
-      decoration: const BoxDecoration(
-        color: Color(0xFF5D5353),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey), // Dış kenarlık
+        borderRadius: BorderRadius.circular(8), // Kenarlık köşeleri
       ),
       child: TextFormField(
-        keyboardType: isNumber ? TextInputType.number : null,
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
         controller: controller,
         autovalidateMode: AutovalidateMode.always,
         validator: (value) => value!.isEmpty ? "Boş bırakmayınız" : null,
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          errorStyle: TextStyle(
-              color: Colors
-                  .black), // Burada errorStyle kullanarak hata rengini ayarlayın
+        decoration: InputDecoration(
+          border: InputBorder.none, // İç kenarlık
+          contentPadding: EdgeInsets.symmetric(horizontal: 12), // İç boşluk
+          errorStyle: TextStyle(color: Colors.black), // Hata rengi
         ),
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.white),
       ),
     );
   }

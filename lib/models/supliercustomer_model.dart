@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 enum CurrentType { tedarikci, musteri }
 
 class SuplierCustomerModel {
@@ -6,6 +8,7 @@ class SuplierCustomerModel {
   late String username;
   late int tel;
   late String adress;
+  late DateTime date;
 
   Map<String, dynamic> toMap() {
     return {
@@ -13,6 +16,7 @@ class SuplierCustomerModel {
       'username': username,
       'tel': tel,
       'adress': adress,
+      'date': Timestamp.fromDate(date),
      // 'id':id
     };
   }
@@ -22,6 +26,7 @@ class SuplierCustomerModel {
     username = data["username"];
     tel = data["tel"];
     adress = data["adress"];
+    date = (data["date"] as Timestamp).toDate();
    // id=data['id'];
   }
 }

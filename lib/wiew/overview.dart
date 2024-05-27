@@ -123,7 +123,9 @@ class _OverviewState extends State<Overview> {
 
             child: Image.asset(
               "assets/prof.png",
-              fit: BoxFit.cover, // Resmi doldurmak için BoxFit kullanın
+              width: 75,
+              height: 75,
+              fit: BoxFit.fitWidth, // Resmi doldurmak için BoxFit kullanın
             ),
           ),
 

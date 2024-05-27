@@ -7,9 +7,9 @@ class Constants {
       SizedBox(height: 25); //textfield arası bosluk
 
   static const TextStyle textStyle =
-      TextStyle(fontSize: 24, color: Colors.grey); //bu baslıkların rengı
+      TextStyle(fontSize: 24, color: Color(0xff768A96)); //bu baslıkların rengı
 
-  static const Color backgroundcolor = Colors.transparent; //arkapplanı
+  static const Color backgroundcolor = Color(0xFF29353C); //arkapplanı
   static const Color mycontainer =
       Color.fromARGB(255, 162, 162, 234); //contaainer rengı
 }

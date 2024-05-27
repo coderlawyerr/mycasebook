@@ -8,6 +8,7 @@ import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/const/const.dart';
 import 'package:flutter_application_1/models/supliercustomer_model.dart';
+import 'package:flutter_application_1/models/supliercustomer_model.dart';
 import 'package:flutter_application_1/widgets/card.dart';
 import 'package:flutter_application_1/widgets/search.dart';
 import 'package:flutter_application_1/wiew/suplier_and_customer_add.dart';
@@ -66,6 +67,7 @@ class _ProductState extends State<SupplierAndCustomer> {
         .whenComplete(() => setState(() {
               isCustomerFetched = true;
             }));
+    customerlist.sort((a, b) => b.date.compareTo(a.date));
   }
 
   @override

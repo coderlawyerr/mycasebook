@@ -12,7 +12,8 @@ Widget customCard({
     decoration: const BoxDecoration(
         color: Colors.grey,
         borderRadius: BorderRadius.all(Radius.circular(10))),
-    height: heightSize(context, 20),
+    padding: const EdgeInsets.symmetric(horizontal: 8),
+    // height: heightSize(context, 20),
     width: widthSize(context, 90),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

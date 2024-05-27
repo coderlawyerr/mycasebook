@@ -69,7 +69,7 @@ class _SalesState extends State<Sales> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _buildAppBar(context), // Üst çubuk
+      appBar: _buildAppBar(context),
       body: SingleChildScrollView(
         child: Form(
           key: _formkey,
@@ -209,6 +209,7 @@ class _SalesState extends State<Sales> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          const SizedBox(height: 25),
           customersDropDown(), // Müşteri dropdown bileşeni
           const SizedBox(height: 20),
           productsDropDown() // Ürün dropdown bileşeni
@@ -229,6 +230,7 @@ class _SalesState extends State<Sales> {
       isExpanded: true,
       dropdownColor: const Color(0xFF5D5353),
       validator: (value) => value == null ? "Müşteri Seçiniz!" : null,
+
       autovalidateMode: AutovalidateMode.always,
       items: customers.isEmpty
           ? null
@@ -246,7 +248,7 @@ class _SalesState extends State<Sales> {
             TextStyle(color: Colors.black), // Validator metni için siyah renk
         errorBorder: OutlineInputBorder(
           // Hata durumunda çerçeve rengi
-          borderSide: BorderSide(color: Colors.transparent), // Şeffaf bir çizgi
+          borderSide: BorderSide(color: Colors.white), // Şeffaf bir çizgi
         ),
       ),
     );
@@ -282,7 +284,7 @@ class _SalesState extends State<Sales> {
             TextStyle(color: Colors.black), // Validator metni için siyah renk
         errorBorder: OutlineInputBorder(
           // Hata durumunda çerçeve rengi
-          borderSide: BorderSide(color: Colors.transparent), // Şeffaf bir çizgi
+          borderSide: BorderSide(color: Colors.white), // Şeffaf bir çizgi
         ),
       ),
     );
@@ -324,7 +326,7 @@ class _SalesState extends State<Sales> {
                     toplamFiyat.toString(),
                     style: const TextStyle(color: Colors.white),
                   ),
-                ))
+                )),
           ],
         )
       ],
@@ -342,33 +344,39 @@ class _SalesState extends State<Sales> {
     );
   }
 
-  // Özel metin giriş alanı bileşeni
   Widget customTextFieldTwo(TextEditingController controller) {
     return Container(
       width: widthSize(context, 90),
       height: 50,
       decoration: const BoxDecoration(
-        color: Color(0xFF5D5353),
+        color: Colors.white,
       ),
       child: TextFormField(
-          controller: controller,
-          keyboardType: TextInputType.number,
-          //dragStartBehavior: DragStartBehavior.down,
-          maxLines: 1,
-          decoration: const InputDecoration(border: InputBorder.none),
-          validator: (value) {
-            if (value!.isEmpty) {
-              return "Urun Adeti giriniz!";
-            } else if (int.parse(value) > maxUrunAdeti) {
-              return "Urun adeti en fazla $maxUrunAdeti kadar olabilir";
-            } else {
-              return null;
-            }
-          },
-          onChanged: (value) {
-            _formkey.currentState!.validate();
-          },
-          style: const TextStyle(color: Colors.white)),
+        controller: controller,
+        keyboardType: TextInputType.number,
+        maxLines: 1,
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          errorStyle:
+              TextStyle(color: Colors.black), // Validator metni için siyah renk
+          errorBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.white), // Şeffaf bir çizgi
+          ),
+        ),
+        validator: (value) {
+          if (value!.isEmpty) {
+            return "Ürün Adedi giriniz!";
+          } else if (int.parse(value) > maxUrunAdeti) {
+            return "Ürün adedi en fazla $maxUrunAdeti kadar olabilir";
+          } else {
+            return null;
+          }
+        },
+        onChanged: (value) {
+          _formkey.currentState!.validate();
+        },
+        style: const TextStyle(color: Colors.black),
+      ),
     );
   }
 
@@ -398,6 +406,7 @@ class _SalesState extends State<Sales> {
     soldProcessList = await dataBaseService
         .fetchProcess(
             userID: AuthService().getCurrentUser()!.uid, tip: IslemTipi.satis)
+        .then((processes) => processes.reversed.toList())
         .whenComplete(() => setState(() {}));
   }
 }

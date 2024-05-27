@@ -73,7 +73,7 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                   text: "Cari Tipi", // Seçim metni
                 ),
                 Container(
-                  color: const Color(0xFF5D5353),
+                  // color: const Color(0xFF44576D),
                   child: DropdownButtonFormField<String>(
                     value: currentType == null
                         ? null
@@ -85,7 +85,7 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                         : null,
                     iconEnabledColor: Colors.white,
                     isExpanded: true,
-                    dropdownColor: const Color(0xFF5D5353),
+
                     ////carı tıpı secımı
                     validator: (value) =>
                         value == null ? " Cari tipi Seçiniz" : null,
@@ -105,11 +105,11 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                         ),
                       );
                     }).toList(),
-                    style: const TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.black),
                     decoration: const InputDecoration(
                       errorStyle: TextStyle(color: Colors.black),
                       enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black),
+                        borderSide: BorderSide(color: Colors.white),
                       ),
                       errorBorder: OutlineInputBorder(
                         borderSide: BorderSide(
@@ -125,19 +125,20 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                 const CustomTextWidget(
                   text: "Ad-Soyad", // Telefon metni
                 ),
-                customTextField(controller: username), // Özel metin giriş alanı
+                customOutlinedTextField(
+                    controller: username), // Özel metin giriş alanı
                 Constants.sizedbox, // Sabit boyutlu bir boşluk
                 ///////////
                 const CustomTextWidget(
                   text: "Telefon", // Adres metni
                 ),
-                customTextField(
+                customOutlinedTextField(
                     controller: tel, isNumber: true), // Özel metin giriş alanı
                 Constants.sizedbox, // Sabit boyutlu bir boşluk
                 const CustomTextWidget(
                   text: "Adres", // Adres metni
                 ),
-                customTextField(controller: adres),
+                customOutlinedTextField(controller: adres),
                 Constants.sizedbox,
                 Center(
                   child: CustomButton(
@@ -163,6 +164,7 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
                           // Burada currentType değişkeninin null olmadığını varsayıyoruz
                           widget.data!.currentType = currentType!;
 
+                          widget.data!.date = DateTime.now();
                           _databaseService
                               .addSupplierOrCustomer(
                                   userId: AuthService().getCurrentUser()!.uid,
@@ -216,24 +218,49 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
     );
   }
 
-  Widget customTextField(
-      {TextEditingController? controller, bool isNumber = false}) {
+  Widget customOutlinedTextField({
+    TextEditingController? controller,
+    bool isNumber = false,
+  }) {
     return Container(
       width: 372,
       height: 42,
-      decoration: const BoxDecoration(
-        color: Color(0xFF5D5353),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey), // Dış kenarlık
+        borderRadius: BorderRadius.circular(8), // Kenarlık köşeleri
       ),
       child: TextFormField(
-          keyboardType: isNumber ? TextInputType.number : null,
-          validator: (value) => value!.isEmpty ? " Boş bırakmayınız" : null,
-          controller: controller,
-          decoration: const InputDecoration(
-              border: InputBorder.none,
-              errorStyle: TextStyle(color: Colors.black)),
-          style: const TextStyle(color: Colors.white)),
+        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+        controller: controller,
+        autovalidateMode: AutovalidateMode.always,
+        validator: (value) => value!.isEmpty ? "Boş bırakmayınız" : null,
+        decoration: InputDecoration(
+          border: InputBorder.none, // İç kenarlık
+          contentPadding: EdgeInsets.symmetric(horizontal: 12), // İç boşluk
+          errorStyle: TextStyle(color: Colors.black), // Hata rengi
+        ),
+        style: TextStyle(color: Colors.white),
+      ),
     );
   }
+  // Widget customTextField(
+  //     {TextEditingController? controller, bool isNumber = false}) {
+  //   return Container(
+  //     width: 372,
+  //     height: 42,
+  //     decoration: const BoxDecoration(
+  //       color: Color(0xFF5D5353),
+  //     ),
+  //     child: TextFormField(
+  //         keyboardType: isNumber ? TextInputType.number : null,
+  //         validator: (value) => value!.isEmpty ? " Boş bırakmayınız" : null,
+  //         controller: controller,
+  //         decoration: const InputDecoration(
+  //             border: InputBorder.none,
+  //             errorStyle: TextStyle(color: Colors.black)),
+  //         style: const TextStyle(color: Colors.white)),
+  //   );
+  // }
 
   AppBar _appbar(BuildContext context) {
     return AppBar(

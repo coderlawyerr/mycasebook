@@ -28,7 +28,7 @@ class ProductModel {
     productID = map["id"];
     date = map["date"];
     productAmount = map["productAmount"];
-    photoURL = map["photoURL"]; // Resim URL'si
+    photoURL = map["photoURL"]?.split('token').first ?? ""; // Resim URL'si
     return this;
   }
 }

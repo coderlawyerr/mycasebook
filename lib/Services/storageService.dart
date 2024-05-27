@@ -1,60 +1,70 @@
-import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io'; // Dosya işlemleri için dart:io kütüphanesi
+import 'package:firebase_storage/firebase_storage.dart'; // Firebase Storage kütüphanesi
+import 'package:image_picker/image_picker.dart'; // Resim seçiminden sorumlu ImagePicker kütüphanesi
+import 'package:cloud_firestore/cloud_firestore.dart'; // Firebase Firestore kütüphanesi
 
-import 'dart:async';
+import 'dart:async'; // Asenkron işlemler için dart:async kütüphanesi
 
 class StorageService {
-  final FirebaseStorage _storage = FirebaseStorage.instance;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage =
+      FirebaseStorage.instance; // Firebase Storage örneği
+  final FirebaseFirestore _firestore =
+      FirebaseFirestore.instance; // Firebase Firestore örneği
 
-  Future<void> uploadImage() async {
-    // Kullanıcıdan bir dosya seçmesini isteyin
-    final picker = ImagePicker();
-    final PickedFile? pickedFile =
-        await picker.getImage(source: ImageSource.gallery);
+  // // Kullanıcıdan bir resim seçerek yükleme işlemini gerçekleştiren fonksiyon
+  // Future<void> uploadImage() async {
+  //   // Kullanıcıdan bir dosya seçmesini isteyin
+  //   final picker = ImagePicker(); // Resim seçiminden sorumlu ImagePicker örneği
+  //   // ignore: deprecated_member_use
+  //   final PickedFile? pickedFile = await picker.getImage(
+  //       source: ImageSource.gallery); // Galeriden resim seçme işlemi
 
-    if (pickedFile != null) {
-      // Dosyayı File türüne dönüştürün
-      final File file = File(pickedFile.path);
+  //   if (pickedFile != null) {
+  //     // Eğer kullanıcı bir resim seçtiyse devam et
+  //     // Dosyayı File türüne dönüştürün
+  //     final File file = File(pickedFile.path);
 
-      // Firebase Storage'a yükleyin
-      String fileName =
-          'images/${DateTime.now().millisecondsSinceEpoch.toString()}';
-      Reference storageRef = _storage.ref().child(fileName);
-      UploadTask uploadTask = storageRef.putFile(file);
+  //     // Firebase Storage'a yükleyin
+  //     String fileName =
+  //         'images/${DateTime.now().millisecondsSinceEpoch.toString()}'; // Dosya adını belirleme
+  //     Reference storageRef =
+  //         _storage.ref().child(fileName); // Yüklenecek dosyanın referansı
+  //     UploadTask uploadTask =
+  //         storageRef.putFile(file); // Dosyayı yükleme işlemi
 
-      // Yükleme tamamlandığında URL'yi alın
-      TaskSnapshot snapshot = await uploadTask;
+  //     // Yükleme tamamlandığında URL'yi alın
+  //     TaskSnapshot snapshot = await uploadTask;
+  //     String downloadUrl = await snapshot.ref
+  //         .getDownloadURL(); // Yüklenen dosyanın URL'sini alma
 
-      String downloadUrl = await snapshot.ref.getDownloadURL();
+  //     // Firestore'a kaydedin
+  //     await _firestore.collection('uploaded_images').add({
+  //       'url': downloadUrl, // URL
+  //       'uploaded_at': DateTime.now(), // Yükleme tarihi
+  //     });
+  //   }
+  // }
 
-      // Firestore'a kaydedin
-      await _firestore.collection('uploaded_images').add({
-        'url': downloadUrl,
-        'uploaded_at': DateTime.now(),
-      });
-    }
-  }
-
-  Future<String> uploadProductImage({XFile? imagePath}) async {
+  // Ürün resmini yükleyen fonksiyon
+  Future<String?> uploadProductImage({XFile? imagePath}) async {
     if (imagePath != null) {
+      // Eğer resim yolu belirlenmişse devam et
       // Dosyayı File türüne dönüştürün
       final File file = File(imagePath.path);
 
       // Firebase Storage'a yükleyin
       String fileName =
-          'images/${DateTime.now().millisecondsSinceEpoch.toString()}';
-      Reference storageRef = _storage.ref().child(fileName);
-      UploadTask uploadTask = storageRef.putFile(file);
+          'images/${DateTime.now().millisecondsSinceEpoch.toString()}'; // Dosya adını belirleme
+      Reference storageRef =
+          _storage.ref().child(fileName); // Yüklenecek dosyanın referansı
+      UploadTask uploadTask =
+          storageRef.putFile(file); // Dosyayı yükleme işlemi
 
       // Yükleme tamamlandığında URL'yi alın
       TaskSnapshot snapshot = await uploadTask;
-
-      return await snapshot.ref.getDownloadURL();
+      return snapshot.ref.getDownloadURL(); // Yüklenen dosyanın URL'sini döndür
     }
-    throw Exception(
-        'Image path is null.'); // Add a throw statement to handle the case when imagePath is null.
+    // Resim yolu belirlenmemişse null döndür
+    return null;
   }
 }
