@@ -10,7 +10,7 @@ import 'package:flutter_application_1/widgets/dateandclock.dart'; // Tarih ve sa
 import 'package:flutter_application_1/widgets/dataList.dart'; // Veri listesi bileşeni
 import 'package:flutter_application_1/widgets/textwidget.dart'; // Özel metin bileşeni
 import 'package:omni_datetime_picker/omni_datetime_picker.dart'; // Tarih/saat seçici
-import 'overview.dart'; // Genel bakış sayfası
+import 'dashboard.dart'; // Genel bakış sayfası
 
 // Satış işlemlerinin yapıldığı bileşen
 class Sales extends StatefulWidget {
@@ -245,7 +245,7 @@ class _SalesState extends State<Sales> {
       },
       decoration: const InputDecoration(
         errorStyle:
-            TextStyle(color: Colors.black), // Validator metni için siyah renk
+            TextStyle(color: Colors.white), // Validator metni için siyah renk
         errorBorder: OutlineInputBorder(
           // Hata durumunda çerçeve rengi
           borderSide: BorderSide(color: Colors.white), // Şeffaf bir çizgi
@@ -281,7 +281,7 @@ class _SalesState extends State<Sales> {
       },
       decoration: const InputDecoration(
         errorStyle:
-            TextStyle(color: Colors.black), // Validator metni için siyah renk
+            TextStyle(color: Colors.white), // Validator metni için siyah renk
         errorBorder: OutlineInputBorder(
           // Hata durumunda çerçeve rengi
           borderSide: BorderSide(color: Colors.white), // Şeffaf bir çizgi
@@ -375,7 +375,7 @@ class _SalesState extends State<Sales> {
         onChanged: (value) {
           _formkey.currentState!.validate();
         },
-        style: const TextStyle(color: Colors.black),
+        style: const TextStyle(color: Colors.white),
       ),
     );
   }

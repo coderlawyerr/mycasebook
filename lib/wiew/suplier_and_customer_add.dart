@@ -237,7 +237,7 @@ class _SupplierAndCustomerAddState extends State<SupplierAndCustomerAdd> {
         decoration: InputDecoration(
           border: InputBorder.none, // İç kenarlık
           contentPadding: EdgeInsets.symmetric(horizontal: 12), // İç boşluk
-          errorStyle: TextStyle(color: Colors.black), // Hata rengi
+          errorStyle: TextStyle(color: Colors.white), // Hata rengi
         ),
         style: TextStyle(color: Colors.white),
       ),

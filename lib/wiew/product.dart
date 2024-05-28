@@ -6,7 +6,7 @@ import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/widgets/card.dart';
 import 'package:flutter_application_1/widgets/search.dart';
 import 'package:flutter_application_1/wiew/add_product.dart';
-import 'package:flutter_application_1/wiew/overview.dart';
+import 'package:flutter_application_1/wiew/dashboard.dart';
 
 class Product extends StatefulWidget {
   const Product({Key? key}) : super(key: key);

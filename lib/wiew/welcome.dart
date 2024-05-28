@@ -12,7 +12,7 @@ import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/textfield.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
 import 'package:flutter_application_1/wiew/forgot_password.dart';
-import 'package:flutter_application_1/wiew/overview.dart';
+import 'package:flutter_application_1/wiew/dashboard.dart';
 import 'package:flutter_application_1/wiew/register.dart';
 
 class LoginPage extends StatelessWidget {

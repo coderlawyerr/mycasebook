@@ -1,9 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Services/authService.dart';
@@ -13,9 +11,8 @@ import 'package:flutter_application_1/models/product_model.dart';
 import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/photo.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
-import 'package:flutter_application_1/wiew/overview.dart';
+import 'package:flutter_application_1/wiew/dashboard.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:uuid/uuid.dart';
 
 import '../Services/storageService.dart';
 
@@ -33,17 +30,15 @@ class AddProduct extends StatefulWidget {
 }
 
 class _AddProductState extends State<AddProduct> {
-  File? yuklenecekDosya;
+  File? yuklenecekDosya; //yuklenecek dosyayı tutar
 
   FirebaseAuth auth = FirebaseAuth.instance;
   String? indirmeBaglantisi;
-  XFile? selectedImage;
+  XFile? selectedImage; //secılen resmı tutar
   @override
   void initState() {
     super.initState();
   }
-
- 
 
   DataBaseService databaseService = DataBaseService();
 
@@ -111,23 +106,26 @@ class _AddProductState extends State<AddProduct> {
 
                   ///ürün fotografı
                   const CustomTextWidget(text: "Ürün Fotografı"),
+                  // kullanıcı bir ürün fotoğrafı seçtiğinde gerçekleştirilecek işlemleri tanımlar.
+                  Center(
+                    child: ProductPhoto(
+                      onPhotoSelected: (resim) async {
+                        final picker =
+                            ImagePicker(); // ImagePicker nesnesi oluşturuluyor
+                        selectedImage = await picker.pickImage(
+                            source: ImageSource
+                                .gallery); // Kullanıcı galeriden bir resim seçiyor
+                        log("Resim seçildi: ${selectedImage!.path}"); // Seçilen resmin yolunu logluyoruz
 
-                  ProductPhoto(
-                    onPhotoSelected: (resim) async {
-                      final picker = ImagePicker();
-                      selectedImage =
-                          await picker.pickImage(source: ImageSource.gallery);
-                      log("Resim seçildi: ${selectedImage!.path}");
+                        debugPrint("Seçilen resim: ${resim.path}");
 
-                      debugPrint("Seçilen resim: ${resim.path}");
-                      // bir resim seç yeniden seç
-                      // buada zaten resim seçildiğinde dönüyor
-                      yuklenecekDosya = resim;
-                      // resim seçildiğinde b otomatik doldurlacak.
-                      // onayla butonuna bsatığında bu "yuklenecekDosya" değişkeninin dolu olduğunu kontrol et
-                      // dolu ise storageye kaydet
-                      var secilenResim = resim;
-                    },
+                        yuklenecekDosya =
+                            resim; // Seçilen dosyayı yuklenecekDosya değişkenine atıyoruz
+
+                        var secilenResim =
+                            resim; // Seçilen resmi secilenResim değişkenine atıyoruz
+                      },
+                    ),
                   ), //
                   SizedBox(height: 20),
                   Center(
@@ -144,9 +142,10 @@ class _AddProductState extends State<AddProduct> {
                             productAmount.text.isNotEmpty) {
                           //
                           // Eğer işlem ekleme modunda ise
-                          final photoUrl = await StorageService()
-                              .uploadProductImage(
-                                  imagePath: selectedImage); // resmi yükle
+                          final photoUrl =
+                              await StorageService() //// Resmi yükle ve URL'yi al
+                                  .uploadProductImage(
+                                      imagePath: selectedImage); // resmi yükle
                           if (widget.mod == AddProductMod.add) {
                             // Yeni bir ürün modeli oluştur
                             ProductModel product = ProductModel();
@@ -262,7 +261,7 @@ class _AddProductState extends State<AddProduct> {
         decoration: InputDecoration(
           border: InputBorder.none, // İç kenarlık
           contentPadding: EdgeInsets.symmetric(horizontal: 12), // İç boşluk
-          errorStyle: TextStyle(color: Colors.black), // Hata rengi
+          errorStyle: TextStyle(color: Colors.white), // Hata rengi
         ),
         style: TextStyle(color: Colors.white),
       ),

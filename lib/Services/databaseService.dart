@@ -522,8 +522,8 @@ class DataBaseService {
       double total = totalIncome + totalOutcome;
 
       // Veri haritasına gelir ve gider yüzdelerini ekle
-      data["Gelirler - $totalIncome TL"] = (100.0 * totalIncome) / total;
-      data["Giderler - $totalOutcome TL"] = (100.0 * totalOutcome) / total;
+      data["Gelirler : $totalIncome TL"] = (100.0 * totalIncome) / total;
+      data["Giderler : $totalOutcome TL"] = (100.0 * totalOutcome) / total;
 
       // İstatistik verilerini düzenle ve döndür
       return data;

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/Services/authService.dart';
 import 'package:flutter_application_1/Services/databaseService.dart';
 import 'package:flutter_application_1/models/userModel.dart';
-import 'package:flutter_application_1/wiew/overview.dart';
+import 'package:flutter_application_1/wiew/dashboard.dart';
 import 'package:flutter_application_1/wiew/welcome.dart';
 
 class Splash extends StatefulWidget {

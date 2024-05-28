@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-
-
 Widget customTextField({TextEditingController? controller, String? hint}) {
   return Container(
     width: 372,
@@ -26,7 +24,7 @@ Widget customTextField({TextEditingController? controller, String? hint}) {
           borderSide: BorderSide(color: Colors.grey),
           borderRadius: BorderRadius.circular(8),
         ),
-        errorStyle: const TextStyle(color: Colors.black), // Hata mesajı stili
+        errorStyle: const TextStyle(color: Colors.white), // Hata mesajı stili
       ),
       autovalidateMode: AutovalidateMode.always,
       validator: (value) => value!.isEmpty ? "Boş bırakmayınız" : null,
