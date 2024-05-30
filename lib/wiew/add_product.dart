@@ -230,7 +230,7 @@ class _AddProductState extends State<AddProduct> {
                             });
                           }
                         }
-                      },
+                      }, 
                     ),
                   ),
                 ],

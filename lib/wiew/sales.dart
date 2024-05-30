@@ -8,14 +8,19 @@ import 'package:flutter_application_1/models/supliercustomer_model.dart'; // Ted
 import 'package:flutter_application_1/widgets/button.dart'; // Özel düğme bileşeni
 import 'package:flutter_application_1/widgets/dateandclock.dart'; // Tarih ve saat göstergesi bileşeni
 import 'package:flutter_application_1/widgets/dataList.dart'; // Veri listesi bileşeni
+
+import 'package:flutter_application_1/widgets/pdfbutton.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart'; // Özel metin bileşeni
 import 'package:omni_datetime_picker/omni_datetime_picker.dart'; // Tarih/saat seçici
+import 'package:syncfusion_flutter_pdf/pdf.dart';
+// Bu satırı ekleyin
+// Bu satırı ekleyin
+
 import 'dashboard.dart'; // Genel bakış sayfası
 
 // Satış işlemlerinin yapıldığı bileşen
 class Sales extends StatefulWidget {
   const Sales({super.key});
-
   @override
   State<Sales> createState() => _SalesState();
 }
@@ -132,6 +137,13 @@ class _SalesState extends State<Sales> {
                           });
                         }
                       }),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  CustomButtonpdf(
+                    text: "PDF OLUSTUR",
+                  ),
+
                   const SizedBox(height: 8),
                 ] +
 
