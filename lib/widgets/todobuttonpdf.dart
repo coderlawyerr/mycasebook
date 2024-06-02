@@ -11,10 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
-class CustomButtonpdf extends StatelessWidget {
+import '../models/product_model.dart';
+
+class Todobuttonpdf extends StatelessWidget {
   final String text;
-  final ProcessModel? product;
-  const CustomButtonpdf({Key? key, required this.text, required this.product})
+  final ProcessModel? data;
+  const Todobuttonpdf({Key? key, required this.text, required this.data})
       : super(key: key);
 
   @override
@@ -178,6 +180,7 @@ class CustomButtonpdf extends StatelessWidget {
         bounds: Rect.fromLTWH(pageSize.width - 30, pageSize.height - 70, 0, 0));
   }
 
+  // Tablo columnlarınun oluştuğu kısım
   //Create PDF grid and return
   PdfGrid getGrid() {
     //Create a PDF grid
@@ -189,20 +192,16 @@ class CustomButtonpdf extends StatelessWidget {
     //Set style
     headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(68, 114, 196));
     headerRow.style.textBrush = PdfBrushes.white;
-    headerRow.cells[0].value = 'Product Id';
+    headerRow.cells[0].value = 'Islem tipi';
     headerRow.cells[0].stringFormat.alignment = PdfTextAlignment.center;
-    headerRow.cells[1].value = 'Product Name';
-    headerRow.cells[2].value = 'Price';
-    headerRow.cells[3].value = 'Quantity';
-    headerRow.cells[4].value = 'Total';
- 
-    if (product != null) {
-      addProducts(
-        product!.processType.name,
-        product!.product.productName,
-        product!.product.sellPrice,
-        product!.product.productAmount,
-        product!.product.productAmount * product!.product.sellPrice,
+    headerRow.cells[1].value = 'Urun Adeti';
+    headerRow.cells[2].value = 'Alis Adeti';
+    headerRow.cells[3].value = 'Alis Birim Fiyati';
+    headerRow.cells[4].value = 'Toplam Tutar';
+
+    if (data != null) {
+      addProcess(
+        data!,
         grid,
       );
     }
@@ -230,14 +229,17 @@ class CustomButtonpdf extends StatelessWidget {
   }
 
   //Create and row for the grid.
-  void addProducts(String productId, String productName, double price,
-      int quantity, double total, PdfGrid grid) {
+  void addProcess(ProcessModel model, PdfGrid grid) {
     final PdfGridRow row = grid.rows.add();
-    row.cells[0].value = productId;
-    row.cells[1].value = productName;
-    row.cells[2].value = price.toString();
-    row.cells[3].value = quantity.toString();
-    row.cells[4].value = total.toString();
+    row.cells[0].value = model.processType.name;
+
+    ///burayıda mı tur--
+    row.cells[1].value = model.product.productAmount.toString();
+    row.cells[2].value = model.product.productAmount.toString();
+    row.cells[3].value = model.product.buyPrice.toString();
+    row.cells[4].value = (model.product.buyPrice * model.product.productAmount)
+        .toStringAsFixed(2);
+    // burdada değerleri girdiğin yer buraya göre düzenleyebilir misin?
   }
 
   //Get the total amount.

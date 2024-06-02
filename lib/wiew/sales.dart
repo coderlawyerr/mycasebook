@@ -8,21 +8,16 @@ import 'package:flutter_application_1/models/supliercustomer_model.dart'; // Ted
 import 'package:flutter_application_1/widgets/button.dart'; // Özel düğme bileşeni
 import 'package:flutter_application_1/widgets/dateandclock.dart'; // Tarih ve saat göstergesi bileşeni
 import 'package:flutter_application_1/widgets/dataList.dart'; // Veri listesi bileşeni
-
-import 'package:flutter_application_1/widgets/pdfbutton.dart';
+import 'package:flutter_application_1/widgets/salesbuttonpdf.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart'; // Özel metin bileşeni
 import 'package:omni_datetime_picker/omni_datetime_picker.dart'; // Tarih/saat seçici
-import 'package:syncfusion_flutter_pdf/pdf.dart';
-
 import 'dashboard.dart'; // Genel bakış sayfası
-
 // Satış işlemlerinin yapıldığı bileşen
 class Sales extends StatefulWidget {
   const Sales({super.key});
   @override
   State<Sales> createState() => _SalesState();
 }
-
 class _SalesState extends State<Sales> {
   // Değişkenlerin tanımlanması
   double satisFiyati = 0.0; // Satış fiyatı
@@ -38,9 +33,7 @@ class _SalesState extends State<Sales> {
   ProductModel? selectedProduct; // Seçili ürün
   DataBaseService dataBaseService = DataBaseService(); // Veritabanı servisi
   List<ProcessModel> soldProcessList = []; // Satılan işlemlerin listesi
-
   double toplamFiyat = 0.0; // Toplam fiyat
-
   @override
   void initState() {
     // İlk durum ayarı
@@ -61,14 +54,12 @@ class _SalesState extends State<Sales> {
 
     super.initState();
   }
-
   @override
   void dispose() {
     // Kontrolcülerin temizlenmesi
     urunAdetiController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,23 +129,19 @@ class _SalesState extends State<Sales> {
                   SizedBox(
                     height: 20,
                   ),
-                  CustomButtonpdf(
+                  Salesbuttonpdf(
                     text: "PDF OLUSTUR",
                     product: soldProcessList.firstOrNull,
                   ),
-
                   const SizedBox(height: 8),
                 ] +
-
                 // Satılan işlemlerin listesi oluşturuluyor
-
                 dataCardList(context, soldProcessList, 2),
           ),
         ),
       ),
     );
   }
-
   // Üst çubuk bileşeni
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
@@ -177,7 +164,6 @@ class _SalesState extends State<Sales> {
       ),
     );
   }
-
   // Tarih ve saat satırı bileşeni
   Widget _buildDateTimeRow() {
     return Row(

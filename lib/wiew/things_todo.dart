@@ -8,6 +8,7 @@ import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/dataList.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
 import 'package:flutter_application_1/widgets/todo_date.dart';
+import 'package:flutter_application_1/widgets/todobuttonpdf.dart';
 import 'package:flutter_application_1/wiew/dashboard.dart';
 
 class Todo extends StatefulWidget {
@@ -166,11 +167,11 @@ class _MyWidgetState extends State<Todo> {
                     height: 5,
                   ),
                   // "Raporla" butonu oluşturulur.
-                  CustomButton(
+                  Todobuttonpdf(
                       text: "Raporla",
-                      toDo: () => setState(() {
-                            showCards = true;
-                          })),
+                      data:data.firstOrNull
+                      
+                     ),
                   const SizedBox(height: 8),
                 ] +
                 // Kartların gösterilmesi için koşul eklenir.
