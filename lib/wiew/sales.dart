@@ -12,12 +12,14 @@ import 'package:flutter_application_1/widgets/salesbuttonpdf.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart'; // Özel metin bileşeni
 import 'package:omni_datetime_picker/omni_datetime_picker.dart'; // Tarih/saat seçici
 import 'dashboard.dart'; // Genel bakış sayfası
+
 // Satış işlemlerinin yapıldığı bileşen
 class Sales extends StatefulWidget {
   const Sales({super.key});
   @override
   State<Sales> createState() => _SalesState();
 }
+
 class _SalesState extends State<Sales> {
   // Değişkenlerin tanımlanması
   double satisFiyati = 0.0; // Satış fiyatı
@@ -54,12 +56,14 @@ class _SalesState extends State<Sales> {
 
     super.initState();
   }
+
   @override
   void dispose() {
     // Kontrolcülerin temizlenmesi
     urunAdetiController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,7 +130,7 @@ class _SalesState extends State<Sales> {
                           });
                         }
                       }),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                   Salesbuttonpdf(
@@ -142,6 +146,7 @@ class _SalesState extends State<Sales> {
       ),
     );
   }
+
   // Üst çubuk bileşeni
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
@@ -164,6 +169,7 @@ class _SalesState extends State<Sales> {
       ),
     );
   }
+
   // Tarih ve saat satırı bileşeni
   Widget _buildDateTimeRow() {
     return Row(

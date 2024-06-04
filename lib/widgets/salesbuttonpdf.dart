@@ -19,8 +19,8 @@ class Salesbuttonpdf extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: generateInvoice,
+    return GestureDetector(
+      onTap: generateInvoice,
       child: Container(
         width: 274,
         height: 61,
