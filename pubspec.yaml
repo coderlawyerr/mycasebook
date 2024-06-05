@@ -31,6 +31,8 @@ dependencies:
   
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -52,6 +54,8 @@ dependencies:
   syncfusion_flutter_pdf: ^25.2.6
   path_provider: ^2.0.9
   open_file: ^3.2.1
+  flutter_cupertino_date_picker_fork: ^1.0.7
+  flutter_localization: ^0.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

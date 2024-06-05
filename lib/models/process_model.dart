@@ -35,6 +35,8 @@ class ProcessModel {
     }
   }
 
+  get customerId => null;
+
 // İşlem kazancını hesaplayan fonksiyon
   double gelirHesapla() {
     double kazancFiyat = product.productAmount.toDouble() * product.sellPrice;
