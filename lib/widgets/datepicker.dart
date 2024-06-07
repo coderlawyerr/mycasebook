@@ -3,28 +3,34 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 class DatePickerApp extends StatelessWidget {
-  const DatePickerApp({super.key});
+  const DatePickerApp({Key? key, required this.onDateSelected})
+      : super(key: key);
+
+  final void Function(DateTime) onDateSelected;
 
   @override
   Widget build(BuildContext context) {
     return CupertinoApp(
-      // localizationsDelegates: [
-      //   DefaultCupertinoLocalizations.delegate,
-      //   GlobalCupertinoLocalizations.delegate,
-      //   GlobalMaterialLocalizations.delegate,
-      //   GlobalWidgetsLocalizations.delegate,
-      // ],
-      // supportedLocales: [
-      //   const Locale('tr', ''), // Turkish locale
-      // ],
+      localizationsDelegates: [
+        DefaultCupertinoLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('tr', ''), // Turkish locale
+      ],
       theme: CupertinoThemeData(brightness: Brightness.light),
-      home: DatePickerExample(),
+      home: DatePickerExample(onDateSelected: onDateSelected),
     );
   }
 }
 
 class DatePickerExample extends StatefulWidget {
-  const DatePickerExample({super.key});
+  const DatePickerExample({Key? key, required this.onDateSelected})
+      : super(key: key);
+
+  final void Function(DateTime) onDateSelected;
 
   @override
   State<DatePickerExample> createState() => _DatePickerExampleState();
@@ -33,7 +39,6 @@ class DatePickerExample extends StatefulWidget {
 class _DatePickerExampleState extends State<DatePickerExample> {
   DateTime date = DateTime(2016, 10, 26);
   DateTime time = DateTime(2016, 5, 10, 22, 35);
-  DateTime dateTime = DateTime(2016, 8, 3, 17, 45);
 
   void _showDialog(Widget child) {
     showCupertinoModalPopup<void>(
@@ -87,30 +92,6 @@ class _DatePickerExampleState extends State<DatePickerExample> {
                     ),
                     child: Text(
                       '${_getFormattedDate(date)}',
-                      style: const TextStyle(fontSize: 22.0),
-                    ),
-                  ),
-                ],
-              ),
-              _DatePickerItem(
-                children: <Widget>[
-                  const Text(
-                    'Saat Seçiniz',
-                    style: TextStyle(fontSize: 15),
-                  ),
-                  CupertinoButton(
-                    onPressed: () => _showDialog(
-                      CupertinoDatePicker(
-                        initialDateTime: time,
-                        mode: CupertinoDatePickerMode.time,
-                        use24hFormat: true,
-                        onDateTimeChanged: (DateTime newTime) {
-                          setState(() => time = newTime);
-                        },
-                      ),
-                    ),
-                    child: Text(
-                      '${time.hour}:${time.minute}',
                       style: const TextStyle(fontSize: 22.0),
                     ),
                   ),
