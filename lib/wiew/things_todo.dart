@@ -9,9 +9,11 @@ import 'package:flutter_application_1/widgets/button.dart';
 import 'package:flutter_application_1/widgets/dataList.dart';
 import 'package:flutter_application_1/widgets/datepicker.dart';
 import 'package:flutter_application_1/widgets/textwidget.dart';
+import 'package:flutter_application_1/widgets/todo_date.dart';
 import 'package:flutter_application_1/widgets/todobuttonpdf.dart';
 import 'package:flutter_application_1/wiew/dashboard.dart';
 
+////////////////////////////orjinalllll//////////////////
 class Todo extends StatefulWidget {
   const Todo({Key? key}) : super(key: key);
 
@@ -31,7 +33,6 @@ class _MyWidgetState extends State<Todo> {
   double bakiye = 0.0;
 
   bool showCards = false;
-
   List<ProcessModel> data = [];
   List<ProcessModel> filteredData = [];
 
@@ -45,9 +46,10 @@ class _MyWidgetState extends State<Todo> {
     bringProducts();
   }
 
-  void datePickerNotifier(DateTime baslangic) {
+  void datePickerNotifier(DateTime baslangic, DateTime bitis) {
     setState(() {
       baslangicTarihi = baslangic;
+      // Bitis tarihini burada kullanabilirsiniz.
     });
     filterData();
   }
@@ -63,28 +65,17 @@ class _MyWidgetState extends State<Todo> {
             children: [
                   Row(
                     children: [
+                      // Tarih seçici bileşeni ve metin alanı oluşturulur.
+                      const Text(
+                        "Tarih Aralığı Seç",
+                        style: TextStyle(color: Colors.white),
+                      ),
                       const SizedBox(width: 15),
-                      Row(
-                        children: [
-                          const SizedBox(width: 15),
-                          DatePickerExample(
-                            onDateSelected: datePickerNotifier,
-                          ),
-                        ],
+                      DATETODO(
+                        datePickerNotifier: datePickerNotifier,
                       ),
                     ],
                   ),
-                  if (baslangicTarihi != null)
-                    Column(
-                      children: [
-                        const SizedBox(height: 10),
-                        Text(
-                          'Başlangıç Tarihi: ${baslangicTarihi!.toLocal()}',
-                          style: Constants.textStyle,
-                        ),
-                      ],
-                    ),
-                  Constants.sizedbox,
                   _buildDropdownRow(),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -279,13 +270,26 @@ class _MyWidgetState extends State<Todo> {
         bool matchesProduct = selectedProduct == null ||
             process.product.productName == selectedProduct!.productName;
 
-        // Check for any two filters applied
-        int filtersApplied = 0;
-        if (baslangicTarihi != null) filtersApplied++;
-        if (selectedCustomer != null) filtersApplied++;
-        if (selectedProduct != null) filtersApplied++;
+        // Check if at least one filter is applied
+        bool atLeastOneFilterApplied = selectedCustomer != null ||
+            selectedProduct != null ||
+            baslangicTarihi != null;
 
-        return filtersApplied >= 2 &&
+        // If only customer is selected, show all purchases by that customer
+        if (selectedCustomer != null &&
+            selectedProduct == null &&
+            baslangicTarihi == null) {
+          return matchesCustomer;
+        }
+
+        // If only product is selected, show all transactions involving that product
+        if (selectedCustomer == null &&
+            selectedProduct != null &&
+            baslangicTarihi == null) {
+          return matchesProduct;
+        }
+
+        return atLeastOneFilterApplied &&
             matchesDateRange &&
             matchesCustomer &&
             matchesProduct;
