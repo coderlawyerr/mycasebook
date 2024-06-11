@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/process_model.dart';
 
 import 'package:open_file/open_file.dart' as open_file;
@@ -73,20 +75,20 @@ class Salesbuttonpdf extends StatelessWidget {
   PdfLayoutResult drawHeader(PdfPage page, Size pageSize, PdfGrid grid) {
     //Draw rectangle
     page.graphics.drawRectangle(
-        brush: PdfSolidBrush(PdfColor(91, 126, 215)),
+        brush: PdfSolidBrush(PdfColor(170, 170, 21)),
         bounds: Rect.fromLTWH(0, 0, pageSize.width - 115, 90));
-    //Draw string
+    //Draw string0
     page.graphics.drawString(
-        'INVOICE', PdfStandardFont(PdfFontFamily.helvetica, 30),
+        'KASA TAKIP', PdfStandardFont(PdfFontFamily.helvetica, 30),
         brush: PdfBrushes.white,
         bounds: Rect.fromLTWH(25, 0, pageSize.width - 115, 90),
         format: PdfStringFormat(lineAlignment: PdfVerticalAlignment.middle));
 
     page.graphics.drawRectangle(
         bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 90),
-        brush: PdfSolidBrush(PdfColor(65, 104, 205)));
+        brush: PdfSolidBrush(PdfColor(170, 170, 21)));
 
-    page.graphics.drawString(r'$' + getTotalAmount(grid).toString(),
+    page.graphics.drawString(r'TL' + getTotalAmount(grid).toString(),
         PdfStandardFont(PdfFontFamily.helvetica, 18),
         bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 100),
         brush: PdfBrushes.white,
@@ -96,7 +98,7 @@ class Salesbuttonpdf extends StatelessWidget {
 
     final PdfFont contentFont = PdfStandardFont(PdfFontFamily.helvetica, 9);
     //Draw string
-    page.graphics.drawString('Amount', contentFont,
+    page.graphics.drawString('Tutar', contentFont,
         brush: PdfBrushes.white,
         bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 33),
         format: PdfStringFormat(
@@ -108,9 +110,9 @@ class Salesbuttonpdf extends StatelessWidget {
         'Invoice Number: 2058557939\r\n\r\nDate: ${format.format(DateTime.now())}';
     final Size contentSize = contentFont.measureString(invoiceNumber);
     // ignore: leading_newlines_in_multiline_strings
-    const String address = '''Bill To: \r\n\r\nAbraham Swearegin, 
-        \r\n\r\nUnited States, California, San Mateo, 
-        \r\n\r\n9920 BridgePointe Parkway, \r\n\r\n9365550136''';
+    const String address = '''Abraham Swearegin, 
+        \r\n\r\nEreğli,KONYA, 
+        \r\n\r\n, \r\n\r\n9365550136''';
 
     PdfTextElement(text: invoiceNumber, font: contentFont).draw(
         page: page,
@@ -141,7 +143,7 @@ class Salesbuttonpdf extends StatelessWidget {
         page: page, bounds: Rect.fromLTWH(0, result.bounds.bottom + 40, 0, 0))!;
 
     //Draw grand total.
-    page.graphics.drawString('Grand Total',
+    page.graphics.drawString('Genel Toplam',
         PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.bold),
         bounds: Rect.fromLTWH(
             quantityCellBounds!.left,
@@ -158,9 +160,9 @@ class Salesbuttonpdf extends StatelessWidget {
   }
 
   //Draw the invoice footer data.
-  void drawFooter(PdfPage page, Size pageSize) {
+  Future<void> drawFooter(PdfPage page, Size pageSize) async {
     final PdfPen linePen =
-        PdfPen(PdfColor(142, 170, 219), dashStyle: PdfDashStyle.custom);
+        PdfPen(PdfColor(210, 210, 60), dashStyle: PdfDashStyle.custom);
     linePen.dashPattern = <double>[3, 3];
     //Draw line
     page.graphics.drawLine(linePen, Offset(0, pageSize.height - 100),
@@ -168,14 +170,21 @@ class Salesbuttonpdf extends StatelessWidget {
 
     const String footerContent =
         // ignore: leading_newlines_in_multiline_strings
-        '''800 Interchange Blvd.\r\n\r\nSuite 2501, Austin,
-         TX 78721\r\n\r\nAny Questions? support@adventure-works.com''';
+        '''betul@gmail.com''';
 
     //Added 30 as a margin for the layout
     page.graphics.drawString(
         footerContent, PdfStandardFont(PdfFontFamily.helvetica, 9),
         format: PdfStringFormat(alignment: PdfTextAlignment.right),
         bounds: Rect.fromLTWH(pageSize.width - 30, pageSize.height - 70, 0, 0));
+
+    //page.graphics.drawImage(image, bounds)
+    // Resmi ekleyin
+    final ByteData imageData = await rootBundle.load('assets/ss.png');
+    final Uint8List imageBytes = imageData.buffer.asUint8List();
+    final PdfBitmap image = PdfBitmap(imageBytes);
+    page.graphics.drawImage(image,
+        Rect.fromLTWH(pageSize.width - 120, pageSize.height - 90, 100, 50));
   }
 
   //Create PDF grid and return
@@ -187,7 +196,7 @@ class Salesbuttonpdf extends StatelessWidget {
     //Create the header row of the grid.
     final PdfGridRow headerRow = grid.headers.add(1)[0];
     //Set style
-    headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(68, 114, 196));
+    headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(170, 170, 21));
     headerRow.style.textBrush = PdfBrushes.white;
     headerRow.cells[0].value = 'Product Id';
     headerRow.cells[0].stringFormat.alignment = PdfTextAlignment.center;

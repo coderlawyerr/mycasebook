@@ -16,7 +16,6 @@ class CustomTextWidget extends StatelessWidget {
       style: const TextStyle(
         color: Colors.grey,
         fontSize: 18,
-        
       ),
     );
   }

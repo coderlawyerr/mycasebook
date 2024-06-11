@@ -38,6 +38,7 @@ class _MyWidgetState extends State<Todo> {
 
   DateTime? baslangicTarihi;
 
+  DateTime? bitisTarihi;
   @override
   void initState() {
     super.initState();
@@ -49,10 +50,17 @@ class _MyWidgetState extends State<Todo> {
   void datePickerNotifier(DateTime baslangic, DateTime bitis) {
     setState(() {
       baslangicTarihi = baslangic;
-      // Bitis tarihini burada kullanabilirsiniz.
+      bitisTarihi = bitis; // burada bitisTarihi'ni güncelliyoruz
+      filterData();
     });
-    filterData();
   }
+
+  // void datePickerNotifier(DateTime baslangic, DateTime bitis) {
+  //   setState(() {
+  //     baslangicTarihi = baslangic;
+  //     filterData();
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -130,23 +138,10 @@ class _MyWidgetState extends State<Todo> {
                   CustomButton(
                     text: "Raporla",
                     toDo: () {
-                      if ((selectedCustomer != null ||
-                              selectedProduct != null ||
-                              baslangicTarihi != null) &&
-                          (selectedCustomer != null ||
-                              selectedProduct != null ||
-                              baslangicTarihi == null)) {
-                        filterData();
-                        setState(() {
-                          showCards = true;
-                        });
-                      } else {
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(const SnackBar(
-                          content: Text(
-                              "Lütfen filtreleme için en az bir değer seçin."),
-                        ));
-                      }
+                      filterData();
+                      setState(() {
+                        showCards = true;
+                      });
                     },
                   ),
                   const SizedBox(height: 8),
@@ -197,13 +192,13 @@ class _MyWidgetState extends State<Todo> {
   Widget customersDropDown() {
     return DropdownButtonFormField<SuplierCustomerModel>(
       value: selectedCustomer,
-      style: const TextStyle(color: Colors.black),
+      style: const TextStyle(color: Colors.grey),
       hint: const Text(
         "Müşteri Seç",
         style: TextStyle(color: Colors.grey),
       ),
       isExpanded: true,
-      dropdownColor: const Color(0xFF5D5353),
+      dropdownColor: Color.fromARGB(255, 255, 255, 255),
       validator: (value) => value == null ? "Müşteri Seçiniz!" : null,
       autovalidateMode: AutovalidateMode.always,
       items: customers.isEmpty
@@ -262,8 +257,13 @@ class _MyWidgetState extends State<Todo> {
     setState(() {
       filteredData = data.where((process) {
         bool matchesDateRange = baslangicTarihi == null ||
-            process.date
-                .isAfter(baslangicTarihi!.subtract(const Duration(days: 1)));
+            (bitisTarihi == null
+                ? process.date
+                    .isAfter(baslangicTarihi!.subtract(const Duration(days: 1)))
+                : process.date.isAfter(
+                        baslangicTarihi!.subtract(const Duration(days: 1))) &&
+                    process.date
+                        .isBefore(bitisTarihi!.add(const Duration(days: 1))));
 
         bool matchesCustomer = selectedCustomer == null ||
             process.customerName == selectedCustomer!.username;
@@ -273,21 +273,7 @@ class _MyWidgetState extends State<Todo> {
         // Check if at least one filter is applied
         bool atLeastOneFilterApplied = selectedCustomer != null ||
             selectedProduct != null ||
-            baslangicTarihi != null;
-
-        // If only customer is selected, show all purchases by that customer
-        if (selectedCustomer != null &&
-            selectedProduct == null &&
-            baslangicTarihi == null) {
-          return matchesCustomer;
-        }
-
-        // If only product is selected, show all transactions involving that product
-        if (selectedCustomer == null &&
-            selectedProduct != null &&
-            baslangicTarihi == null) {
-          return matchesProduct;
-        }
+            (baslangicTarihi != null && bitisTarihi != null);
 
         return atLeastOneFilterApplied &&
             matchesDateRange &&
