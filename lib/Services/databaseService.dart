@@ -15,7 +15,7 @@ class DataBaseService {
   Future<bool> newUser(Map<String, dynamic> data) async {
     try {
       return await _ref
-          .collection('users2')
+          .collection('user')
           .doc(data['UserID'])
           .set(data)
           .then((value) => true);
@@ -31,7 +31,7 @@ class DataBaseService {
 
   Future<Map<String, dynamic>?> findUserbyID(String userID) async {
     try {
-      return await _ref.collection("users2").doc(userID).get().then((userData) {
+      return await _ref.collection("user").doc(userID).get().then((userData) {
         return userData.data();
       });
     } catch (e) {
@@ -50,7 +50,7 @@ class DataBaseService {
       product.date = DateTime.now().millisecondsSinceEpoch;
 
       DocumentReference productRef = await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection('Products')
           .add(product.toMap());
@@ -66,7 +66,7 @@ class DataBaseService {
 
       // İşlem modelini oluştur ve Firestore'a gönder
       var pref = _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection('Products')
           .doc(product.productID);
@@ -79,13 +79,13 @@ class DataBaseService {
       processModel.processId = AutoIdGenerator.autoId();
 
       await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection('Processes')
           .doc(processModel.processId)
           .set(processModel.toMap());
       // Kullanıcının bakiyesini güncelle (opsiyonel)
-      await _ref.collection('users2').doc(userId).update({
+      await _ref.collection('user').doc(userId).update({
         "bakiye":
             FieldValue.increment(-(product.buyPrice * product.productAmount))
       });
@@ -179,14 +179,14 @@ class DataBaseService {
       processModel.processId = AutoIdGenerator.autoId();
 
       var pref = _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection("Products")
           .doc(processModel.product.productID);
 
       processModel.productRef = pref;
       await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection('Processes')
           .doc(processModel.processId)
@@ -213,7 +213,7 @@ class DataBaseService {
 
       // Firestore'dan belirli bir kullanıcının işlemlerini getirmek için sorgu yapılıyor
       QuerySnapshot<Map<String, dynamic>> processes = await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userID)
           .collection('Processes')
           .where("processType", isEqualTo: tip.index)
@@ -251,7 +251,7 @@ class DataBaseService {
     try {
       List<ProcessModel> processList = [];
       return await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userID)
           .collection('Processes')
           .get()
@@ -279,7 +279,7 @@ class DataBaseService {
     try {
       List<ProductModel> productsList = [];
       return await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userID)
           .collection('Products')
           .get()
@@ -304,7 +304,7 @@ class DataBaseService {
       {required String userId, required SuplierCustomerModel data}) async {
     try {
       return await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection("Customer&Supplier")
           .doc()
@@ -324,7 +324,7 @@ class DataBaseService {
     try {
       List<SuplierCustomerModel> customerlist = [];
       await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userID)
           .collection("Customer&Supplier")
           .get()
@@ -358,7 +358,7 @@ class DataBaseService {
     try {
       List<SuplierCustomerModel> customerlist = [];
       await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userID)
           .collection("Customer&Supplier")
           .where("currentType", isEqualTo: 1)
@@ -388,7 +388,7 @@ class DataBaseService {
       {required String userId, required SuplierCustomerModel data}) async {
     try {
       await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection("Customer&Supplier")
           .doc(data.id)
@@ -408,7 +408,7 @@ class DataBaseService {
       {required String userID, required ProductModel newData}) async {
     try {
       return await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userID)
           .collection("Products")
           .doc(newData.productID)
@@ -430,7 +430,7 @@ class DataBaseService {
     print(data.productID);
     try {
       await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection("Products")
           .doc(data.productID)
@@ -452,7 +452,7 @@ class DataBaseService {
       {required String userId, required SuplierCustomerModel newData}) async {
     try {
       await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection("Customer&Supplier")
           .doc(newData.id)
@@ -471,7 +471,7 @@ class DataBaseService {
       {required String userId, required ProcessModel newData}) async {
     try {
       await _ref
-          .collection('users2')
+          .collection('user')
           .doc(userId)
           .collection("Processes")
           .doc(newData.processId)

@@ -10,7 +10,7 @@ enum IslemTipi { alis, satis }
 class ProcessModel {
   late String processId;
   late DateTime date;
-  late ProductModel product;
+  late ProductModel product; 
   late DocumentReference<Map<String, dynamic>> productRef;
   late String? customerName;
   late KarZarar? profitState;
