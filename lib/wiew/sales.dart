@@ -38,23 +38,18 @@ class _SalesState extends State<Sales> {
   double toplamFiyat = 0.0; // Toplam fiyat
   @override
   void initState() {
-    // İlk durum ayarı
+    super.initState();
     bringCustomers(); // Müşterileri getir
     bringProducts(); // Ürünleri getir
     bringSoldProcesses(); // Satılan işlemleri getir
-    // Ürün adeti kontrolcüsü dinleniyor
     urunAdetiController.addListener(() {
-      // Giriş alanından alınan değer double türüne çeviriliyor
       double? adet = double.tryParse(urunAdetiController.text.trim());
       setState(() {
-        // 'toplamFiyat', satış fiyatı ile adet çarpılarak hesaplanır ve 'toplamFiyat' değişkenine atanır.
         if (adet != null) {
           toplamFiyat = satisFiyati * adet;
         }
       });
     });
-
-    super.initState();
   }
 
   @override
@@ -139,8 +134,9 @@ class _SalesState extends State<Sales> {
                   // ),
                   Salesbuttonpdf(
                     text: "PDF OLUSTUR",
-                    product: soldProcessList.firstOrNull,
+                    products: soldProcessList,
                   ),
+
                   const SizedBox(height: 8),
                 ] +
                 // Satılan işlemlerin listesi oluşturuluyor
@@ -225,7 +221,6 @@ class _SalesState extends State<Sales> {
     );
   }
 
-// Müşteri dropdown bileşeni
   Widget customersDropDown() {
     return DropdownButtonFormField<SuplierCustomerModel>(
       value: selectedCustomer,
@@ -237,17 +232,18 @@ class _SalesState extends State<Sales> {
       isExpanded: true,
       dropdownColor: const Color(0xFF5D5353),
       validator: (value) => value == null ? "Müşteri Seçiniz!" : null,
-
       autovalidateMode: AutovalidateMode.always,
       items: customers.isEmpty
-          ? null
+          ? []
           : customers
               .map((e) => DropdownMenuItem<SuplierCustomerModel>(
                   value: e, child: Text(e.username)))
               .toList(),
+
       onChanged: (selected) {
         setState(() {
           selectedCustomer = selected;
+          print("Selected customer: $selectedCustomer");
         });
       },
       decoration: const InputDecoration(
@@ -261,7 +257,6 @@ class _SalesState extends State<Sales> {
     );
   }
 
-// Ürün dropdown bileşeni
   Widget productsDropDown() {
     return DropdownButtonFormField<ProductModel>(
       value: selectedProduct,
@@ -273,7 +268,7 @@ class _SalesState extends State<Sales> {
       validator: (value) => value == null ? "Ürün Seçiniz!" : null,
       autovalidateMode: AutovalidateMode.always,
       items: products.isEmpty
-          ? null
+          ? []
           : products
               .map((e) => DropdownMenuItem<ProductModel>(
                   value: e, child: Text(e.productName)))
@@ -282,8 +277,8 @@ class _SalesState extends State<Sales> {
         setState(() {
           selectedProduct = selected;
           satisFiyati = selected!.sellPrice;
-          //urunAdetiController.text = "1";
           maxUrunAdeti = selected.productAmount;
+          print("Selected product: $selectedProduct");
         });
       },
       decoration: const InputDecoration(
@@ -387,15 +382,16 @@ class _SalesState extends State<Sales> {
     );
   }
 
-  // Müşteri verilerini getir
   Future<void> bringCustomers() async {
+    print("Fetching customers");
     customers = await dataBaseService
         .fetchCustomerAndSuppliers(AuthService().getCurrentUser()!.uid)
         .whenComplete(() => setState(() {}));
+    print("Customers fetched: $customers");
   }
 
-  // Ürün verilerini getir
   Future<void> bringProducts() async {
+    print("Fetching products");
     products = await dataBaseService
         .fetchProducts(AuthService().getCurrentUser()!.uid)
         .then((val) {
@@ -406,6 +402,7 @@ class _SalesState extends State<Sales> {
       }
       return val;
     }).whenComplete(() => setState(() {}));
+    print("Products fetched: $products");
   }
 
   // Satılan işlemleri getir

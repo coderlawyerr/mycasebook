@@ -145,7 +145,10 @@ class _MyWidgetState extends State<Todo> {
                     },
                   ),
                   const SizedBox(height: 8),
-                  Todobuttonpdf(text: "PDF OLUŞTUR", data: data.firstOrNull),
+                  Todobuttonpdf(
+                    text: "PDF OLUŞTUR",
+                    data: filteredData, // Filtrelenmiş süreçlerin listesi
+                  ),
                 ] +
                 (showCards ? dataCardList(context, filteredData, 1) : []),
           ),
