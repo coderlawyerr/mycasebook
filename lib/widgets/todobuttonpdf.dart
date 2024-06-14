@@ -55,7 +55,7 @@ class Todobuttonpdf extends StatelessWidget {
     final PdfGrid grid = getGrid();
     final PdfLayoutResult result = drawHeader(page, pageSize, grid);
     drawGrid(page, grid, result);
-    drawFooter(page, pageSize);
+    await drawFooter(page, pageSize);
     final List<int> bytes = document.saveSync();
     document.dispose();
     await saveAndLaunchFile(bytes, 'Invoice.pdf');
@@ -89,7 +89,7 @@ class Todobuttonpdf extends StatelessWidget {
         bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 33),
         format: PdfStringFormat(
             alignment: PdfTextAlignment.center,
-            lineAlignment: PdfVerticalAlignment.bottom));
+            lineAlignment: PdfVerticalAlignment.middle));
     final DateFormat format = DateFormat.yMMMMd('en_US');
     final String invoiceNumber =
         'Invoice Number: 2058557939\r\n\r\nDate: ${format.format(DateTime.now())}';
@@ -152,27 +152,30 @@ class Todobuttonpdf extends StatelessWidget {
         footerContent, PdfStandardFont(PdfFontFamily.helvetica, 9),
         format: PdfStringFormat(alignment: PdfTextAlignment.right),
         bounds: Rect.fromLTWH(pageSize.width - 30, pageSize.height - 70, 0, 0));
-    final ByteData imageData = await rootBundle.load('assets/ss.png');
-    final Uint8List imageBytes = imageData.buffer.asUint8List();
-    final PdfBitmap image = PdfBitmap(imageBytes);
-    page.graphics.drawImage(image,
-        Rect.fromLTWH(pageSize.width - 120, pageSize.height - 90, 100, 50));
+    try {
+      final ByteData imageData = await rootBundle.load('assets/ss.png');
+      final Uint8List imageBytes = imageData.buffer.asUint8List();
+      final PdfBitmap image = PdfBitmap(imageBytes);
+      page.graphics.drawImage(image,
+          Rect.fromLTWH(pageSize.width - 120, pageSize.height - 90, 100, 50));
+    } catch (e) {
+      print('Error loading image: $e');
+    }
   }
 
   PdfGrid getGrid() {
     final PdfGrid grid = PdfGrid();
-    grid.columns.add(count: 5);
+    grid.columns.add(count: 6); // Toplam 6 sütun
     final PdfGridRow headerRow = grid.headers.add(1)[0];
     headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(170, 170, 21));
     headerRow.style.textBrush = PdfBrushes.white;
-    headerRow.cells[0].value = 'Islem tipi';
-    headerRow.cells[0].stringFormat.alignment = PdfTextAlignment.center;
-    headerRow.cells[1].value = 'Urun Adeti';
-    headerRow.cells[2].value = 'Alis Adeti';
-    headerRow.cells[3].value = 'Alis Birim Fiyati';
-    headerRow.cells[4].value = 'Toplam Tutar';
+    headerRow.cells[0].value = 'Islem Tipi';
+    headerRow.cells[1].value = 'Tarih';
+    headerRow.cells[2].value = 'Urun Adi';
+    headerRow.cells[3].value = 'Satilan Musteri';
+    headerRow.cells[4].value = 'Kar/Zarar';
+    headerRow.cells[5].value = 'Satis Adedi';
 
-    // Verilen tüm verileri ekle
     for (var model in data) {
       addProcess(model, grid);
     }
@@ -199,12 +202,13 @@ class Todobuttonpdf extends StatelessWidget {
 
   void addProcess(ProcessModel model, PdfGrid grid) {
     final PdfGridRow row = grid.rows.add();
+    final DateFormat format = DateFormat('yyyy-MM-dd');
     row.cells[0].value = model.processType.name;
-    row.cells[1].value = model.product.productAmount.toString();
-    row.cells[2].value = model.product.productAmount.toString();
-    row.cells[3].value = model.product.buyPrice.toString();
-    row.cells[4].value = (model.product.buyPrice * model.product.productAmount)
-        .toStringAsFixed(2);
+    row.cells[1].value = format.format(model.date);
+    row.cells[2].value = model.product.productName;
+    row.cells[3].value = model.customerName ?? 'Bilinmiyor';
+    row.cells[4].value = model.profitState?.name ?? 'Bilinmiyor';
+    row.cells[5].value = model.product.productAmount.toString();
   }
 
   double getTotalAmount(PdfGrid grid) {
@@ -217,7 +221,6 @@ class Todobuttonpdf extends StatelessWidget {
     return total;
   }
 }
-
 
 ///To save the pdf file in the device
 Future<void> saveAndLaunchFile(List<int> bytes, String fileName) async {
