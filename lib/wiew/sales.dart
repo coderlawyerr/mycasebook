@@ -227,10 +227,10 @@ class _SalesState extends State<Sales> {
       style: const TextStyle(color: Colors.black), // Metin rengini siyah yap
       hint: const Text(
         "Müşteri Seç", // Varsayılan metin
-        style: TextStyle(color: Colors.grey),
+        style: TextStyle(color: Colors.white),
       ),
       isExpanded: true,
-      dropdownColor: const Color(0xFF5D5353),
+      dropdownColor: Colors.white,
       validator: (value) => value == null ? "Müşteri Seçiniz!" : null,
       autovalidateMode: AutovalidateMode.always,
       items: customers.isEmpty
@@ -351,7 +351,7 @@ class _SalesState extends State<Sales> {
       width: widthSize(context, 90),
       height: 50,
       decoration: const BoxDecoration(
-        color: Colors.white,
+        color: Colors.grey,
       ),
       child: TextFormField(
         controller: controller,
@@ -362,7 +362,7 @@ class _SalesState extends State<Sales> {
           errorStyle:
               TextStyle(color: Colors.black), // Validator metni için siyah renk
           errorBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.white), // Şeffaf bir çizgi
+            borderSide: BorderSide(color: Colors.grey), // Şeffaf bir çizgi
           ),
         ),
         validator: (value) {

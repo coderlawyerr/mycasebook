@@ -6,8 +6,9 @@ Bu widget, kullanıcının galeriden bir resim seçmesine olanak tanır.
 */
 
 import 'dart:io'; // Dosya işlemleri için gerekli kütüphane
-import 'package:flutter/material.dart'; // Flutter'ın temel widget'ları
-import 'package:image_picker/image_picker.dart'; // Resim seçmek için gerekli kütüphane
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart'; // Flutter'ın temel widget'ları
+
 
 class ProductPhoto extends StatefulWidget {
   final void Function(File)? onPhotoSelected; // Seçilen fotoğrafı geri bildirim olarak göndermek için bir callback fonksiyonu

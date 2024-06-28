@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_application_1/models/process_model.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
@@ -43,34 +45,37 @@ class Salesbuttonpdf extends StatelessWidget {
     final PdfDocument document = PdfDocument();
     final PdfPage page = document.pages.add();
     final Size pageSize = page.getClientSize();
+    // Daha açık gri renk seçimi
+    final PdfColor lightGrayColor = PdfColor(220, 220, 220);
+
     page.graphics.drawRectangle(
         bounds: Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
-        pen: PdfPen(PdfColor(142, 170, 219)));
+        brush: PdfSolidBrush(lightGrayColor), // Gri arka plan rengi
+        pen: PdfPen(PdfColor(41, 53, 60)));
     final PdfGrid grid = getGrid();
     final PdfLayoutResult result = drawHeader(page, pageSize, grid);
     drawGrid(page, grid, result);
-    drawFooter(page, pageSize);
+    await drawFooter(page, pageSize);
     final List<int> bytes = document.saveSync();
     document.dispose();
     await saveAndLaunchFile(bytes, 'Invoice.pdf');
   }
 
-  PdfLayoutResult drawHeader(PdfPage page, 
-  Size pageSize, PdfGrid grid) {
+  PdfLayoutResult drawHeader(PdfPage page, Size pageSize, PdfGrid grid) {
     page.graphics.drawRectangle(
-        brush: PdfSolidBrush(PdfColor(91, 126, 215)),
+        brush: PdfSolidBrush(PdfColor(41, 53, 60)),
         bounds: Rect.fromLTWH(0, 0, pageSize.width - 115, 90));
     page.graphics.drawString(
-        'INVOICE', PdfStandardFont(PdfFontFamily.helvetica, 30),
+        'KASA TAKIP', PdfStandardFont(PdfFontFamily.helvetica, 30),
         brush: PdfBrushes.white,
         bounds: Rect.fromLTWH(25, 0, pageSize.width - 115, 90),
         format: PdfStringFormat(lineAlignment: PdfVerticalAlignment.middle));
 
     page.graphics.drawRectangle(
         bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 90),
-        brush: PdfSolidBrush(PdfColor(65, 104, 205)));
+        brush: PdfSolidBrush(PdfColor(41, 53, 60)));
 
-    page.graphics.drawString(r'$' + getTotalAmount(grid).toString(),
+    page.graphics.drawString(r'TL' + getTotalAmount(grid).toString(),
         PdfStandardFont(PdfFontFamily.helvetica, 18),
         bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 100),
         brush: PdfBrushes.white,
@@ -84,21 +89,18 @@ class Salesbuttonpdf extends StatelessWidget {
         bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 33),
         format: PdfStringFormat(
             alignment: PdfTextAlignment.center,
-            lineAlignment: PdfVerticalAlignment.bottom));
+            lineAlignment: PdfVerticalAlignment.middle));
     final DateFormat format = DateFormat.yMMMMd('en_US');
     final String invoiceNumber =
         'Invoice Number: 2058557939\r\n\r\nDate: ${format.format(DateTime.now())}';
     final Size contentSize = contentFont.measureString(invoiceNumber);
-    const String address = '''Bill To: \r\n\r\nAbraham Swearegin, 
-        \r\n\r\nUnited States, California, San Mateo, 
-        \r\n\r\n9920 BridgePointe Parkway, \r\n\r\n9365550136''';
 
     PdfTextElement(text: invoiceNumber, font: contentFont).draw(
         page: page,
         bounds: Rect.fromLTWH(pageSize.width - (contentSize.width + 30), 120,
             contentSize.width + 30, pageSize.height - 120));
 
-    return PdfTextElement(text: address, font: contentFont).draw(
+    return PdfTextElement(font: contentFont).draw(
         page: page,
         bounds: Rect.fromLTWH(30, 120,
             pageSize.width - (contentSize.width + 30), pageSize.height - 120))!;
@@ -134,21 +136,29 @@ class Salesbuttonpdf extends StatelessWidget {
             totalPriceCellBounds!.height));
   }
 
-  void drawFooter(PdfPage page, Size pageSize) {
+  Future<void> drawFooter(PdfPage page, Size pageSize) async {
     final PdfPen linePen =
-        PdfPen(PdfColor(142, 170, 219), dashStyle: PdfDashStyle.custom);
+        PdfPen(PdfColor(41, 53, 60), dashStyle: PdfDashStyle.custom);
     linePen.dashPattern = <double>[3, 3];
     page.graphics.drawLine(linePen, Offset(0, pageSize.height - 100),
         Offset(pageSize.width, pageSize.height - 100));
 
-    const String footerContent =
-        '''800 Interchange Blvd.\r\n\r\nSuite 2501, Austin,
-         TX 78721\r\n\r\nAny Questions? support@adventure-works.com''';
+    const String footerContent = '''iletisim : betulsensoy@gmail.com''';
 
-    page.graphics.drawString(
-        footerContent, PdfStandardFont(PdfFontFamily.helvetica, 9),
+    page.graphics.drawString(footerContent,
+        PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.bold),
         format: PdfStringFormat(alignment: PdfTextAlignment.right),
-        bounds: Rect.fromLTWH(pageSize.width - 30, pageSize.height - 70, 0, 0));
+        bounds:
+            Rect.fromLTWH(pageSize.width - 350, pageSize.height - 70, 0, 0));
+    try {
+      final ByteData imageData = await rootBundle.load('assets/ss.png');
+      final Uint8List imageBytes = imageData.buffer.asUint8List();
+      final PdfBitmap image = PdfBitmap(imageBytes);
+      page.graphics.drawImage(image,
+          Rect.fromLTWH(pageSize.width - 95, pageSize.height - 95, 90, 85));
+    } catch (e) {
+      print('Error loading image: $e');
+    }
   }
 
   PdfGrid getGrid() {
@@ -220,7 +230,7 @@ class Salesbuttonpdf extends StatelessWidget {
   }
 }
 
-///To save the pdf file in the device
+///kaydet ve acar
 Future<void> saveAndLaunchFile(List<int> bytes, String fileName) async {
   //Get the storage folder location using path_provider package.
   String? path;

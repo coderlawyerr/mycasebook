@@ -49,9 +49,13 @@ class Todobuttonpdf extends StatelessWidget {
     final PdfDocument document = PdfDocument();
     final PdfPage page = document.pages.add();
     final Size pageSize = page.getClientSize();
+    // Daha açık gri renk seçimi
+    final PdfColor lightGrayColor = PdfColor(220, 220, 220);
+
     page.graphics.drawRectangle(
         bounds: Rect.fromLTWH(0, 0, pageSize.width, pageSize.height),
-        pen: PdfPen(PdfColor(142, 170, 219)));
+        brush: PdfSolidBrush(lightGrayColor), // Gri arka plan rengi
+        pen: PdfPen(PdfColor(41, 53, 60)));
     final PdfGrid grid = getGrid();
     final PdfLayoutResult result = drawHeader(page, pageSize, grid);
     drawGrid(page, grid, result);
@@ -60,20 +64,20 @@ class Todobuttonpdf extends StatelessWidget {
     document.dispose();
     await saveAndLaunchFile(bytes, 'Invoice.pdf');
   }
-
+///////bslık
   PdfLayoutResult drawHeader(PdfPage page, Size pageSize, PdfGrid grid) {
     page.graphics.drawRectangle(
-        brush: PdfSolidBrush(PdfColor(170, 170, 21)),
+        brush: PdfSolidBrush(PdfColor(41, 53, 60)),
         bounds: Rect.fromLTWH(0, 0, pageSize.width - 115, 90));
     page.graphics.drawString(
-        'KAS TAKIP', PdfStandardFont(PdfFontFamily.helvetica, 30),
+        'KASA TAKIP', PdfStandardFont(PdfFontFamily.helvetica, 30),
         brush: PdfBrushes.white,
         bounds: Rect.fromLTWH(25, 0, pageSize.width - 115, 90),
         format: PdfStringFormat(lineAlignment: PdfVerticalAlignment.middle));
 
     page.graphics.drawRectangle(
         bounds: Rect.fromLTWH(400, 0, pageSize.width - 400, 90),
-        brush: PdfSolidBrush(PdfColor(170, 170, 21)));
+        brush: PdfSolidBrush(PdfColor(41, 53, 60)));
 
     page.graphics.drawString(r'TL' + getTotalAmount(grid).toString(),
         PdfStandardFont(PdfFontFamily.helvetica, 18),
@@ -94,16 +98,13 @@ class Todobuttonpdf extends StatelessWidget {
     final String invoiceNumber =
         'Invoice Number: 2058557939\r\n\r\nDate: ${format.format(DateTime.now())}';
     final Size contentSize = contentFont.measureString(invoiceNumber);
-    const String address = '''Abraham Swearegin, 
-        \r\n\r\nUnited States, California, San Mateo, 
-        \r\n\r\n9920 BridgePointe Parkway, \r\n\r\n9365550136''';
 
     PdfTextElement(text: invoiceNumber, font: contentFont).draw(
         page: page,
         bounds: Rect.fromLTWH(pageSize.width - (contentSize.width + 30), 120,
             contentSize.width + 30, pageSize.height - 120));
 
-    return PdfTextElement(text: address, font: contentFont).draw(
+    return PdfTextElement(font: contentFont).draw(
         page: page,
         bounds: Rect.fromLTWH(30, 120,
             pageSize.width - (contentSize.width + 30), pageSize.height - 120))!;
@@ -138,26 +139,27 @@ class Todobuttonpdf extends StatelessWidget {
             totalPriceCellBounds!.width,
             totalPriceCellBounds!.height));
   }
-
+///alt
   Future<void> drawFooter(PdfPage page, Size pageSize) async {
     final PdfPen linePen =
-        PdfPen(PdfColor(142, 170, 219), dashStyle: PdfDashStyle.custom);
+        PdfPen(PdfColor(41, 53, 60), dashStyle: PdfDashStyle.custom);
     linePen.dashPattern = <double>[3, 3];
     page.graphics.drawLine(linePen, Offset(0, pageSize.height - 100),
         Offset(pageSize.width, pageSize.height - 100));
 
-    const String footerContent = '''betulsensoy@gmail.com''';
+    const String footerContent = '''iletisim : betulsensoy@gmail.com''';
 
-    page.graphics.drawString(
-        footerContent, PdfStandardFont(PdfFontFamily.helvetica, 9),
+    page.graphics.drawString(footerContent,
+        PdfStandardFont(PdfFontFamily.helvetica, 9, style: PdfFontStyle.bold),
         format: PdfStringFormat(alignment: PdfTextAlignment.right),
-        bounds: Rect.fromLTWH(pageSize.width - 30, pageSize.height - 70, 0, 0));
+        bounds:
+            Rect.fromLTWH(pageSize.width - 350, pageSize.height - 70, 0, 0));
     try {
       final ByteData imageData = await rootBundle.load('assets/ss.png');
       final Uint8List imageBytes = imageData.buffer.asUint8List();
       final PdfBitmap image = PdfBitmap(imageBytes);
       page.graphics.drawImage(image,
-          Rect.fromLTWH(pageSize.width - 120, pageSize.height - 90, 100, 50));
+          Rect.fromLTWH(pageSize.width - 95, pageSize.height - 95, 90, 85));
     } catch (e) {
       print('Error loading image: $e');
     }
@@ -167,7 +169,7 @@ class Todobuttonpdf extends StatelessWidget {
     final PdfGrid grid = PdfGrid();
     grid.columns.add(count: 6); // Toplam 6 sütun
     final PdfGridRow headerRow = grid.headers.add(1)[0];
-    headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(170, 170, 21));
+    headerRow.style.backgroundBrush = PdfSolidBrush(PdfColor(41, 53, 60));
     headerRow.style.textBrush = PdfBrushes.white;
     headerRow.cells[0].value = 'Islem Tipi';
     headerRow.cells[1].value = 'Tarih';

@@ -195,7 +195,7 @@ class _MyWidgetState extends State<Todo> {
   Widget customersDropDown() {
     return DropdownButtonFormField<SuplierCustomerModel>(
       value: selectedCustomer,
-      style: const TextStyle(color: Colors.grey),
+      style: const TextStyle(color: Colors.black),
       hint: const Text(
         "Müşteri Seç",
         style: TextStyle(color: Colors.grey),
